@@ -74,7 +74,7 @@ $(LIB):
 	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
 
 test:   
-	./check_test_vectors.sh -src=$(SRC_DIR)
+	./test.sh -src=$(SRC_DIR)
 
 clean:
 	rm -f $(BIN) $(LIB)

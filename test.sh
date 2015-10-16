@@ -25,8 +25,8 @@ fi
 ARGON2_TYPES=(Argon2d Argon2i Argon2id Argon2ds)
 ARGON2_IMPLEMENTATIONS=(REF OPT)
 
-OUTPUT_PATH=./../../Output/
-TEST_VECTORS_PATH=./../../TestVectors/
+OUTPUT_PATH=./tests/
+TEST_VECTORS_PATH=./tests/
 
 KAT_REF=kat-argon2-ref.log
 KAT_OPT=kat-argon2-opt.log
@@ -85,7 +85,7 @@ do
 		rm -f $kat_file
 
 		run_log=$OUTPUT_PATH"run_"$type"_"$implementation".log"
-		./../../Build/argon2 -gen-tv -type $type > $run_log
+		./argon2 g --type $type > $run_log
 		if [ 0 -ne $? ] ; then
 			echo -e "\t\t -> Wrong! Run error! See $run_log for details!"
 			continue
