@@ -72,9 +72,6 @@ $(LIB):
             $(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) \
 	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
 
-test:   
-	./test.sh -src=$(SRC_DIR)
-
 clean:
 	rm -f $(BIN) $(LIB) kat-argon2* 
 	cd tests &&  rm -f kat-* diff* run_*
