@@ -59,12 +59,10 @@ typedef struct _block
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
 } __attribute__ ((aligned (16))) block;
 #else
-#pragma pack(push, 16)
 typedef struct _block
 {
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} block;
-#pragma pack(pop)
+} __declspec(align(16)) block;
 #endif
 
 /*****************Functions that work with the block******************/
