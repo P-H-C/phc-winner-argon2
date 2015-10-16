@@ -28,10 +28,11 @@
 #define LANES_DEF 4
 #define THREADS_DEF 4
 
+#define UNUSED_PARAMETER(x) (void)(x)
 
-static inline uint64_t rdtsc(uint32_t *aux) {
+static inline uint64_t rdtsc(void) {
 #ifdef _MSC_VER
-	return __rdtsc(aux);
+	return __rdtsc();
 #else
     uint64_t rax, rdx;
     __asm__ __volatile__ ( "rdtsc" : "=a" (rax), "=d" (rdx) : : );
@@ -54,6 +55,7 @@ int CustomAllocateMemory(uint8_t **memory, size_t length) {
  * Custom free memory
  */
 void CustomFreeMemory(uint8_t *memory, size_t length) {
+    UNUSED_PARAMETER(length);
     if (memory) {
         free(memory);
     }
@@ -84,30 +86,29 @@ void Benchmark() {
 			uint32_t thread_n = thread_test[i];
 #ifdef _MEASURE
             uint64_t start_cycles, stop_cycles, stop_cycles_i, stop_cycles_di, stop_cycles_ds;
-            uint32_t ui1, ui2, ui3, ui4, ui5;
 
             clock_t start_time = clock();
-            start_cycles = rdtsc(&ui1);
+            start_cycles = rdtsc();
 #endif
 
             Argon2_Context context = {out, outlen, pwd_array, inlen, salt_array, inlen, 
-				NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false };
+				NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false, false };
             Argon2d(&context);
 
 #ifdef _MEASURE
-            stop_cycles = rdtsc(&ui2);
+            stop_cycles = rdtsc();
 #endif
             Argon2i(&context);
 #ifdef _MEASURE
-            stop_cycles_i = rdtsc(&ui3);
+            stop_cycles_i = rdtsc();
 #endif
             Argon2id(&context);
 #ifdef _MEASURE
-            stop_cycles_di = rdtsc(&ui4);
+            stop_cycles_di = rdtsc();
 #endif
             Argon2ds(&context);
 #ifdef _MEASURE
-            stop_cycles_ds = rdtsc(&ui5);
+            stop_cycles_ds = rdtsc();
             clock_t stop_time = clock();
 
             uint64_t delta_d = (stop_cycles - start_cycles) / (m_cost);
@@ -135,10 +136,9 @@ void Benchmark() {
 void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char* type, bool print) {
 #ifdef _MEASURE
     uint64_t start_cycles, stop_cycles, delta;
-    uint32_t ui1, ui2;
 
     clock_t start_time = clock();
-    start_cycles = rdtsc(&ui1);
+    start_cycles = rdtsc();
 #endif
 
     /*Fixed parameters*/
@@ -155,7 +155,7 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
     uint8_t secret[secret_length];
     uint8_t ad[ad_length];
     
-    
+    UNUSED_PARAMETER(threads);
 
     memset(pwd, 1, pwd_length);
     memset(salt, 2, salt_length);
@@ -192,7 +192,7 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
     
     
 #ifdef _MEASURE
-    stop_cycles = rdtsc(&ui2);
+    stop_cycles = rdtsc();
     clock_t finish_time = clock();
 
     delta = (stop_cycles - start_cycles) / (m_cost);

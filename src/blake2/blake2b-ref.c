@@ -397,6 +397,7 @@ int main( int argc, char **argv )
 int blake2b_long(uint8_t *out, const void *in, const uint32_t outlen, const uint64_t inlen)
 {
 	blake2b_state blake_state;
+  memset(&blake_state, 0, sizeof blake_state);
 	if (outlen <= BLAKE2B_OUTBYTES)
 	{
 		blake2b_init(&blake_state, outlen);
