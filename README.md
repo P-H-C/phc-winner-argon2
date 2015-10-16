@@ -1,4 +1,4 @@
-*WORK IN PROGRESS, DO NOT USE*
+**WORK IN PROGRESS, DO NOT USE**
 
 # Argon2
 
@@ -9,13 +9,20 @@ function that won the [Password Hashing Competition
 You should use Argon2 whenever you need to hash passwords for credential
 storage, key derivation, or other applications.
 
+Argon2 is a family of functions... *(TODO, see which ones to keep)*
+
 Please report bugs as issues on this repository (after searching if
 anyone has already reported it).
 
 ## Usage
 
-Todo
+`make` builds the executable `argon2` and the shared library
+`libargon2.so` (or `libargon2.dylib` on OSX):
 
+`argon2` is a commmand-line utility to test specific Argon2 instances
+  on your system...
+
+Example use of libargon2...
 
 ## Intellectual property
 
