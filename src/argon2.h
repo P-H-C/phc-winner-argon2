@@ -13,8 +13,9 @@
 #ifndef __ARGON2_H__
 #define __ARGON2_H__
 
-#include "stddef.h"
-#include "stdbool.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
 
 /************************* Constants to enable Known Answer Tests (KAT)  **************************************************/
 /* Enable ARGON2_KAT */
@@ -145,7 +146,7 @@ typedef void( *FreeMemoryCallback )( uint8_t *memory, size_t bytes_to_allocate )
  You want to erase the password, but you're OK with last pass not being erased.
  You want to use the default memory allocator.
  Then you initialize
- Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,NULL,NULL,true,false,false).
+ Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,4,NULL,NULL,true,false,false,false).
  */
 typedef struct _Argon2_Context
 {
