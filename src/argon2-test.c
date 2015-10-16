@@ -29,13 +29,13 @@
 #define THREADS_DEF 4
 
 
-static inline uint64_t rdtscp(uint32_t *aux) {
+static inline uint64_t rdtsc(uint32_t *aux) {
 #ifdef _MSC_VER
-	return __rdtscp(aux);
+	return __rdtsc(aux);
 #else
     uint64_t rax, rdx;
-    __asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
-    return (rdx << 32) + rax;
+    __asm__ __volatile__ ( "rdtsc" : "=a" (rax), "=d" (rdx) : : );
+    return (rdx << 32) | rax;
 #endif
 }
 
@@ -87,7 +87,7 @@ void Benchmark() {
             uint32_t ui1, ui2, ui3, ui4, ui5;
 
             clock_t start_time = clock();
-            start_cycles = rdtscp(&ui1);
+            start_cycles = rdtsc(&ui1);
 #endif
 
             Argon2_Context context = {out, outlen, pwd_array, inlen, salt_array, inlen, 
@@ -95,19 +95,19 @@ void Benchmark() {
             Argon2d(&context);
 
 #ifdef _MEASURE
-            stop_cycles = rdtscp(&ui2);
+            stop_cycles = rdtsc(&ui2);
 #endif
             Argon2i(&context);
 #ifdef _MEASURE
-            stop_cycles_i = rdtscp(&ui3);
+            stop_cycles_i = rdtsc(&ui3);
 #endif
             Argon2id(&context);
 #ifdef _MEASURE
-            stop_cycles_di = rdtscp(&ui4);
+            stop_cycles_di = rdtsc(&ui4);
 #endif
             Argon2ds(&context);
 #ifdef _MEASURE
-            stop_cycles_ds = rdtscp(&ui5);
+            stop_cycles_ds = rdtsc(&ui5);
             clock_t stop_time = clock();
 
             uint64_t delta_d = (stop_cycles - start_cycles) / (m_cost);
@@ -138,7 +138,7 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
     uint32_t ui1, ui2;
 
     clock_t start_time = clock();
-    start_cycles = rdtscp(&ui1);
+    start_cycles = rdtsc(&ui1);
 #endif
 
     /*Fixed parameters*/
@@ -192,7 +192,7 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
     
     
 #ifdef _MEASURE
-    stop_cycles = rdtscp(&ui2);
+    stop_cycles = rdtsc(&ui2);
     clock_t finish_time = clock();
 
     delta = (stop_cycles - start_cycles) / (m_cost);
