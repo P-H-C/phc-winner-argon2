@@ -9,56 +9,23 @@
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 #
 
-# Get current dir
-initial_dir=$(pwd)
+TYPES=(d i id ds)
+#IMPLEMENTATIONS=(REF OPT)
+IMPLEMENTATIONS=(REF)
 
-# Get current script path
-script_path=$(dirname $0)
-
-
-# Change current directory to root directory
-if [ '.' != $script_path ] ; then
-	cd $script_path/../
-fi
-
-
-ARGON2_TYPES=(d i id ds)
-ARGON2_IMPLEMENTATIONS=(REF OPT)
-
-OUTPUT_PATH=./tests/
-TEST_VECTORS_PATH=./tests/
+TESTS_PATH=./tests/
 
 KAT_REF=kat-argon2-ref.log
 KAT_OPT=kat-argon2-opt.log
 
 
 # Default arguments
-SOURCE_DIR=$initial_dir
 
-# Parse script arguments
-for i in "$@"
+for implementation in ${IMPLEMENTATIONS[@]}
 do
-	case $i in
-		-s=*|-src=*|--source=*)
-			SOURCE_DIR="${i#*=}"
-			shift
-			;;
-		*)
-			# Unknown option
-			;;
-	esac
-done
+	echo "Testing $implementation implementation"
 
-
-# Change current directory to source directory
-cd $SOURCE_DIR
-
-
-for implementation in ${ARGON2_IMPLEMENTATIONS[@]}
-do
-	echo "Test for $implementation"
-
-	make_log=$OUTPUT_PATH"make_"$implementation".log"
+	make_log=$TESTS_PATH"make_"$implementation".log"
 	rm -f $make_log
 
 	flags=""
@@ -69,47 +36,49 @@ do
 	make $flags &> $make_log
 
 	if [ 0 -ne $? ] ; then
-		echo -e "\t\t -> Wrong! Make error! See $make_log for details!"
+		echo -e "\tFAIL: make error, see $make_log"
 		continue
 	else
+                echo -e "\tbuild OK"
 		rm -f $make_log
 	fi
 
 
-	for type in ${ARGON2_TYPES[@]}
+	for type in ${TYPES[@]}
 	do
-		echo -e "\t Test for $type"
+		echo -e "\t Testing Argon2$type"
 
 		kat_file_name="KAT_"$implementation
 		kat_file=${!kat_file_name}
 		rm -f $kat_file
 
-		run_log=$OUTPUT_PATH"run_"$type"_"$implementation".log"
+		run_log=$TESTS_PATH"run_"$type"_"$implementation".log"
 		./argon2 g --type $type > $run_log
 		if [ 0 -ne $? ] ; then
-			echo -e "\t\t -> Wrong! Run error! See $run_log for details!"
+			echo -e "\t\tFAIL: run error, see $run_log"
 			continue
 		else
 			rm -f $run_log
 		fi
 
-
-		kat_file_copy=$OUTPUT_PATH/${kat_file/"argon2"/$type}
+		kat_file_copy=$TESTS_PATH/${kat_file/"argon2"/$type}
 		cp $kat_file $kat_file_copy
 		rm -f $kat_file
 
-		test_vectors_file=$TEST_VECTORS_PATH$type".txt"
+                echo -e $kat_file_copy
 
-		diff_file=$OUTPUT_PATH"diff_"$type"_"$implementation
+		test_vectors_file=$TESTS_PATH"Argon2"$type".txt"
+                echo -e $test_vectors_file
+
+		diff_file=$TESTS_PATH"diff_"$type"_"$implementation
 		rm -f $diff_file
 
-
 		if diff -Naur $kat_file_copy $test_vectors_file > $diff_file ; then
-			echo -e "\t\t -> OK!"
+			echo -e "\t\t OK"
 			rm -f $kat_file_copy
 			rm -f $diff_file
 		else
-			echo -e "\t\t -> Wrong! See $diff_file for details!"
+			echo -e "\t\tFAIL: wrong values, see $diff_file"
 		fi
 	done
 done
