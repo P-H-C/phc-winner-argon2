@@ -438,22 +438,22 @@ int main( int argc, char **argv )
 /* Argon2 Team - Begin Code */
 int blake2b_long(uint8_t *out, const void *in, const uint32_t outlen, const uint64_t inlen)
 {
-	blake2b_state blake_state;
+	blake2b_state blake_state[1];
 	if (outlen <= BLAKE2B_OUTBYTES)
 	{
-		blake2b_init(&blake_state, outlen);
-		blake2b_update(&blake_state, (const uint8_t*)&outlen, sizeof(uint32_t));
-		blake2b_update(&blake_state, (const uint8_t *)in, inlen);
-		blake2b_final(&blake_state, out, outlen);
+		blake2b_init(blake_state, outlen);
+		blake2b_update(blake_state, (const uint8_t*)&outlen, sizeof(uint32_t));
+		blake2b_update(blake_state, (const uint8_t *)in, inlen);
+		blake2b_final(blake_state, out, outlen);
 	}
 	else
 	{
 		uint8_t out_buffer[BLAKE2B_OUTBYTES];
 		uint8_t in_buffer[BLAKE2B_OUTBYTES];
-		blake2b_init(&blake_state, BLAKE2B_OUTBYTES);
-		blake2b_update(&blake_state, (const uint8_t*)&outlen, sizeof(uint32_t));
-		blake2b_update(&blake_state, (const uint8_t *)in, inlen);
-		blake2b_final(&blake_state, out_buffer, BLAKE2B_OUTBYTES);
+		blake2b_init(blake_state, BLAKE2B_OUTBYTES);
+		blake2b_update(blake_state, (const uint8_t*)&outlen, sizeof(uint32_t));
+		blake2b_update(blake_state, (const uint8_t *)in, inlen);
+		blake2b_final(blake_state, out_buffer, BLAKE2B_OUTBYTES);
 		memcpy(out, out_buffer, BLAKE2B_OUTBYTES / 2);
 		out += BLAKE2B_OUTBYTES / 2;
 		uint32_t toproduce = outlen - BLAKE2B_OUTBYTES / 2;
