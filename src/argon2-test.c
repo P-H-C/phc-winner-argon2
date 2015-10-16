@@ -167,22 +167,22 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
             NULL, NULL,
             clear_password, clear_secret, clear_memory};
 
-    if (strcmp(type,"Argon2d")==0) {
+    if (!strcmp(type,"Argon2d")) {
         printf("Test Argon2d\n");
         Argon2d(&context);
         return;
     }
-    if (strcmp(type,"Argon2i")==0) {
+    if (!strcmp(type,"Argon2i")) {
         printf("Test Argon2i\n");
         Argon2i(&context);
         return;
     }
-    if (strcmp(type,"Argon2ds")==0) {
+    if (!strcmp(type,"Argon2ds")) {
         printf("Test Argon2ds\n");
         Argon2ds(&context);
         return;
     }
-    if (strcmp(type,"Argon2id")==0) {
+    if (!strcmp(type,"Argon2id")) {
         printf("Test Argon2id\n");
         Argon2id(&context);
         return;
@@ -242,22 +242,22 @@ void GenerateTestVectors(const char* type) {
             myown_allocator, myown_deallocator,
             clear_password, clear_secret, clear_memory};
 
-    if (strcmp(type,"Argon2d")==0) {
+    if (!strcmp(type,"Argon2d")) {
         printf("Test Argon2d\n");
         Argon2d(&context);
         return;
     }
-    if (strcmp(type,"Argon2i")==0) {
+    if (!strcmp(type,"Argon2i")) {
         printf("Test Argon2i\n");
         Argon2i(&context);
         return;
     }
-    if (strcmp(type,"Argon2ds")==0) {
+    if (!strcmp(type,"Argon2ds")) {
         printf("Test Argon2ds\n");
         Argon2ds(&context);
         return;
     }
-    if (strcmp(type,"Argon2id")==0) {
+    if (!strcmp(type,"Argon2id")) {
         printf("Test Argon2id\n");
         Argon2id(&context);
         return;
@@ -266,9 +266,10 @@ void GenerateTestVectors(const char* type) {
     printf("Wrong Argon2 type!\n");
 }
 
-void usage(char * cmd) {
+void usage(const char * cmd) {
     printf("usage: %s [options]\n", cmd);
     printf("Options:\n");
+    printf("\t-h, --help\n");
     printf("\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF);
     printf("\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF);
     printf("\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF);
@@ -276,7 +277,12 @@ void usage(char * cmd) {
     printf("\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n");
     printf("\t-g, --gentv\n");
     printf("\t-b, --benchmark\n");
-    printf("\t-h, --help\n");
+}
+
+
+void fatal(const char *error) {
+    fprintf(stderr, "error: %s\n", error);
+    exit(1);
 }
 
 
@@ -309,55 +315,65 @@ int main(int argc, char* argv[]) {
         }
 
 
-        if (strcmp(argv[i], "-logmcost") == 0) {
+        if (!strcmp(a, "-m") || !strcmp(a, "--mcost")) {
             if (i < argc - 1) {
                 i++;
                 m_cost = (uint8_t) 1 << ((uint8_t)atoi(argv[i]) % 24);
                 continue;
             }
+            else 
+                fatal("missing memory cost argument");
         }
 
-        if (strcmp(argv[i], "-tcost") == 0) {
+        if (!strcmp(a, "-t") || !strcmp(a, "--tcost")) {
             if (i < argc - 1) {
                 i++;
                 t_cost = atoi(argv[i]) & 0xffffff;
                 continue;
             }
+            else 
+                fatal("missing time cost argument");
         }
 
-        if (strcmp(argv[i], "-threads") == 0) {
+        if (!strcmp(a, "-p") || !strcmp(a, "--threads"))  {
             if (i < argc - 1) {
                 i++;
                 threads = atoi(argv[i]) % ARGON2_MAX_THREADS;
                 continue;
             }
+            else 
+                fatal("missing threads argument");
         }
         
-        if (strcmp(argv[i], "-lanes") == 0) {
+        if (!strcmp(a, "-l") || !strcmp(a, "--lanes")) {
             if (i < argc - 1) {
                 i++;
                 lanes = atoi(argv[i]) % ARGON2_MAX_LANES;
                 continue;
             }
+            else 
+                fatal("missing lanes argument");
         }
 
 
-        if (strcmp(argv[i], "-type") == 0) {
+        if (!strcmp(a, "-y") || !strcmp(a, "--type")) {
             if (i < argc - 1) {
                 i++;
                 type = argv[i];
                 continue;
             }
+            else
+                fatal("missing type argument");
         }
 
-          if (strcmp(argv[i], "-gen-tv") == 0) {
+          if (!strcmp(a, "-g") || !strcmp(a, "--gen-tv")) {
             generate_test_vectors = true;
             continue;
         }
 
 
 
-        if (strcmp(argv[i], "-benchmark") == 0) {
+        if (!strcmp(a, "-b") || !strcmp(a, "--benchmark")) {
             Benchmark();
             return 0;
         }
