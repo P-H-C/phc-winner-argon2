@@ -9,7 +9,7 @@ int main() {
     memset(salt, 0x00, 16);
 
     // Argon2i with 1 pass and ~50MiB memory usage
-    hash(out, 32, pwd, sizeof(pwd), salt, 16, 1, 50*(1<<10));
+    hash(out, 32, pwd, strlen(pwd), salt, 16, 1, 50*(1<<10));
 
     for(int i=0; i<32; ++i) printf("%02x", out[i]); printf("\n");
 
