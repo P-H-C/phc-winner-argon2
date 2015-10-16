@@ -41,10 +41,9 @@ const char *ARGON2_KAT_FILENAME = "kat-argon2-opt.log";
 #define r16  (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))
 #define r24 (_mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10))
 
-__m128i t0, t1;
-
 void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, const uint64_t *Sbox )
 {
+    __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
     //__m128i state[64];
 
