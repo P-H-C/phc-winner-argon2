@@ -51,7 +51,7 @@ void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, c
 
     for ( uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++ )
     {
-        block_XY[i] = _mm_load_si128( ( __m128i * ) ref_block );
+        block_XY[i] = _mm_loadu_si128( ( __m128i * ) ref_block );
         ref_block += 16;
     }
 
@@ -138,7 +138,7 @@ void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, c
 
     for ( uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++ )
     {
-        _mm_store_si128( ( __m128i * ) next_block, state[i] );
+        _mm_storeu_si128( ( __m128i * ) next_block, state[i] );
         next_block += 16;
     }
 }

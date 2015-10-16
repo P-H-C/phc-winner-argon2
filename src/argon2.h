@@ -29,10 +29,10 @@ extern const char *ARGON2_KAT_FILENAME;
 /*************************Argon2 input parameter restrictions**************************************************/
 
 /* Minimum and maximum number of lanes (degree of parallelism) */
-extern const uint32_t ARGON2_MIN_LANES ;
+extern const uint32_t ARGON2_MIN_LANES;
 extern const uint32_t ARGON2_MAX_LANES;
 
-extern const uint32_t ARGON2_MIN_THREADS ;
+extern const uint32_t ARGON2_MIN_THREADS;
 extern const uint32_t ARGON2_MAX_THREADS;
 
 /* Number of synchronization points between lanes per pass */

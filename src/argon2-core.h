@@ -53,10 +53,19 @@ typedef enum _Argon2_type
  * Structure for the (1KB) memory block implemented as 128 64-bit words.
  * Memory blocks can be copied, XORed. Internal words can be accessed by [] (no bounds checking).
  */
+#ifndef _MSC_VER
+typedef struct _block
+{
+    uint64_t v[ARGON2_WORDS_IN_BLOCK];
+} __attribute__ ((aligned (16))) block;
+#else
+#pragma pack(push, 16)
 typedef struct _block
 {
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
 } block;
+#pragma pack(pop)
+#endif
 
 /*****************Functions that work with the block******************/
 

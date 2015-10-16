@@ -9,7 +9,7 @@
 
 CC = gcc
 BIN = argon2
-REF_CFLAGS = -std=c99 -pthread -O3 -Wall -Wno-unused-function
+REF_CFLAGS = -g -std=c99 -pthread -O3 -Wall -Wno-unused-function
 OPT_CFLAGS = $(REF_CFLAGS) -m64 -mavx
 
 ARGON2_DIR = src
