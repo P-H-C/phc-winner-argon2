@@ -22,7 +22,7 @@ if [ '.' != $script_path ] ; then
 fi
 
 
-ARGON2_TYPES=(Argon2d Argon2i Argon2id Argon2ds)
+ARGON2_TYPES=(d i id ds)
 ARGON2_IMPLEMENTATIONS=(REF OPT)
 
 OUTPUT_PATH=./tests/
