@@ -22,10 +22,8 @@
 //#define ARGON2_KAT_INTERNAL
 
 
-#if defined(ARGON2_KAT) || defined(ARGON2_KAT_INTERNAL)
 /* The KAT file name */
 extern const char* ARGON2_KAT_FILENAME;
-#endif 
 
 
 /*************************Argon2 input parameter restrictions**************************************************/
@@ -175,7 +173,8 @@ typedef struct _Argon2_Context {
     const bool clear_password; //whether to clear the password array
     const bool clear_secret; //whether to clear the secret array
     const bool clear_memory; //whether to clear the memory after the run
-
+    
+    const bool print; //whether to print starting variables, memory blocks, and the tag to the file -- Test vectors only!
     
 } Argon2_Context;
 

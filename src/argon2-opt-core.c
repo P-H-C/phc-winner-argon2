@@ -34,10 +34,8 @@
 #include "../Blake2/blake2.h"
 
 
-#if defined(ARGON2_KAT) || defined(ARGON2_KAT_INTERNAL)
 /* The KAT file name */
 const char* ARGON2_KAT_FILENAME = "kat-argon2-opt.log";
-#endif
 
 
 #define r16  (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))

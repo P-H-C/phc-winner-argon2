@@ -132,7 +132,7 @@ void Benchmark() {
 
 /*Call Argon2 with default salt and password and user-defined parameter values.*/
 
-void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char* type) {
+void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char* type, bool print) {
 #ifdef _MEASURE
     uint64_t start_cycles, stop_cycles, delta;
     uint32_t ui1, ui2;
@@ -165,7 +165,7 @@ void Run(uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_
     Argon2_Context context={out, out_length, pwd, pwd_length, salt, salt_length,
             secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
             NULL, NULL,
-            clear_password, clear_secret, clear_memory};
+            clear_password, clear_secret, clear_memory, print};
 
     if (!strcmp(type,"Argon2d")) {
         printf("Test Argon2d\n");
@@ -213,6 +213,7 @@ void GenerateTestVectors(const char* type) {
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
+    bool print_internals = true;
     unsigned char out[out_length];
     unsigned char pwd[pwd_length];
     unsigned char salt[salt_length];
@@ -231,16 +232,12 @@ void GenerateTestVectors(const char* type) {
     memset(secret, 3, secret_length);
     memset(ad, 4, ad_length);
 
-#if defined(ARGON2_KAT) || defined(ARGON2_KAT_INTERNAL)
     printf("Generate test vectors in file: \"%s\".\n", ARGON2_KAT_FILENAME);
-#else
-    printf("Enable ARGON2_KAT to generate the test vectors.\n");
-#endif
 
     Argon2_Context context={out, out_length, pwd, pwd_length, salt, salt_length,
             secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
             myown_allocator, myown_deallocator,
-            clear_password, clear_secret, clear_memory};
+            clear_password, clear_secret, clear_memory, print_internals};
 
     if (!strcmp(type,"Argon2d")) {
         printf("Test Argon2d\n");
@@ -386,7 +383,7 @@ int main(int argc, char* argv[]) {
     
     /*No benchmark, no test vectors, just run*/
 
-    Run(out,  t_cost, m_cost, lanes, threads, type);
+    Run(out,  t_cost, m_cost, lanes, threads, type, generate_test_vectors);
 
     return 0;
 }

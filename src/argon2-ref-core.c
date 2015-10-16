@@ -25,10 +25,8 @@
 #include "../Blake2/blake2.h"
 
 
-#if defined(ARGON2_KAT) || defined(ARGON2_KAT_INTERNAL)
 /* The KAT file name */
 const char* ARGON2_KAT_FILENAME = "kat-argon2-ref.log";
-#endif
 
 
 void FillBlock(const block* prev_block, const block* ref_block, block* next_block, const uint64_t* Sbox) {

@@ -121,6 +121,7 @@ int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt
     bool c_p=true;
     bool c_s=true;
     bool c_m=false;
+    bool pr=false;
 
     Argon2_Context context = {(uint8_t*) out, (uint32_t) outlen,
             (uint8_t*) in, (uint32_t) inlen,
@@ -128,7 +129,7 @@ int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt
             default_ad_ptr, default_ad_length,
             default_secret_ptr, default_secret_length,
             (uint32_t) t_cost, (uint32_t) m_cost, default_parallelism,default_parallelism,default_a_cbk,default_f_cbk,
-    c_p,c_s,c_m};
+    c_p,c_s,c_m,pr};
 
     return Argon2Core(&context, Argon2_d);
 }

@@ -19,8 +19,6 @@
 
 
 
-#ifdef ARGON2_KAT
-
 void InitialKat(const uint8_t* blockhash, const Argon2_Context* context, Argon2_type type) {
     FILE* fp = fopen(ARGON2_KAT_FILENAME, "a+");
 
@@ -107,10 +105,6 @@ void PrintTag(const void* out, uint32_t outlen) {
         fclose(fp);
     }
 }
-#endif
-
-
-#ifdef ARGON2_KAT_INTERNAL
 
 void InternalKat(const Argon2_instance_t* instance, uint32_t pass) {
     FILE* fp = fopen(ARGON2_KAT_FILENAME, "a+");
@@ -125,4 +119,3 @@ void InternalKat(const Argon2_instance_t* instance, uint32_t pass) {
         fclose(fp);
     }
 }
-#endif

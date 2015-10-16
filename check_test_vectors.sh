@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # Argon2 source code package
 # 
@@ -8,6 +9,8 @@
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 #
 
+# Get current dir
+initial_dir=$(pwd)
 
 # Get current script path
 script_path=$(dirname $0)
@@ -22,11 +25,15 @@ fi
 ARGON2_TYPES=(Argon2d Argon2i Argon2id Argon2ds)
 ARGON2_IMPLEMENTATIONS=(REF OPT)
 
-TEST_PATH=./test/
+OUTPUT_PATH=./../../Output/
+TEST_VECTORS_PATH=./../../TestVectors/
 
 KAT_REF=kat-argon2-ref.log
 KAT_OPT=kat-argon2-opt.log
 
+
+# Default arguments
+SOURCE_DIR=$initial_dir
 
 # Parse script arguments
 for i in "$@"
@@ -51,7 +58,7 @@ for implementation in ${ARGON2_IMPLEMENTATIONS[@]}
 do
 	echo "Test for $implementation"
 
-	make_log=$TEST_PATH"make_"$implementation".log"
+	make_log=$OUTPUT_PATH"make_"$implementation".log"
 	rm -f $make_log
 
 	flags=""
@@ -77,8 +84,8 @@ do
 		kat_file=${!kat_file_name}
 		rm -f $kat_file
 
-		run_log=$TEST_PATH"run_"$type"_"$implementation".log"
-		./../../Build/argon2-tv -gen-tv -type $type > $run_log
+		run_log=$OUTPUT_PATH"run_"$type"_"$implementation".log"
+		./../../Build/argon2 -gen-tv -type $type > $run_log
 		if [ 0 -ne $? ] ; then
 			echo -e "\t\t -> Wrong! Run error! See $run_log for details!"
 			continue
@@ -87,13 +94,13 @@ do
 		fi
 
 
-		kat_file_copy=$TEST_PATH/${kat_file/"argon2"/$type}
+		kat_file_copy=$OUTPUT_PATH/${kat_file/"argon2"/$type}
 		cp $kat_file $kat_file_copy
 		rm -f $kat_file
 
-		test_vectors_file=$TEST_PATH$type".txt"
+		test_vectors_file=$TEST_VECTORS_PATH$type".txt"
 
-		diff_file=$TEST_PATH"diff_"$type"_"$implementation
+		diff_file=$OUTPUT_PATH"diff_"$type"_"$implementation
 		rm -f $diff_file
 
 

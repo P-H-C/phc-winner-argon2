@@ -82,6 +82,7 @@ typedef struct _Argon2_instance_t {
     const uint32_t threads;
     const Argon2_type type;
     uint64_t *Sbox; //S-boxes for Argon2_ds
+    const bool print_internals;  //whether to print the memory blocks
 }Argon2_instance_t;
 
 

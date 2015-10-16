@@ -38,8 +38,6 @@
 #if defined(__clang__)
 #if __has_attribute(optnone)
 #define NOT_OPTIMIZED __attribute__((optnone))
-#else
-#define NOT_OPTIMIZED
 #endif
 #elif defined(__GNUC__)
 #define GCC_VERSION (__GNUC__ * 10000 \
@@ -48,10 +46,10 @@
 #if GCC_VERSION >= 40400
 #define NOT_OPTIMIZED __attribute__((optimize("O0")))
 #endif
-#else 
+#endif
+#ifndef NOT_OPTIMIZED
 #define NOT_OPTIMIZED
 #endif
-
 
 /***************Instance and Position constructors**********/
 void InitBlockValue(block* b, uint8_t in){
@@ -157,9 +155,9 @@ void Finalize(const Argon2_Context *context, Argon2_instance_t* instance) {
         // Hash the result
         blake2b_long(context->out, (uint8_t*) blockhash.v, context->outlen, ARGON2_BLOCK_SIZE);
         secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); //clear the blockhash
-#ifdef ARGON2_KAT
-        PrintTag(context->out, context->outlen);
-#endif 
+        if(context->print){ //Shall we print the output tag?
+            PrintTag(context->out, context->outlen);
+        }
 
         // Clear memory
         ClearMemory(instance, context->clear_memory);
@@ -229,59 +227,61 @@ uint32_t IndexAlpha(const Argon2_instance_t* instance, const Argon2_position_t* 
 }
 
 void FillMemoryBlocks(Argon2_instance_t* instance) {
-    if (instance != NULL) {
-        for (uint32_t r = 0; r < instance->passes; ++r) {
-            if (Argon2_ds == instance->type) {
-                GenerateSbox(instance);
-            }
-            for (uint8_t s = 0; s < ARGON2_SYNC_POINTS; ++s) {
-                //1. Allocating space for threads
-                pthread_t* thread = malloc(sizeof(pthread_t)*(instance->lanes));
-                Argon2_thread_data* thr_data = malloc(sizeof(Argon2_thread_data)*(instance->lanes));
-                pthread_attr_t attr;
-                int rc;
-                void* status;
-                pthread_attr_init(&attr);
-                pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
-                
-                //2. Calling threads 
-                for (uint32_t l = 0; l < instance->lanes; ++l) {
-                    //2.1 Join a thread if limit is exceeded
-                    if(l>=instance->threads){
-                        rc=pthread_join(thread[l-instance->threads],&status);
-                        if (rc) {
-                            printf("ERROR; return code from pthread_join() is %d\n", rc);
-                            exit(-1);
-                        }
-                    }
-                    
-                    //2.2 Create thread
-                    Argon2_position_t position = {r,l,s,0};
-                    thr_data[l].instance_ptr = instance;//preparing the thread input
-                    memcpy(&(thr_data[l].pos), &position, sizeof(Argon2_position_t));
-                    rc =pthread_create(&thread[l],&attr,FillSegmentThr,(void*)&thr_data[l]);
-                    
-                    
-                    //FillSegment(instance, position);  //Non-thread equivalent of the lines above
-                }
+    if (instance == NULL) {
+        return;
+    }
+    for (uint32_t r = 0; r < instance->passes; ++r) {
+        if (Argon2_ds == instance->type) {
+            GenerateSbox(instance);
+        }
+        for (uint8_t s = 0; s < ARGON2_SYNC_POINTS; ++s) {
+            //1. Allocating space for threads
+            pthread_t* thread = malloc(sizeof(pthread_t)*(instance->lanes));
+            Argon2_thread_data* thr_data = malloc(sizeof(Argon2_thread_data)*(instance->lanes));
+            pthread_attr_t attr;
+            int rc;
+            void* status;
+            pthread_attr_init(&attr);
+            pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE);
 
-                //3. Joining remaining threads
-                for (uint32_t l = instance->lanes - instance->threads; l < instance->lanes; ++l) {
-                    rc=pthread_join(thread[l],&status);
+            //2. Calling threads 
+            for (uint32_t l = 0; l < instance->lanes; ++l) {
+                //2.1 Join a thread if limit is exceeded
+                if(l>=instance->threads){
+                    rc=pthread_join(thread[l-instance->threads],&status);
                     if (rc) {
                         printf("ERROR; return code from pthread_join() is %d\n", rc);
                         exit(-1);
                     }
                 }
-                free(thread);
-                pthread_attr_destroy(&attr);
-                free(thr_data);
+
+                //2.2 Create thread
+                Argon2_position_t position = {r,l,s,0};
+                thr_data[l].instance_ptr = instance;//preparing the thread input
+                memcpy(&(thr_data[l].pos), &position, sizeof(Argon2_position_t));
+                rc =pthread_create(&thread[l],&attr,FillSegmentThr,(void*)&thr_data[l]);
+
+
+                //FillSegment(instance, position);  //Non-thread equivalent of the lines above
             }
-#ifdef ARGON2_KAT_INTERNAL
-            InternalKat(instance, r);
-#endif
+
+            //3. Joining remaining threads
+            for (uint32_t l = instance->lanes - instance->threads; l < instance->lanes; ++l) {
+                rc=pthread_join(thread[l],&status);
+                if (rc) {
+                    printf("ERROR; return code from pthread_join() is %d\n", rc);
+                    exit(-1);
+                }
+            }
+            free(thread);
+            pthread_attr_destroy(&attr);
+            free(thr_data);
+        }
+        if(instance->print_internals){
+            InternalKat(instance, r); // Print all memory blocks
         }
     }
+
     
 }
 
@@ -498,9 +498,9 @@ int Initialize(Argon2_instance_t* instance, Argon2_Context* context) {
     // Zeroing 8 extra bytes
     secure_wipe_memory(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, ARGON2_PREHASH_SEED_LENGTH - ARGON2_PREHASH_DIGEST_LENGTH);
 
-#ifdef ARGON2_KAT
-    InitialKat(blockhash, context, instance->type);
-#endif
+    if(context->print){
+        InitialKat(blockhash, context, instance->type);
+    }
 
     // 3. Creating first blocks, we always have at least two blocks in a slice
     FillFirstBlocks(blockhash, instance);
@@ -527,10 +527,11 @@ int Argon2Core(Argon2_Context* context, Argon2_type type) {
         memory_blocks = 2 * ARGON2_SYNC_POINTS * context->lanes;
     }
     uint32_t segment_length = memory_blocks / (context->lanes * ARGON2_SYNC_POINTS);
+    bool print_internals = context->print;
     // Ensure that all segments have equal length
     memory_blocks = segment_length * (context->lanes * ARGON2_SYNC_POINTS);
 	Argon2_instance_t instance = { NULL, context->t_cost, memory_blocks, segment_length, 
-        segment_length * ARGON2_SYNC_POINTS, context->lanes, context->threads, type, NULL };
+        segment_length * ARGON2_SYNC_POINTS, context->lanes, context->threads, type, NULL,print_internals };
 
     /* 3. Initialization: Hashing inputs, allocating memory, filling first blocks */
     result = Initialize(&instance, context);

@@ -8,13 +8,14 @@
 #
 
 CC = gcc
+BIN = argon2
 REF_CFLAGS = -std=c99 -pthread -O3 -Wall -Wno-unused-function
 OPT_CFLAGS = $(REF_FLAGS) -m64 -mavx
 
-ARGON2_DIR = ./src
-BLAKE2_DIR = ./src/blake2
-BUILD_DIR = ./build
-TEST_DIR = ./test
+ARGON2_DIR = src
+BLAKE2_DIR = src/blake2
+BUILD_DIR = build
+TEST_DIR = test
 
 ARGON2_SRC = argon2.c argon2-core.c kat.c
 BLAKE2_SRC = blake2b-ref.c
@@ -22,7 +23,6 @@ OPT_SRC = argon2-opt-core.c
 REF_SRC = argon2-ref-core.c
 TEST_SRC = argon2-test.c
 
-LIB_NAME=argon2
 
 ARGON2_BUILD_SRC = $(addprefix $(ARGON2_DIR)/,$(ARGON2_SRC))
 BLAKE2_BUILD_SRC = $(addprefix $(BLAKE2_DIR)/,$(BLAKE2_SRC))
@@ -41,10 +41,11 @@ endif
 
 SRC_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-BUILD_DIR_PATH := $(shell pwd)/$(BUILD_DIR)
+BUILD_DIR_PATH := $(shell pwd)
 
 SYSTEM_KERNEL_NAME := $(shell uname -s)
 
+LIB_NAME=argon2
 ifeq ($(SYSTEM_KERNEL_NAME), Linux)
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
@@ -56,35 +57,24 @@ ifeq ($(SYSTEM_KERNEL_NAME), Darwin)
 	LIB_PATH := -Xlinker -rpath -Xlinker $(BUILD_DIR_PATH)
 endif
 
-.PHONY: clean genkat lib test
+LIB := lib$(LIB_NAME).$(LIB_EXT)
 
-all:  argon2 genkat lib 
+.PHONY: clean test
 
-argon2:
-	mkdir -p $(BUILD_DIR)
+all: clean $(BIN) $(LIB)
+
+$(BIN):
 	$(CC) $(CFLAGS) \
-		$(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) $(TEST_BUILD_SRC) \
-		-I$(ARGON2_DIR) -I$(BLAKE2_DIR) \
-		-o $(BUILD_DIR)/$@
+            $(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) $(TEST_BUILD_SRC) \
+	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
 
-genkat:
-	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) \
-		-DARGON2_KAT -DARGON2_KAT_INTERNAL \
-		$(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) $(TEST_BUILD_SRC) \
-		-I$(ARGON2_DIR) -I$(BLAKE2_DIR) \
-		-o $(BUILD_DIR)/$@
-
-lib:
-	mkdir -p $(BUILD_DIR)
+$(LIB):
 	$(CC) $(CFLAGS) $(LIB_CFLAGS) \
-		$(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) \
-		-I$(ARGON2_DIR) -I$(BLAKE2_DIR) \
-		-o $(BUILD_DIR)/lib$(LIB_NAME).$(LIB_EXT)
+            $(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) \
+	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
 
-test:   genkat
+test:   
 	./check_test_vectors.sh -src=$(SRC_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR)/
-	rm -f $(TEST_DIR)/run_*
+	rm -f $(BIN) $(LIB)
