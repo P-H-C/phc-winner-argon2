@@ -1,10 +1,10 @@
 /*
  * Argon2 source code package
- * 
+ *
  * Written by Daniel Dinu and Dmitry Khovratovich, 2015
- * 
+ *
  * This work is licensed under a Creative Commons CC0 1.0 License/Waiver.
- * 
+ *
  * You should have received a copy of the CC0 Public Domain Dedication along with
  * this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
@@ -23,7 +23,7 @@
 
 
 /* The KAT file name */
-extern const char* ARGON2_KAT_FILENAME;
+extern const char *ARGON2_KAT_FILENAME;
 
 
 /*************************Argon2 input parameter restrictions**************************************************/
@@ -68,7 +68,8 @@ extern const uint32_t ARGON2_MIN_SECRET ;
 extern const uint32_t ARGON2_MAX_SECRET ;
 
 /************************* Error codes *********************************************************************************/
-typedef enum _Argon2_ErrorCodes {
+typedef enum _Argon2_ErrorCodes
+{
     ARGON2_OK = 0,
 
     ARGON2_OUTPUT_PTR_NULL = 1,
@@ -111,7 +112,7 @@ typedef enum _Argon2_ErrorCodes {
     ARGON2_INCORRECT_TYPE = 26,
 
     ARGON2_OUT_PTR_MISMATCH = 27,
-            
+
     ARGON2_THREADS_TOO_FEW = 28,
     ARGON2_THREADS_TOO_MANY = 29,
 
@@ -121,14 +122,14 @@ typedef enum _Argon2_ErrorCodes {
 
 
 /********************************************* Memory allocator types --- for external allocation *************************************************************/
-typedef int (*AllocateMemoryCallback)(uint8_t **memory, size_t bytes_to_allocate);
-typedef void(*FreeMemoryCallback)(uint8_t *memory, size_t bytes_to_allocate);
+typedef int ( *AllocateMemoryCallback )( uint8_t **memory, size_t bytes_to_allocate );
+typedef void( *FreeMemoryCallback )( uint8_t *memory, size_t bytes_to_allocate );
 
 /********************************************* Argon2 external data structures*************************************************************/
 
 /*
- *****Context: structure to hold Argon2 inputs: 
- * output array and its length, 
+ *****Context: structure to hold Argon2 inputs:
+ * output array and its length,
  * password and its length,
  * salt and its length,
  * secret and its length,
@@ -146,7 +147,8 @@ typedef void(*FreeMemoryCallback)(uint8_t *memory, size_t bytes_to_allocate);
  Then you initialize
  Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,NULL,NULL,true,false,false).
  */
-typedef struct _Argon2_Context {
+typedef struct _Argon2_Context
+{
     uint8_t *out; //output array
     const uint32_t outlen; //digest length
 
@@ -173,9 +175,9 @@ typedef struct _Argon2_Context {
     const bool clear_password; //whether to clear the password array
     const bool clear_secret; //whether to clear the secret array
     const bool clear_memory; //whether to clear the memory after the run
-    
+
     const bool print; //whether to print starting variables, memory blocks, and the tag to the file -- Test vectors only!
-    
+
 } Argon2_Context;
 
 
@@ -193,15 +195,15 @@ typedef struct _Argon2_Context {
  * @pre    @a saltlen must be at least @saltlen bytes long
  * @return Zero if successful, 1 otherwise.
  */
-extern  int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
-        unsigned int t_cost, unsigned int m_cost);
+extern  int PHS( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
+                 unsigned int t_cost, unsigned int m_cost );
 
 /*
  * **************Argon2d: Version of Argon2 that picks memory blocks depending on the password and salt. Only for side-channel-free environment!!***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2d(Argon2_Context* context);
+extern int Argon2d( Argon2_Context *context );
 
 /*
  *  * **************Argon2i: Version of Argon2 that picks memory blocks independent on the password and salt. Good for side-channels,
@@ -210,21 +212,21 @@ extern int Argon2d(Argon2_Context* context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2i(Argon2_Context* context);
+extern int Argon2i( Argon2_Context *context );
 
 /*
  *   * **************Argon2di: Reserved name***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2di(Argon2_Context* context);
+extern int Argon2di( Argon2_Context *context );
 
 /*
  *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20% slower***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2ds(Argon2_Context* context);
+extern int Argon2ds( Argon2_Context *context );
 
 
 /*
@@ -233,7 +235,7 @@ extern int Argon2ds(Argon2_Context* context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2id(Argon2_Context* context);
+extern int Argon2id( Argon2_Context *context );
 
 /*
  * Verify if a given password is correct for Argon2d hashing
@@ -241,12 +243,12 @@ extern int Argon2id(Argon2_Context* context);
  * @param  hash  The password hash to verify. The length of the hash is specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int VerifyD(Argon2_Context* context, const char *hash);
+extern int VerifyD( Argon2_Context *context, const char *hash );
 
 /*
  * Get the associated error message for given error code
  * @return  The error message associated with the given error code
  */
-const char* ErrorMessage(int error_code);
+const char *ErrorMessage( int error_code );
 
 #endif
