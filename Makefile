@@ -77,4 +77,4 @@ test:
 	./test.sh -src=$(SRC_DIR)
 
 clean:
-	rm -f $(BIN) $(LIB)
+	rm -f $(BIN) $(LIB) kat-argon2*
