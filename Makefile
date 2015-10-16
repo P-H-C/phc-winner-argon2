@@ -15,7 +15,6 @@ OPT_CFLAGS = $(REF_FLAGS) -m64 -mavx
 ARGON2_DIR = src
 BLAKE2_DIR = src/blake2
 BUILD_DIR = build
-TEST_DIR = test
 
 ARGON2_SRC = argon2.c argon2-core.c kat.c
 BLAKE2_SRC = blake2b-ref.c
@@ -77,4 +76,5 @@ test:
 	./test.sh -src=$(SRC_DIR)
 
 clean:
-	rm -f $(BIN) $(LIB) kat-argon2*
+	rm -f $(BIN) $(LIB) kat-argon2* 
+	cd tests &&  rm -f kat-* diff* run_*

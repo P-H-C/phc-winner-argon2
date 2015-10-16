@@ -78,7 +78,7 @@ void usage( const char *cmd )
     printf( "\tg\tgenerates test vectors for given Argon2 type\n" );
     printf( "\tb\tbenchmarks various Argon2 versions\n" );
     printf( "Parameters (for run mode):\n" );
-    printf( "\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n" );
+    printf( "\t-y, --type [d | i | id | ds]\n" );
     printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
     printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
@@ -213,17 +213,17 @@ void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
                             };
-    printf("%s with\n", type);
+    printf("Argon2%s with\n", type);
     printf("\tt_cost = %d\n", t_cost);
     printf("\tm_cost = %d\n", m_cost);
     printf("\tpassword = "); print_bytes(pwd, pwd_length);
     printf("\tsalt = "); print_bytes(salt, salt_length);
 
-    if ( !strcmp( type,"Argon2d" ) )  Argon2d( &context );
-    else if ( !strcmp( type,"Argon2i" ) ) Argon2i( &context );
-    else if ( !strcmp( type,"Argon2ds" ) ) Argon2ds( &context );
-    else if ( !strcmp( type,"Argon2id" ) ) Argon2id( &context );
-    else  printf( "Wrong Argon2 type!\n" );
+    if ( !strcmp( type,"d" ) )  Argon2d( &context );
+    else if ( !strcmp( type,"i" ) ) Argon2i( &context );
+    else if ( !strcmp( type,"ds" ) ) Argon2ds( &context );
+    else if ( !strcmp( type,"id" ) ) Argon2id( &context );
+    else fatal( "wrong Argon2 type" );
 
 
 #ifdef _MEASURE
@@ -269,7 +269,7 @@ void GenerateTestVectors( const char *type )
     memset( secret, 3, secret_length );
     memset( ad, 4, ad_length );
 
-    printf( "Generate test vectors for %s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
+    printf( "Generate test vectors for Argon2%s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
 
     Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
                              secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
@@ -277,11 +277,11 @@ void GenerateTestVectors( const char *type )
                              clear_password, clear_secret, clear_memory, print_internals
                             };
 
-    if ( !strcmp( type,"Argon2d" ) ) Argon2d( &context );
-    else if ( !strcmp( type,"Argon2i" ) ) Argon2i( &context );
-    else if ( !strcmp( type,"Argon2ds" ) ) Argon2ds( &context );
-    else if ( !strcmp( type,"Argon2id" ) ) Argon2id( &context );
-    else  printf( "Wrong Argon2 type!\n" );
+    if ( !strcmp( type,"d" ) ) Argon2d( &context );
+    else if ( !strcmp( type,"i" ) ) Argon2i( &context );
+    else if ( !strcmp( type,"ds" ) ) Argon2ds( &context );
+    else if ( !strcmp( type,"id" ) ) Argon2id( &context );
+    else  fatal( "wrong Argon2 type" );
 }
 
 int main( int argc, char *argv[] )
@@ -294,7 +294,7 @@ int main( int argc, char *argv[] )
     uint32_t threads = THREADS_DEF;
 
     bool generate_test_vectors = false;
-    const char *type= "Argon2d";
+    const char *type= "d";
 
     remove( ARGON2_KAT_FILENAME );
 
