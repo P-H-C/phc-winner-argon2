@@ -1,3 +1,3 @@
-# PHC winner: Argon2
+# Argon2
 
-Soon
+Work in progress, do not use 
