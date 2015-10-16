@@ -22,8 +22,7 @@ fi
 ARGON2_TYPES=(Argon2d Argon2i Argon2id Argon2ds)
 ARGON2_IMPLEMENTATIONS=(REF OPT)
 
-OUTPUT_PATH=./../../Output/
-TEST_VECTORS_PATH=./../../TestVectors/
+TEST_PATH=./test/
 
 KAT_REF=kat-argon2-ref.log
 KAT_OPT=kat-argon2-opt.log
@@ -52,7 +51,7 @@ for implementation in ${ARGON2_IMPLEMENTATIONS[@]}
 do
 	echo "Test for $implementation"
 
-	make_log=$OUTPUT_PATH"make_"$implementation".log"
+	make_log=$TEST_PATH"make_"$implementation".log"
 	rm -f $make_log
 
 	flags=""
@@ -78,7 +77,7 @@ do
 		kat_file=${!kat_file_name}
 		rm -f $kat_file
 
-		run_log=$OUTPUT_PATH"run_"$type"_"$implementation".log"
+		run_log=$TEST_PATH"run_"$type"_"$implementation".log"
 		./../../Build/argon2-tv -gen-tv -type $type > $run_log
 		if [ 0 -ne $? ] ; then
 			echo -e "\t\t -> Wrong! Run error! See $run_log for details!"
@@ -88,13 +87,13 @@ do
 		fi
 
 
-		kat_file_copy=$OUTPUT_PATH/${kat_file/"argon2"/$type}
+		kat_file_copy=$TEST_PATH/${kat_file/"argon2"/$type}
 		cp $kat_file $kat_file_copy
 		rm -f $kat_file
 
-		test_vectors_file=$TEST_VECTORS_PATH$type".txt"
+		test_vectors_file=$TEST_PATH$type".txt"
 
-		diff_file=$OUTPUT_PATH"diff_"$type"_"$implementation
+		diff_file=$TEST_PATH"diff_"$type"_"$implementation
 		rm -f $diff_file
 
 

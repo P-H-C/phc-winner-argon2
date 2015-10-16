@@ -12,8 +12,9 @@ REF_CFLAGS = -std=c99 -pthread -O3 -Wall
 OPT_CFLAGS = -std=c99 -pthread -O3 -m64 -mavx -Wall
 
 ARGON2_DIR = ./src/
-BLAKE2_DIR = ./src/blake2
-BUILD_DIR = ./build
+BLAKE2_DIR = ./src/blake2/
+BUILD_DIR = ./build/
+TEST_DIR = ./test/
 
 ARGON2_SOURCES = argon2.c argon2-core.c kat.c
 BLAKE2_SOURCES = blake2b-ref.c
@@ -23,8 +24,6 @@ REF_SOURCES = argon2-ref-core.c
 OPT_SOURCES = argon2-opt-core.c
 
 LIB_NAME=argon2
-
-SCRIPTS_DIR = ./../../Scripts
 
 ARGON2_BUILD_SOURCES = $(addprefix $(ARGON2_DIR)/,$(ARGON2_SOURCES))
 BLAKE2_BUILD_SOURCES = $(addprefix $(BLAKE2_DIR)/,$(BLAKE2_SOURCES))
@@ -95,7 +94,8 @@ argon2-lib:
 		-o $(BUILD_DIR)/lib$(LIB_NAME).$(LIB_EXT)
 
 test:   argon2-genkat
-	$(SCRIPTS_DIR)/check_test_vectors.sh -src=$(SRC_DIR)
+	./check_test_vectors.sh -src=$(SRC_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR)/
+	rm -f $(TEST_DIR)/run_*
