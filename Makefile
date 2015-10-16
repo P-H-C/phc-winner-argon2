@@ -16,27 +16,27 @@ BLAKE2_DIR = ./src/blake2/
 BUILD_DIR = ./build/
 TEST_DIR = ./test/
 
-ARGON2_SOURCES = argon2.c argon2-core.c kat.c
-BLAKE2_SOURCES = blake2b-ref.c
-TEST_SOURCES = argon2-test.c
+ARGON2_SRC = argon2.c argon2-core.c kat.c
+BLAKE2_SRC = blake2b-ref.c
+TEST_SRC = argon2-test.c
 
-REF_SOURCES = argon2-ref-core.c
-OPT_SOURCES = argon2-opt-core.c
+REF_SRC = argon2-ref-core.c
+OPT_SRC = argon2-opt-core.c
 
 LIB_NAME=argon2
 
-ARGON2_BUILD_SOURCES = $(addprefix $(ARGON2_DIR)/,$(ARGON2_SOURCES))
-BLAKE2_BUILD_SOURCES = $(addprefix $(BLAKE2_DIR)/,$(BLAKE2_SOURCES))
-TEST_BUILD_SOURCES = $(addprefix $(ARGON2_DIR)/,$(TEST_SOURCES))
+ARGON2_BUILD_SRC = $(addprefix $(ARGON2_DIR)/,$(ARGON2_SRC))
+BLAKE2_BUILD_SRC = $(addprefix $(BLAKE2_DIR)/,$(BLAKE2_SRC))
+TEST_BUILD_SRC = $(addprefix $(ARGON2_DIR)/,$(TEST_SRC))
 
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
 	CFLAGS=$(OPT_CFLAGS)
-	ARGON2_BUILD_SOURCES += $(addprefix $(ARGON2_DIR)/,$(OPT_SOURCES))
+	ARGON2_BUILD_SRC += $(addprefix $(ARGON2_DIR)/,$(OPT_SRC))
 else
 	CFLAGS=$(REF_CFLAGS)
-	ARGON2_BUILD_SOURCES += $(addprefix $(ARGON2_DIR)/,$(REF_SOURCES))
+	ARGON2_BUILD_SRC += $(addprefix $(ARGON2_DIR)/,$(REF_SRC))
 endif
 
 
@@ -58,37 +58,37 @@ ifeq ($(SYSTEM_KERNEL_NAME), Darwin)
 endif
 
 
-.PHONY: clean argon2-genkat argon2-lib test
+.PHONY: clean genkat lib test
 
-all:  argon2 argon2-genkat argon2-lib 
+all:  argon2 genkat lib 
 
 argon2:
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) \
-		$(ARGON2_BUILD_SOURCES) \
-		$(BLAKE2_BUILD_SOURCES) \
-		$(TEST_BUILD_SOURCES) \
+		$(ARGON2_BUILD_SRC) \
+		$(BLAKE2_BUILD_SRC) \
+		$(TEST_BUILD_SRC) \
 		-I$(ARGON2_DIR) \
 		-I$(BLAKE2_DIR) \
 		-o $(BUILD_DIR)/$@
 
-argon2-genkat:
+genkat:
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) \
 		-DARGON2_KAT -DARGON2_KAT_INTERNAL \
-		$(ARGON2_BUILD_SOURCES) \
-		$(BLAKE2_BUILD_SOURCES) \
-		$(TEST_BUILD_SOURCES) \
+		$(ARGON2_BUILD_SRC) \
+		$(BLAKE2_BUILD_SRC) \
+		$(TEST_BUILD_SRC) \
 		-I$(ARGON2_DIR) \
 		-I$(BLAKE2_DIR) \
 		-o $(BUILD_DIR)/$@
 
-argon2-lib:
+lib:
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) \
 		$(LIB_CFLAGS) \
-		$(ARGON2_BUILD_SOURCES) \
-		$(BLAKE2_BUILD_SOURCES) \
+		$(ARGON2_BUILD_SRC) \
+		$(BLAKE2_BUILD_SRC) \
 		-I$(ARGON2_DIR) \
 		-I$(BLAKE2_DIR) \
 		-o $(BUILD_DIR)/lib$(LIB_NAME).$(LIB_EXT)
