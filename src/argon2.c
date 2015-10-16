@@ -110,7 +110,7 @@ const char *Argon2_ErrorMessage[] =
 {ARGON2_OUT_PTR_MISMATCH, */"Output pointer mismatch"/*}*/
 };
 
-int PHS( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
+int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
          size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
     uint8_t *default_ad_ptr = NULL;
@@ -122,7 +122,7 @@ int PHS( void *out, size_t outlen, const void *in, size_t inlen, const void *sal
     FreeMemoryCallback default_f_cbk= NULL;
     bool c_p=true;
     bool c_s=true;
-    bool c_m=false;
+    bool c_m=true;
     bool pr=false;
 
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
@@ -134,8 +134,9 @@ int PHS( void *out, size_t outlen, const void *in, size_t inlen, const void *sal
                               c_p,c_s,c_m,pr
                              };
 
-    return Argon2Core( &context, Argon2_d );
+    return Argon2Core( &context, Argon2_i );
 }
+
 
 int Argon2d( Argon2_Context *context )
 {

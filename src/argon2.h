@@ -184,7 +184,7 @@ typedef struct _Argon2_Context
 
 
 /**
- * Function to hash the inputs in the memory-hard fashion
+ * Function to hash the inputs in the memory-hard fashion (uses Argon2i)
  * @param  out  Pointer to the memory where the hash digest will be written
  * @param  outlen Digest length in bytes
  * @param  in Pointer to the input (password)
@@ -196,7 +196,7 @@ typedef struct _Argon2_Context
  * @pre    @a saltlen must be at least @saltlen bytes long
  * @return Zero if successful, 1 otherwise.
  */
-extern  int PHS( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
+extern  int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
                  unsigned int t_cost, unsigned int m_cost );
 
 /*

@@ -22,7 +22,7 @@ KAT_OPT=kat-argon2-opt.log
 
 for implementation in ${IMPLEMENTATIONS[@]}
 do
-	echo "Testing $implementation implementation"
+	echo "$implementation implementation"
 
 	make_log=$TESTS_PATH"make_"$implementation".log"
 	rm -f $make_log
@@ -38,14 +38,13 @@ do
 		echo -e "\tFAIL: make error, see $make_log"
 		continue
 	else
-                echo -e "\tbuild OK"
 		rm -f $make_log
 	fi
 
 
 	for type in ${TYPES[@]}
 	do
-		echo -e "\t Testing Argon2$type"
+		echo -n -e "argon2$type"
 
 		kat_file_name="KAT_"$implementation
 		kat_file=${!kat_file_name}
@@ -54,7 +53,7 @@ do
 		run_log=$TESTS_PATH"run_"$type"_"$implementation".log"
 		./argon2 g --type $type > $run_log
 		if [ 0 -ne $? ] ; then
-			echo -e "\t\tFAIL: run error, see $run_log"
+			echo -e "\tFAIL: run error, see $run_log"
 			continue
 		else
 			rm -f $run_log
@@ -64,16 +63,13 @@ do
 		cp $kat_file $kat_file_copy
 		rm -f $kat_file
 
-                echo -e $kat_file_copy
-
-		test_vectors_file=$TESTS_PATH"Argon2"$type".txt"
-                echo -e $test_vectors_file
+		test_vectors_file=$TESTS_PATH"argon2"$type
 
 		diff_file=$TESTS_PATH"diff_"$type"_"$implementation
 		rm -f $diff_file
 
 		if diff -Naur $kat_file_copy $test_vectors_file > $diff_file ; then
-			echo -e "\t\t OK"
+			echo -e " \t\tOK"
 			rm -f $kat_file_copy
 			rm -f $diff_file
 		else
