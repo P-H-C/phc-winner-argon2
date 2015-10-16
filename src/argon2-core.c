@@ -73,8 +73,6 @@ void XORBlock( block *dst, const  block *src )
 }
 
 
-
-
 /***************Memory allocators*****************/
 int AllocateMemory( block **memory, uint32_t m_cost )
 {

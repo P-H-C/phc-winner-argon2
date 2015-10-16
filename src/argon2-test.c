@@ -70,6 +70,37 @@ void CustomFreeMemory( uint8_t *memory, size_t length )
 }
 
 
+void usage( const char *cmd )
+{
+    printf( "usage: %s mode [parameters]\n", cmd );
+    printf( "Mode:\n" );
+    printf( "\tr\trun Argon2 with the selected parameters\n" );
+    printf( "\tg\tgenerates known-answer test values\n" );
+    printf( "\tb\tbenchmarks various Argon2 versions\n" );
+    printf( "Parameters (for run mode):\n" );
+    printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
+    printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
+    printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
+    printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
+    printf( "\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n" );
+}
+
+
+void fatal( const char *error )
+{
+    fprintf( stderr, "error: %s\n", error );
+    exit( 1 );
+}
+
+void print_bytes(const void *s, size_t len)
+{
+  for(size_t i = 0; i < len; i++)
+  {
+    printf("%02x", ((const unsigned char *) s)[i] & 0xff);
+  }
+  printf("\n");
+}
+
 
 /*
  * Benchmarks Argon2 with salt length 16, password length 32, t_cost 3, and different threads and m_cost
@@ -150,7 +181,7 @@ void Benchmark()
 void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
 {
 #ifdef _MEASURE
-    uint64_t start_cycles, stop_cycles, delta;
+    uint64_t start_cycles, stop_cycles;
 
     clock_t start_time = clock();
     start_cycles = rdtsc();
@@ -182,49 +213,32 @@ void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
                             };
+    printf("%s with\n", type);
+    printf("\tt_cost = %d\n", t_cost);
+    printf("\tm_cost = %d\n", m_cost);
+    printf("\tpassword = "); print_bytes(pwd, pwd_length);
+    printf("\tsalt = "); print_bytes(salt, salt_length);
 
-    if ( !strcmp( type,"Argon2d" ) )
-    {
-        printf( "Test Argon2d\n" );
-        Argon2d( &context );
-        return;
-    }
-
-    if ( !strcmp( type,"Argon2i" ) )
-    {
-        printf( "Test Argon2i\n" );
-        Argon2i( &context );
-        return;
-    }
-
-    if ( !strcmp( type,"Argon2ds" ) )
-    {
-        printf( "Test Argon2ds\n" );
-        Argon2ds( &context );
-        return;
-    }
-
-    if ( !strcmp( type,"Argon2id" ) )
-    {
-        printf( "Test Argon2id\n" );
-        Argon2id( &context );
-        return;
-    }
-
-    printf( "Wrong Argon2 type!\n" );
+    if ( !strcmp( type,"Argon2d" ) )  Argon2d( &context );
+    else if ( !strcmp( type,"Argon2i" ) ) Argon2i( &context );
+    else if ( !strcmp( type,"Argon2ds" ) ) Argon2ds( &context );
+    else if ( !strcmp( type,"Argon2id" ) ) Argon2id( &context );
+    else  printf( "Wrong Argon2 type!\n" );
 
 
 #ifdef _MEASURE
     stop_cycles = rdtsc();
     clock_t finish_time = clock();
 
-    delta = ( stop_cycles - start_cycles ) / ( m_cost );
-    float mcycles = ( float ) ( stop_cycles - start_cycles ) / ( 1 << 20 );
-    printf( "Argon:  %2.2f cpb %2.2f Mcycles ", ( float ) delta / 1024, mcycles );
 
     float run_time = ( ( float ) finish_time - start_time ) / ( CLOCKS_PER_SEC );
-    printf( "%2.4f seconds\n", run_time );
+    printf( "%2.3f seconds ", run_time );
+
+    float mcycles = ( float ) ( stop_cycles - start_cycles ) / ( 1 << 20 );
+    printf( "(%.3f mebicycles)\n", mcycles );
 #endif
+
+    printf("hash = "); print_bytes(out, out_length);
 }
 
 void GenerateTestVectors( const char *type )
@@ -268,54 +282,25 @@ void GenerateTestVectors( const char *type )
     {
         printf( "Test Argon2d\n" );
         Argon2d( &context );
-        return;
     }
-
-    if ( !strcmp( type,"Argon2i" ) )
+    else if ( !strcmp( type,"Argon2i" ) )
     {
         printf( "Test Argon2i\n" );
         Argon2i( &context );
-        return;
     }
-
-    if ( !strcmp( type,"Argon2ds" ) )
+    else if ( !strcmp( type,"Argon2ds" ) )
     {
         printf( "Test Argon2ds\n" );
         Argon2ds( &context );
-        return;
     }
-
-    if ( !strcmp( type,"Argon2id" ) )
+    else if ( !strcmp( type,"Argon2id" ) )
     {
         printf( "Test Argon2id\n" );
         Argon2id( &context );
-        return;
     }
-
-    printf( "Wrong Argon2 type!\n" );
+    else  
+        printf( "Wrong Argon2 type!\n" );
 }
-
-void usage( const char *cmd )
-{
-    printf( "usage: %s [options]\n", cmd );
-    printf( "Options:\n" );
-    printf( "\t-h, --help\n" );
-    printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
-    printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
-    printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
-    printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
-    printf( "\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n" );
-    printf( "\t-g, --gentv\n" );
-    printf( "\t-b, --benchmark\n" );
-}
-
-
-void fatal( const char *error )
-{
-    fprintf( stderr, "error: %s\n", error );
-    exit( 1 );
-}
-
 
 int main( int argc, char *argv[] )
 {
@@ -327,7 +312,6 @@ int main( int argc, char *argv[] )
     uint32_t threads = THREADS_DEF;
 
     bool generate_test_vectors = false;
-    //char type[argon2_type_length] = "Argon2d";
     const char *type= "Argon2d";
 
 #ifdef ARGON2_KAT
@@ -344,13 +328,6 @@ int main( int argc, char *argv[] )
     {
         char *a = argv[i];
 
-        if ( !strcmp( a, "-h" ) || !strcmp( a, "--help" ) )
-        {
-            usage( argv[0] );
-            return 0;
-        }
-
-
         if ( !strcmp( a, "-m" ) || !strcmp( a, "--mcost" ) )
         {
             if ( i < argc - 1 )
@@ -362,8 +339,7 @@ int main( int argc, char *argv[] )
             else
                 fatal( "missing memory cost argument" );
         }
-
-        if ( !strcmp( a, "-t" ) || !strcmp( a, "--tcost" ) )
+        else if ( !strcmp( a, "-t" ) || !strcmp( a, "--tcost" ) )
         {
             if ( i < argc - 1 )
             {
@@ -374,8 +350,7 @@ int main( int argc, char *argv[] )
             else
                 fatal( "missing time cost argument" );
         }
-
-        if ( !strcmp( a, "-p" ) || !strcmp( a, "--threads" ) )
+        else if ( !strcmp( a, "-p" ) || !strcmp( a, "--threads" ) )
         {
             if ( i < argc - 1 )
             {
@@ -386,8 +361,7 @@ int main( int argc, char *argv[] )
             else
                 fatal( "missing threads argument" );
         }
-
-        if ( !strcmp( a, "-l" ) || !strcmp( a, "--lanes" ) )
+        else if ( !strcmp( a, "-l" ) || !strcmp( a, "--lanes" ) )
         {
             if ( i < argc - 1 )
             {
@@ -398,9 +372,7 @@ int main( int argc, char *argv[] )
             else
                 fatal( "missing lanes argument" );
         }
-
-
-        if ( !strcmp( a, "-y" ) || !strcmp( a, "--type" ) )
+        else if ( !strcmp( a, "-y" ) || !strcmp( a, "--type" ) )
         {
             if ( i < argc - 1 )
             {
@@ -411,19 +383,23 @@ int main( int argc, char *argv[] )
             else
                 fatal( "missing type argument" );
         }
-
-        if ( !strcmp( a, "-g" ) || !strcmp( a, "--gen-tv" ) )
+        else if ( !strcmp( a, "r" ))
+        {
+            generate_test_vectors = false;
+            continue;
+        }
+        else if ( !strcmp( a, "g" ))
         {
             generate_test_vectors = true;
             continue;
         }
-
-
-
-        if ( !strcmp( a, "-b" ) || !strcmp( a, "--benchmark" ) )
+        else if ( !strcmp( a, "b" ))
         {
             Benchmark();
             return 0;
+        }
+        else {
+            fatal("unknown argument");
         }
     }
 
@@ -432,8 +408,6 @@ int main( int argc, char *argv[] )
         GenerateTestVectors( type );
         return 0;
     }
-
-    /*No benchmark, no test vectors, just run*/
 
     Run( out,  t_cost, m_cost, lanes, threads, type, generate_test_vectors );
 
