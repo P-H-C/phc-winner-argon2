@@ -75,14 +75,14 @@ void usage( const char *cmd )
     printf( "usage: %s mode [parameters]\n", cmd );
     printf( "Mode:\n" );
     printf( "\tr\trun Argon2 with the selected parameters\n" );
-    printf( "\tg\tgenerates known-answer test values\n" );
+    printf( "\tg\tgenerates test vectors for given Argon2 type\n" );
     printf( "\tb\tbenchmarks various Argon2 versions\n" );
     printf( "Parameters (for run mode):\n" );
+    printf( "\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n" );
     printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
     printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
     printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
-    printf( "\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n" );
 }
 
 
@@ -264,13 +264,12 @@ void GenerateTestVectors( const char *type )
     unsigned m_cost = 16;
     unsigned lanes = 4;
 
-
     memset( pwd, 1, pwd_length );
     memset( salt, 2, salt_length );
     memset( secret, 3, secret_length );
     memset( ad, 4, ad_length );
 
-    printf( "Generate test vectors in file: \"%s\".\n", ARGON2_KAT_FILENAME );
+    printf( "Generate test vectors for %s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
 
     Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
                              secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
@@ -278,28 +277,11 @@ void GenerateTestVectors( const char *type )
                              clear_password, clear_secret, clear_memory, print_internals
                             };
 
-    if ( !strcmp( type,"Argon2d" ) )
-    {
-        printf( "Test Argon2d\n" );
-        Argon2d( &context );
-    }
-    else if ( !strcmp( type,"Argon2i" ) )
-    {
-        printf( "Test Argon2i\n" );
-        Argon2i( &context );
-    }
-    else if ( !strcmp( type,"Argon2ds" ) )
-    {
-        printf( "Test Argon2ds\n" );
-        Argon2ds( &context );
-    }
-    else if ( !strcmp( type,"Argon2id" ) )
-    {
-        printf( "Test Argon2id\n" );
-        Argon2id( &context );
-    }
-    else  
-        printf( "Wrong Argon2 type!\n" );
+    if ( !strcmp( type,"Argon2d" ) ) Argon2d( &context );
+    else if ( !strcmp( type,"Argon2i" ) ) Argon2i( &context );
+    else if ( !strcmp( type,"Argon2ds" ) ) Argon2ds( &context );
+    else if ( !strcmp( type,"Argon2id" ) ) Argon2id( &context );
+    else  printf( "Wrong Argon2 type!\n" );
 }
 
 int main( int argc, char *argv[] )
@@ -314,9 +296,7 @@ int main( int argc, char *argv[] )
     bool generate_test_vectors = false;
     const char *type= "Argon2d";
 
-#ifdef ARGON2_KAT
     remove( ARGON2_KAT_FILENAME );
-#endif
 
     if ( argc == 1 )
     {
@@ -336,8 +316,7 @@ int main( int argc, char *argv[] )
                 m_cost = ( uint8_t ) 1 << ( ( uint8_t )atoi( argv[i] ) % 24 );
                 continue;
             }
-            else
-                fatal( "missing memory cost argument" );
+            else fatal( "missing memory cost argument" );
         }
         else if ( !strcmp( a, "-t" ) || !strcmp( a, "--tcost" ) )
         {
@@ -347,8 +326,7 @@ int main( int argc, char *argv[] )
                 t_cost = atoi( argv[i] ) & 0xffffff;
                 continue;
             }
-            else
-                fatal( "missing time cost argument" );
+            else fatal( "missing time cost argument" );
         }
         else if ( !strcmp( a, "-p" ) || !strcmp( a, "--threads" ) )
         {
@@ -358,8 +336,7 @@ int main( int argc, char *argv[] )
                 threads = atoi( argv[i] ) % ARGON2_MAX_THREADS;
                 continue;
             }
-            else
-                fatal( "missing threads argument" );
+            else fatal( "missing threads argument" );
         }
         else if ( !strcmp( a, "-l" ) || !strcmp( a, "--lanes" ) )
         {
@@ -369,8 +346,7 @@ int main( int argc, char *argv[] )
                 lanes = atoi( argv[i] ) % ARGON2_MAX_LANES;
                 continue;
             }
-            else
-                fatal( "missing lanes argument" );
+            else fatal( "missing lanes argument" );
         }
         else if ( !strcmp( a, "-y" ) || !strcmp( a, "--type" ) )
         {
@@ -380,8 +356,7 @@ int main( int argc, char *argv[] )
                 type = argv[i];
                 continue;
             }
-            else
-                fatal( "missing type argument" );
+            else fatal( "missing type argument" );
         }
         else if ( !strcmp( a, "r" ))
         {
@@ -398,9 +373,7 @@ int main( int argc, char *argv[] )
             Benchmark();
             return 0;
         }
-        else {
-            fatal("unknown argument");
-        }
+        else fatal("unknown argument");
     }
 
     if ( generate_test_vectors )
