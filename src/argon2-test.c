@@ -23,6 +23,12 @@
 /* Enable timing measurements */
 #define _MEASURE
 
+#define T_COST_DEF 3
+#define M_COST_DEF (1<<18)
+#define LANES_DEF 4
+#define THREADS_DEF 4
+
+
 static inline uint64_t rdtscp(uint32_t *aux) {
 #ifdef _MSC_VER
 	return __rdtscp(aux);
@@ -260,15 +266,27 @@ void GenerateTestVectors(const char* type) {
     printf("Wrong Argon2 type!\n");
 }
 
+void usage(char * cmd) {
+    printf("usage: %s [options]\n", cmd);
+    printf("Options:\n");
+    printf("\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF);
+    printf("\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF);
+    printf("\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF);
+    printf("\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF);
+    printf("\t-y, --type [Argon2d | Argon2ds | Argon2i | Argon2id]\n");
+    printf("\t-g, --gentv\n");
+    printf("\t-b, --benchmark\n");
+    printf("\t-h, --help\n");
+}
+
 
 int main(int argc, char* argv[]) {
    
-   
     unsigned char out[32];
-    uint32_t m_cost = 1 << 18;
-    uint32_t t_cost = 3;
-    uint32_t lanes=4;
-    uint32_t threads = 4;
+    uint32_t m_cost = M_COST_DEF;
+    uint32_t t_cost = T_COST_DEF;
+    uint32_t lanes = LANES_DEF;
+    uint32_t threads = THREADS_DEF;
 
     bool generate_test_vectors = false;
     //char type[argon2_type_length] = "Argon2d";
@@ -278,23 +296,15 @@ int main(int argc, char* argv[]) {
     remove(ARGON2_KAT_FILENAME);
 #endif
 
+    if (argc == 1) {
+        usage(argv[0]);
+        return 1;
+    }
     
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-help") == 0) {
-            printf("====================================== \n");
-            printf("Argon2 - test implementation \n");
-            printf("====================================== \n");
-            printf("Options:\n");
-            printf("\t -logmcost < Base 2 logarithm of m_cost : 0..23 > \n");
-            printf("\t -tcost < t_cost : 0..2^24 > \n");
-            printf("\t -lanes < Number of lanes : %u.. %u>\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES);
-            printf("\t -threads < Number of threads : %u.. %u>\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS);
-            printf("\t -type <Argon2d; Argon2ds; Argon2i; Argon2id >\n");
-            printf("\t -gen-tv\n");
-            printf("\t -benchmark\n");
-            printf("\t -help\n");
-            printf("If no arguments given, Argon2 is called with default parameters t_cost=%d, "
-                    "m_cost=%d and threads=%d.\n", t_cost, m_cost, threads);
+        char * a = argv[i];
+        if (!strcmp(a, "-h") || !strcmp(a, "--help")) {
+            usage(argv[0]);
             return 0;
         }
 
@@ -359,8 +369,6 @@ int main(int argc, char* argv[]) {
     }
     
     /*No benchmark, no test vectors, just run*/
-    
-    
 
     Run(out,  t_cost, m_cost, lanes, threads, type);
 
