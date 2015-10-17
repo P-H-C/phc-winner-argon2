@@ -7,14 +7,8 @@
 
 static inline __m128i fBlaMka( __m128i x, __m128i y )
 {
-    __m128i z = _mm_mul_epu32 ( x, y );
-
-    z = _mm_slli_epi64 ( z, 1 );
-
-    z = _mm_add_epi64 ( z, x );
-    z = _mm_add_epi64 ( z, y );
-
-    return z;
+    const __m128i z = _mm_mul_epu32 ( x, y );
+    return _mm_add_epi64(_mm_add_epi64(x, y), _mm_add_epi64(z, z));
 }
 
 #define G1(row1l,row2l,row3l,row4l,row1h,row2h,row3h,row4h) \
