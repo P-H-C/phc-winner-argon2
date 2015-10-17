@@ -151,33 +151,33 @@ typedef void( *FreeMemoryCallback )( uint8_t *memory, size_t bytes_to_allocate )
 typedef struct _Argon2_Context
 {
     uint8_t *out; //output array
-    const uint32_t outlen; //digest length
+    uint32_t outlen; //digest length
 
     uint8_t *pwd; //password array
     uint32_t pwdlen; //password length
 
-    const uint8_t *salt; //salt array
-    const uint32_t saltlen; //salt length
+    uint8_t *salt; //salt array
+    uint32_t saltlen; //salt length
 
     uint8_t *secret; //key array
     uint32_t secretlen; //key length
 
-    const uint8_t *ad; //associated data array
-    const uint32_t adlen; //associated data length
+    uint8_t *ad; //associated data array
+    uint32_t adlen; //associated data length
 
-    const uint32_t t_cost; //number of passes
-    const uint32_t m_cost; //amount of memory requested (KB)
-    const uint32_t lanes; //number of lanes
-    const uint32_t threads; //maximum number of threads
+    uint32_t t_cost; //number of passes
+    uint32_t m_cost; //amount of memory requested (KB)
+    uint32_t lanes; //number of lanes
+    uint32_t threads; //maximum number of threads
 
     AllocateMemoryCallback allocate_cbk; //pointer to memory allocator
     FreeMemoryCallback free_cbk; //pointer to memory deallocator
 
-    const bool clear_password; //whether to clear the password array
-    const bool clear_secret; //whether to clear the secret array
-    const bool clear_memory; //whether to clear the memory after the run
+    bool clear_password; //whether to clear the password array
+    bool clear_secret; //whether to clear the secret array
+    bool clear_memory; //whether to clear the memory after the run
 
-    const bool print; //whether to print starting variables, memory blocks, and the tag to the file -- Test vectors only!
+    bool print; //whether to print starting variables, memory blocks, and the tag to the file -- Test vectors only!
 
 } Argon2_Context;
 
