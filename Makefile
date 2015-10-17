@@ -7,53 +7,38 @@
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 #
 
-CC = gcc
 BIN = argon2
-REF_CFLAGS = -std=c99 -pthread -O3 -Wall #-Wno-unused-function
-OPT_CFLAGS = $(REF_CFLAGS) -m64 -mavx
+DIST = phc-winner-argon2
 
-ARGON2_DIR = src
-BLAKE2_DIR = src/blake2
-BUILD_DIR = build
+CC = gcc
+SRC = src/argon2.c src/argon2-core.c src/kat.c src/blake2/blake2b-ref.c
+SRC_MAIN = src/argon2-test.c
 
-ARGON2_SRC = argon2.c argon2-core.c kat.c
-BLAKE2_SRC = blake2b-ref.c
-OPT_SRC = argon2-opt-core.c
-REF_SRC = argon2-ref-core.c
-TEST_SRC = argon2-test.c
-
-
-ARGON2_BUILD_SRC = $(addprefix $(ARGON2_DIR)/,$(ARGON2_SRC))
-BLAKE2_BUILD_SRC = $(addprefix $(BLAKE2_DIR)/,$(BLAKE2_SRC))
-TEST_BUILD_SRC = $(addprefix $(ARGON2_DIR)/,$(TEST_SRC))
-
+CFLAGS = -std=c99 -pthread -O3 -Wall
+CFLAGS_OPT = $(CFLAGS) 
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
-	CFLAGS=$(OPT_CFLAGS)
-	ARGON2_BUILD_SRC += $(addprefix $(ARGON2_DIR)/,$(OPT_SRC))
+	CFLAGS += -m64 -mavx
+	SRC += src/argon2-opt-core.c
 else
-	CFLAGS=$(REF_CFLAGS)
-	ARGON2_BUILD_SRC += $(addprefix $(ARGON2_DIR)/,$(REF_SRC))
+	SRC += src/argon2-ref-core.c
 endif
 
 
-SRC_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-
-BUILD_DIR_PATH := $(shell pwd)
-
-SYSTEM_KERNEL_NAME := $(shell uname -s)
+BUILD_PATH := $(shell pwd)
+KERNEL_NAME := $(shell uname -s)
 
 LIB_NAME=argon2
-ifeq ($(SYSTEM_KERNEL_NAME), Linux)
+ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
-	LIB_PATH := -Wl,-rpath=$(BUILD_DIR_PATH)
+	LIB_PATH := -Wl,-rpath=$(BUILD_PATH)
 endif
-ifeq ($(SYSTEM_KERNEL_NAME), Darwin)
+ifeq ($(KERNEL_NAME), Darwin)
 	LIB_EXT := dylib
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
-	LIB_PATH := -Xlinker -rpath -Xlinker $(BUILD_DIR_PATH)
+	LIB_PATH := -Xlinker -rpath -Xlinker $(BUILD_PATH)
 endif
 
 LIB := lib$(LIB_NAME).$(LIB_EXT)
@@ -62,16 +47,16 @@ LIB := lib$(LIB_NAME).$(LIB_EXT)
 
 all: clean $(BIN) $(LIB)
 
-$(BIN):
-	$(CC) $(CFLAGS) \
-            $(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) $(TEST_BUILD_SRC) \
-	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
+$(BIN): $(SRC) $(SRC_MAIN)
+	$(CC) $(CFLAGS) $^ -Isrc -Isrc/blake2 -o $@
 
-$(LIB):
-	$(CC) $(CFLAGS) $(LIB_CFLAGS) \
-            $(ARGON2_BUILD_SRC) $(BLAKE2_BUILD_SRC) \
-	    -I$(ARGON2_DIR) -I$(BLAKE2_DIR) -o $@
+$(LIB): $(SRC)
+	$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -Isrc/blake2 -o $@
 
 clean:
 	rm -f $(BIN) $(LIB) kat-argon2* 
 	cd test-vectors/ &&  rm -f kat-* diff* run_* make_*
+
+dist:
+	cd ..; \
+	tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
