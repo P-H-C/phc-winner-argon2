@@ -103,6 +103,8 @@ To use Argon2d instead of Argon2i call `hashpwd2` instead of `hashpwd`
 using the high-level API, and `argon2d` instead of `argon2i` using the
 low-level API.
 
+*Note: in this example the salt is set to the all-`0x00` string, but in
+your application you should use a random salt.*
 
 ## Intellectual property
 
