@@ -24,49 +24,49 @@
 
 
 /* The KAT file name */
-extern const char *ARGON2_KAT_FILENAME;
+const char *ARGON2_KAT_FILENAME;
 
 
 /*************************Argon2 input parameter restrictions**************************************************/
 
 /* Minimum and maximum number of lanes (degree of parallelism) */
-extern const uint32_t ARGON2_MIN_LANES;
-extern const uint32_t ARGON2_MAX_LANES;
+const uint32_t ARGON2_MIN_LANES;
+const uint32_t ARGON2_MAX_LANES;
 
-extern const uint32_t ARGON2_MIN_THREADS;
-extern const uint32_t ARGON2_MAX_THREADS;
+const uint32_t ARGON2_MIN_THREADS;
+const uint32_t ARGON2_MAX_THREADS;
 
 /* Number of synchronization points between lanes per pass */
 #define __ARGON_SYNC_POINTS 4
-extern const uint32_t ARGON2_SYNC_POINTS;
+const uint32_t ARGON2_SYNC_POINTS;
 
 /* Minimum and maximum digest size in bytes */
-extern const uint32_t ARGON2_MIN_OUTLEN ;
-extern const uint32_t ARGON2_MAX_OUTLEN ;
+const uint32_t ARGON2_MIN_OUTLEN ;
+const uint32_t ARGON2_MAX_OUTLEN ;
 
 /* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
-extern const uint32_t ARGON2_MIN_MEMORY ; // 2 blocks per slice
-extern const uint32_t ARGON2_MAX_MEMORY; // 2^32-1 blocks
+const uint32_t ARGON2_MIN_MEMORY ; // 2 blocks per slice
+const uint32_t ARGON2_MAX_MEMORY; // 2^32-1 blocks
 
 /* Minimum and maximum number of passes */
-extern const uint32_t ARGON2_MIN_TIME ;
-extern const uint32_t ARGON2_MAX_TIME;
+const uint32_t ARGON2_MIN_TIME ;
+const uint32_t ARGON2_MAX_TIME;
 
 /* Minimum and maximum password length in bytes */
-extern const uint32_t ARGON2_MIN_PWD_LENGTH ;
-extern const uint32_t ARGON2_MAX_PWD_LENGTH ;
+const uint32_t ARGON2_MIN_PWD_LENGTH ;
+const uint32_t ARGON2_MAX_PWD_LENGTH ;
 
 /* Minimum and maximum associated data length in bytes */
-extern const uint32_t ARGON2_MIN_AD_LENGTH ;
-extern const uint32_t ARGON2_MAX_AD_LENGTH ;
+const uint32_t ARGON2_MIN_AD_LENGTH ;
+const uint32_t ARGON2_MAX_AD_LENGTH ;
 
 /* Minimum and maximum salt length in bytes */
-extern const uint32_t ARGON2_MIN_SALT_LENGTH ;
-extern  const uint32_t ARGON2_MAX_SALT_LENGTH;
+const uint32_t ARGON2_MIN_SALT_LENGTH ;
+ const uint32_t ARGON2_MAX_SALT_LENGTH;
 
 /* Minimum and maximum key length in bytes */
-extern const uint32_t ARGON2_MIN_SECRET ;
-extern const uint32_t ARGON2_MAX_SECRET ;
+const uint32_t ARGON2_MIN_SECRET ;
+const uint32_t ARGON2_MAX_SECRET ;
 
 /************************* Error codes *********************************************************************************/
 typedef enum _Argon2_ErrorCodes
@@ -196,11 +196,11 @@ typedef struct _Argon2_Context
  * @pre    @a saltlen must be at least @saltlen bytes long
  * @return Zero if successful, 1 otherwise.
  */
-extern  int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
+int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
                   unsigned int t_cost, unsigned int m_cost );
 
 /* same for argon2d */
-extern  int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
+int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
                   unsigned int t_cost, unsigned int m_cost );
 
 /*
@@ -208,7 +208,7 @@ extern  int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, co
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int argon2d( Argon2_Context *context );
+int argon2d( Argon2_Context *context );
 
 /*
  *  * **************Argon2i: Version of Argon2 that picks memory blocks independent on the password and salt. Good for side-channels,
@@ -217,21 +217,21 @@ extern int argon2d( Argon2_Context *context );
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int argon2i( Argon2_Context *context );
+int argon2i( Argon2_Context *context );
 
 /*
  *   * **************Argon2di: Reserved name***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int argon2di( Argon2_Context *context );
+int argon2di( Argon2_Context *context );
 
 /*
  *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20% slower***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int argon2ds( Argon2_Context *context );
+int argon2ds( Argon2_Context *context );
 
 
 /*
@@ -240,7 +240,7 @@ extern int argon2ds( Argon2_Context *context );
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int argon2id( Argon2_Context *context );
+int argon2id( Argon2_Context *context );
 
 /*
  * Verify if a given password is correct for Argon2d hashing
@@ -248,7 +248,7 @@ extern int argon2id( Argon2_Context *context );
  * @param  hash  The password hash to verify. The length of the hash is specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int verify_d( Argon2_Context *context, const char *hash );
+int verify_d( Argon2_Context *context, const char *hash );
 
 /*
  * Get the associated error message for given error code

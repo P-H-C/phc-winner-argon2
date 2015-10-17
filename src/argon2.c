@@ -113,30 +113,31 @@ const char *Argon2_ErrorMessage[] =
 int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
           size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
-    uint8_t *default_ad_ptr = NULL;
-    uint32_t default_ad_length = 0;
-    uint8_t *default_secret_ptr = NULL;
-    uint32_t default_secret_length = 0;
-    uint8_t default_parallelism = 1;
-    AllocateMemoryCallback default_a_cbk = NULL;
-    FreeMemoryCallback default_f_cbk= NULL;
-    bool c_p=true;
-    bool c_s=true;
-    bool c_m=true;
-    bool pr=false;
-
-     
-
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
                               ( uint8_t * ) in, ( uint32_t ) inlen,
                               ( uint8_t * ) salt, ( uint32_t ) saltlen,
-                              default_ad_ptr, default_ad_length,
-                              default_secret_ptr, default_secret_length,
-                              ( uint32_t ) t_cost, ( uint32_t ) m_cost, default_parallelism,default_parallelism,default_a_cbk,default_f_cbk,
-                              c_p,c_s,c_m,pr
+                              NULL, 0, NULL, 0,
+                              ( uint32_t ) t_cost, ( uint32_t ) m_cost, 
+                              1, 1, NULL, NULL,
+                              true, true, true, false
                              };
 
     return argon2_core( &context, Argon2_i );
+}
+
+int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
+          size_t saltlen, unsigned int t_cost, unsigned int m_cost )
+{
+    Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
+                              ( uint8_t * ) in, ( uint32_t ) inlen,
+                              ( uint8_t * ) salt, ( uint32_t ) saltlen,
+                              NULL, 0, NULL, 0,
+                              ( uint32_t ) t_cost, ( uint32_t ) m_cost, 
+                              1, 1, NULL, NULL,
+                              true, true, true, false
+                             };
+
+    return argon2_core( &context, Argon2_d );
 }
 
 
