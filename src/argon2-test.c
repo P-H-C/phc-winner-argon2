@@ -24,9 +24,10 @@
 #define _MEASURE
 
 #define T_COST_DEF 3
-#define M_COST_DEF (1<<18)
+#define M_COST_DEF 50*(1<<10)
 #define LANES_DEF 4
 #define THREADS_DEF 4
+#define PWD_DEF "password"
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -83,6 +84,7 @@ void usage( const char *cmd )
     printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
     printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
+    printf( "\t-i, --password [password, default \"%s\"]\n", PWD_DEF);
 }
 
 
@@ -163,9 +165,8 @@ void benchmark()
     }
 }
 
-/*Call Argon2 with default salt and password and user-defined parameter values.*/
 
-void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
+void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
 {
 #ifdef _MEASURE
     uint64_t start_cycles, stop_cycles;
@@ -176,20 +177,26 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
 
     /*Fixed parameters*/
     const unsigned out_length = 32;
-    const unsigned pwd_length = 32;
     const unsigned salt_length = 16;
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
-    uint8_t pwd[pwd_length];
     uint8_t salt[salt_length];
+    uint8_t *in = NULL;
+
+    if (pwd) {
+        in = (uint8_t *)strdup(pwd);
+    }
+    else {
+        in = (uint8_t *)strdup(PWD_DEF);
+    }
+    const unsigned in_length = strlen((char *)in);
 
     UNUSED_PARAMETER( threads );
 
-    memset( pwd, 1, pwd_length );
-    memset( salt, 2, salt_length );
+    memset( salt, 0x00, salt_length );
 
-    Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
+    Argon2_Context context= {out, out_length, in, in_length, salt, salt_length,
                              NULL, 0, NULL, 0, t_cost, m_cost, lanes, lanes,
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
@@ -197,13 +204,12 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "Argon2%s with\n", type );
     printf( "\tt_cost = %d\n", t_cost );
     printf( "\tm_cost = %d\n", m_cost );
-    printf( "\tpassword = " ); print_bytes( pwd, pwd_length );
+    printf( "\tpassword = %s\n", in ); 
     printf( "\tsalt = " ); print_bytes( salt, salt_length );
 
     if ( !strcmp( type,"d" ) )  argon2d( &context );
     else if ( !strcmp( type,"i" ) ) argon2i( &context );
     else fatal( "wrong Argon2 type" );
-
 
 #ifdef _MEASURE
     stop_cycles = rdtsc();
@@ -217,7 +223,7 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "(%.3f mebicycles)\n", mcycles );
 #endif
 
-    printf( "hash = " ); print_bytes( out, out_length );
+    print_bytes( out, out_length );
 }
 
 void generate_testvectors( const char *type )
@@ -269,6 +275,7 @@ int main( int argc, char *argv[] )
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
+    char *pwd = NULL;
 
     bool testvectors = false;
     const char *type= "i";
@@ -335,6 +342,16 @@ int main( int argc, char *argv[] )
             }
             else fatal( "missing type argument" );
         }
+        else if ( !strcmp( a, "-i" ) || !strcmp( a, "--password" ) )
+        {
+            if ( i < argc - 1 )
+            {
+                i++;
+                pwd = argv[i];
+                continue;
+            }
+            else fatal( "missing threads argument" );
+        }
         else if ( !strcmp( a, "r" ) )
         {
             testvectors = false;
@@ -359,7 +376,7 @@ int main( int argc, char *argv[] )
         return 0;
     }
 
-    run( out,  t_cost, m_cost, lanes, threads, type, testvectors );
+    run( out, pwd,  t_cost, m_cost, lanes, threads, type, testvectors );
 
     return 0;
 }
