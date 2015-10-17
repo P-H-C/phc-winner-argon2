@@ -74,4 +74,4 @@ $(LIB):
 
 clean:
 	rm -f $(BIN) $(LIB) kat-argon2* 
-	cd tests &&  rm -f kat-* diff* run_*
+	cd test-vectors/ &&  rm -f kat-* diff* run_*

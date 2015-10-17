@@ -104,12 +104,13 @@ void print_bytes( const void *s, size_t len )
 
 
 /*
- * Benchmarks Argon2 with salt length 16, password length 32, t_cost 3, and different threads and m_cost
+ * Benchmarks Argon2 with salt length 16, password length 16, t_cost 1,
+   and different m_cost and threads 
  */
-void Benchmark()
+void benchmark()
 {
     const uint32_t inlen = 16;
-    const unsigned outlen=16;
+    const unsigned outlen = 16;
     unsigned char out[outlen];
     unsigned char pwd_array[inlen];
     unsigned char salt_array[inlen];
@@ -164,7 +165,7 @@ void Benchmark()
 
 /*Call Argon2 with default salt and password and user-defined parameter values.*/
 
-void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
+void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
 {
 #ifdef _MEASURE
     uint64_t start_cycles, stop_cycles;
@@ -225,7 +226,7 @@ void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "hash = " ); print_bytes( out, out_length );
 }
 
-void GenerateTestVectors( const char *type )
+void gen_testvectors( const char *type )
 {
     const unsigned out_length = 32;
     const unsigned pwd_length = 32;
@@ -253,7 +254,7 @@ void GenerateTestVectors( const char *type )
     memset( secret, 3, secret_length );
     memset( ad, 4, ad_length );
 
-    printf( "Generate test vectors for Argon2%s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
+    printf( "Generating test vectors for Argon2%s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
 
     Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
                              secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
@@ -275,7 +276,7 @@ int main( int argc, char *argv[] )
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
 
-    bool generate_test_vectors = false;
+    bool testvectors = false;
     const char *type= "i";
 
     remove( ARGON2_KAT_FILENAME );
@@ -342,29 +343,29 @@ int main( int argc, char *argv[] )
         }
         else if ( !strcmp( a, "r" ) )
         {
-            generate_test_vectors = false;
+            testvectors = false;
             continue;
         }
         else if ( !strcmp( a, "g" ) )
         {
-            generate_test_vectors = true;
+            testvectors = true;
             continue;
         }
         else if ( !strcmp( a, "b" ) )
         {
-            Benchmark();
+            benchmark();
             return 0;
         }
         else fatal( "unknown argument" );
     }
 
-    if ( generate_test_vectors )
+    if ( testvectors )
     {
-        GenerateTestVectors( type );
+        gen_testvectors( type );
         return 0;
     }
 
-    Run( out,  t_cost, m_cost, lanes, threads, type, generate_test_vectors );
+    run( out,  t_cost, m_cost, lanes, threads, type, testvectors );
 
     return 0;
 }
