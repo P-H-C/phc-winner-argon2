@@ -110,7 +110,7 @@ const char *Argon2_ErrorMessage[] =
 {ARGON2_OUT_PTR_MISMATCH, */"Output pointer mismatch"/*}*/
 };
 
-int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
+int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
           size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
     uint8_t *default_ad_ptr = NULL;
