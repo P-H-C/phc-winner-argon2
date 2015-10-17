@@ -36,7 +36,7 @@ anyone has already reported it).
 `libargon2.so` (or `libargon2.dylib` on OSX). Make sure to run `test.sh`
 to verify that your build produces valid test vectors.
 
-`argon2` is a commmand-line utility to test specific Argon2 instances
+`argon2` is a command-line utility to test specific Argon2 instances
 on your system and run benchmarks. To show instructions run `./argon2`
 without arguments.
 
