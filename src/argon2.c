@@ -134,28 +134,28 @@ int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *sa
                               c_p,c_s,c_m,pr
                              };
 
-    return Argon2Core( &context, Argon2_i );
+    return argon2_core( &context, Argon2_i );
 }
 
 
-int Argon2d( Argon2_Context *context )
+int argon2d( Argon2_Context *context )
 {
-    return Argon2Core( context, Argon2_d );
+    return argon2_core( context, Argon2_d );
 }
 
-int Argon2i( Argon2_Context *context )
+int argon2i( Argon2_Context *context )
 {
-    return Argon2Core( context, Argon2_i );
+    return argon2_core( context, Argon2_i );
 }
 
-int VerifyD( Argon2_Context *context, const char *hash )
+int verify_d( Argon2_Context *context, const char *hash )
 {
     if ( 0 == context->outlen || NULL == hash )
     {
         return ARGON2_OUT_PTR_MISMATCH;
     }
 
-    int result = Argon2Core( context, Argon2_d );
+    int result = argon2_core( context, Argon2_d );
 
     if ( ARGON2_OK != result )
     {
@@ -165,7 +165,7 @@ int VerifyD( Argon2_Context *context, const char *hash )
     return 0 == memcmp( hash, context->out, context->outlen );
 }
 
-const char *ErrorMessage( int error_code )
+const char *error_message( int error_code )
 {
     if ( error_code < ARGON2_ERROR_CODES_LENGTH )
     {

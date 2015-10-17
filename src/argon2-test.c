@@ -140,11 +140,11 @@ void benchmark()
             Argon2_Context context = {out, outlen, pwd_array, inlen, salt_array, inlen,
                                       NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false, false
                                      };
-            Argon2d( &context );
+            argon2d( &context );
 #ifdef _MEASURE
             stop_cycles = rdtsc();
 #endif
-            Argon2i( &context );
+            argon2i( &context );
 #ifdef _MEASURE
             stop_cycles_i = rdtsc();
             clock_t stop_time = clock();
@@ -206,8 +206,8 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "\tpassword = " ); print_bytes( pwd, pwd_length );
     printf( "\tsalt = " ); print_bytes( salt, salt_length );
 
-    if ( !strcmp( type,"d" ) )  Argon2d( &context );
-    else if ( !strcmp( type,"i" ) ) Argon2i( &context );
+    if ( !strcmp( type,"d" ) )  argon2d( &context );
+    else if ( !strcmp( type,"i" ) ) argon2i( &context );
     else fatal( "wrong Argon2 type" );
 
 
@@ -226,7 +226,7 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "hash = " ); print_bytes( out, out_length );
 }
 
-void gen_testvectors( const char *type )
+void generate_testvectors( const char *type )
 {
     const unsigned out_length = 32;
     const unsigned pwd_length = 32;
@@ -262,8 +262,8 @@ void gen_testvectors( const char *type )
                              clear_password, clear_secret, clear_memory, print_internals
                             };
 
-    if ( !strcmp( type,"d" ) ) Argon2d( &context );
-    else if ( !strcmp( type,"i" ) ) Argon2i( &context );
+    if ( !strcmp( type,"d" ) ) argon2d( &context );
+    else if ( !strcmp( type,"i" ) ) argon2i( &context );
     else  fatal( "wrong Argon2 type" );
 }
 
@@ -361,7 +361,7 @@ int main( int argc, char *argv[] )
 
     if ( testvectors )
     {
-        gen_testvectors( type );
+        generate_testvectors( type );
         return 0;
     }
 

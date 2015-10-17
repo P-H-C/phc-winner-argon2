@@ -41,7 +41,7 @@ const char *ARGON2_KAT_FILENAME = "kat-argon2-opt.log";
 #define r16  (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))
 #define r24 (_mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10))
 
-void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
+void fill_block( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
 {
     __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
@@ -127,12 +127,12 @@ void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
     }
 }
 
-void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position_t *position, uint64_t *pseudo_rands )
+void generate_addresses( const Argon2_instance_t *instance, const Argon2_position_t *position, uint64_t *pseudo_rands )
 {
     block zero_block, address_block,input_block;
-    InitBlockValue( &zero_block,0 );
-    CopyBlock( &address_block,&zero_block );
-    CopyBlock( &input_block,&zero_block );
+    init_block_value( &zero_block,0 );
+    copy_block( &address_block,&zero_block );
+    copy_block( &input_block,&zero_block );
 
     if ( instance != NULL && position != NULL )
     {
@@ -149,10 +149,10 @@ void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position
             {
                 input_block.v[6]++;
                 block zero_block, zero2_block;
-                InitBlockValue( &zero_block,0 );
-                InitBlockValue( &zero2_block,0 );
-                FillBlock( ( __m128i * ) & zero_block.v, ( uint8_t * ) & input_block.v, ( uint8_t * ) & address_block.v );
-                FillBlock( ( __m128i * ) & zero2_block.v, ( uint8_t * ) & address_block.v, ( uint8_t * ) & address_block.v );
+                init_block_value( &zero_block,0 );
+                init_block_value( &zero2_block,0 );
+                fill_block( ( __m128i * ) & zero_block.v, ( uint8_t * ) & input_block.v, ( uint8_t * ) & address_block.v );
+                fill_block( ( __m128i * ) & zero2_block.v, ( uint8_t * ) & address_block.v, ( uint8_t * ) & address_block.v );
             }
 
             pseudo_rands[i] = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
@@ -160,7 +160,7 @@ void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position
     }
 }
 
-void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position )
+void fill_segment( const Argon2_instance_t *instance, Argon2_position_t position )
 {
     if ( instance == NULL )
     {
@@ -183,7 +183,7 @@ void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position 
 
     if ( data_independent_addressing )
     {
-        GenerateAddresses( instance, &position, pseudo_rands );
+        generate_addresses( instance, &position, pseudo_rands );
     }
 
     uint32_t starting_index = 0;
@@ -239,12 +239,12 @@ void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position 
 
         /* 1.2.3 Computing the number of possible reference block within the lane. */
         position.index = i;
-        ref_index = IndexAlpha( instance, &position, pseudo_rand & 0xFFFFFFFF, ref_lane == position.lane );
+        ref_index = index_alpha( instance, &position, pseudo_rand & 0xFFFFFFFF, ref_lane == position.lane );
 
         /* 2 Creating a new block */
         block *ref_block = instance->memory + instance->lane_length * ref_lane + ref_index;
         block *curr_block = instance->memory + curr_offset;
-        FillBlock( state, ( uint8_t * ) ref_block->v, ( uint8_t * ) curr_block->v );
+        fill_block( state, ( uint8_t * ) ref_block->v, ( uint8_t * ) curr_block->v );
     }
 
     free( pseudo_rands );

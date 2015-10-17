@@ -20,7 +20,7 @@
  * @param next_block Pointer to the block to be constructed
  * @pre all block pointers must be valid
  */
-void FillBlock( const block *prev_block, const block *ref_block, block *next_block );
+void fill_block( const block *prev_block, const block *ref_block, block *next_block );
 
 /*
  * Generate pseudo-random values to reference blocks in the segment and puts them into the array
@@ -29,7 +29,7 @@ void FillBlock( const block *prev_block, const block *ref_block, block *next_blo
  * @param pseudo_rands Pointer to the array of 64-bit values
  * @pre pseudo_rands must point to @a instance->segment_length allocated values
  */
-void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position_t *position, uint64_t *pseudo_rands );
+void generate_addresses( const Argon2_instance_t *instance, const Argon2_position_t *position, uint64_t *pseudo_rands );
 
 /*
  * Function that fills the segment using previous segments also from other threads
@@ -37,7 +37,7 @@ void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position
  * @param position Current position
  * @pre all block pointers must be valid
  */
-void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position );
+void fill_segment( const Argon2_instance_t *instance, Argon2_position_t position );
 
 #endif  /* ARGON2_REF_CORE_H */
 

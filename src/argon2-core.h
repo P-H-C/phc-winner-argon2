@@ -60,13 +60,13 @@ typedef struct _block
 /*****************Functions that work with the block******************/
 
 //Initialize each byte of the block with @in
-extern void InitBlockValue( block *b, uint8_t in );
+extern void init_block_value( block *b, uint8_t in );
 
 //Copy block @src to block @dst
-extern void CopyBlock( block *dst, const block *src );
+extern void copy_block( block *dst, const block *src );
 
 //XOR @src onto @dst bytewise
-extern void XORBlock( block *dst, const block *src );
+extern void xor_block( block *dst, const block *src );
 
 
 /*
@@ -120,18 +120,18 @@ typedef struct _Argon2_thread_data
  * @param m_cost number of blocks to allocate in the memory
  * @return ARGON2_OK if @memory is a valid pointer and memory is allocated
  */
-int AllocateMemory( block **memory, uint32_t m_cost );
+int allocate_memory( block **memory, uint32_t m_cost );
 
 /* Clears memory
  * @param instance pointer to the current instance
  * @param clear_memory indicates if we clear the memory with zeros.
  */
-void ClearMemory( Argon2_instance_t *instance, bool clear );
+void clear_memory( Argon2_instance_t *instance, bool clear );
 
 /* Deallocates memory
  * @param memory pointer to the blocks
  */
-void FreeMemory( block *memory );
+void free_memory( block *memory );
 
 
 
@@ -144,14 +144,14 @@ void FreeMemory( block *memory );
  * @param same_lane Indicates if the block will be taken from the current lane. If so we can reference the current segment
  * @pre All pointers must be valid
  */
-uint32_t IndexAlpha( const Argon2_instance_t *instance, const Argon2_position_t *position, uint32_t pseudo_rand, bool same_lane );
+uint32_t index_alpha( const Argon2_instance_t *instance, const Argon2_position_t *position, uint32_t pseudo_rand, bool same_lane );
 
 /*
  * Function that validates all inputs against predefined restrictions and return an error code
  * @param context Pointer to current Argon2 context
  * @return ARGON2_OK if everything is all right, otherwise one of error codes (all defined in <argon2.h>
  */
-int ValidateInputs( const Argon2_Context *context );
+int validate_inputs( const Argon2_Context *context );
 
 /*
  * Hashes all the inputs into @a blockhash[PREHASH_DIGEST_LENGTH], clears password and secret if needed
@@ -160,7 +160,7 @@ int ValidateInputs( const Argon2_Context *context );
  * @param  type Argon2 type
  * @pre    @a blockhash must have at least @a PREHASH_DIGEST_LENGTH bytes allocated
  */
-void InitialHash( uint8_t *blockhash,  Argon2_Context *context, Argon2_type type );
+void initial_hash( uint8_t *blockhash,  Argon2_Context *context, Argon2_type type );
 
 /*
  * Function creates first 2 blocks per lane
@@ -168,7 +168,7 @@ void InitialHash( uint8_t *blockhash,  Argon2_Context *context, Argon2_type type
  * @param blockhash Pointer to the pre-hashing digest
  * @pre blockhash must point to @a PREHASH_SEED_LENGTH allocated values
  */
-void FillFirstBlocks( uint8_t *blockhash, const Argon2_instance_t *instance );
+void fill_firsts_blocks( uint8_t *blockhash, const Argon2_instance_t *instance );
 
 
 /*
@@ -178,7 +178,7 @@ void FillFirstBlocks( uint8_t *blockhash, const Argon2_instance_t *instance );
  * @param  instance Current Argon2 instance
  * @return Zero if successful, -1 if memory failed to allocate. @context->state will be modified if successful.
  */
-int Initialize( Argon2_instance_t *instance, Argon2_Context *context );
+int initialize( Argon2_instance_t *instance, Argon2_Context *context );
 
 /*
  * XORing the last block of each lane, hashing it, making the tag. Deallocates the memory.
@@ -188,7 +188,7 @@ int Initialize( Argon2_instance_t *instance, Argon2_Context *context );
  * @pre context->out must point to outlen bytes of memory
  * @pre if context->free_cbk is not NULL, it should point to a function that deallocates memory
  */
-void Finalize( const Argon2_Context *context, Argon2_instance_t *instance );
+void finalize( const Argon2_Context *context, Argon2_instance_t *instance );
 
 
 
@@ -198,20 +198,20 @@ void Finalize( const Argon2_Context *context, Argon2_instance_t *instance );
  * @param position Current position
  * @pre all block pointers must be valid
  */
-extern void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position );
+extern void fill_segment( const Argon2_instance_t *instance, Argon2_position_t position );
 
 /*
  * Wrapper for FillSegment for <pthread> library
  * @param thread_data Pointer to the structure that holds inputs for FillSegment
  * @pre all block pointers must be valid
  */
-void *FillSegmentThr( void *Argon2_thread_data );
+void *fill_segment_thr( void *Argon2_thread_data );
 
 /*
  * Function that fills the entire memory t_cost times based on the first two blocks in each lane
  * @param instance Pointer to the current instance
  */
-void FillMemoryBlocks( Argon2_instance_t *instance );
+void fill_memory_blocks( Argon2_instance_t *instance );
 
 
 /*
@@ -219,7 +219,7 @@ void FillMemoryBlocks( Argon2_instance_t *instance );
  * @param  context  Pointer to the Argon2 internal structure
  * @return Error code if smth is wrong, ARGON2_OK otherwise
  */
-int Argon2Core( Argon2_Context *context, Argon2_type type );
+int argon2_core( Argon2_Context *context, Argon2_type type );
 
 
 #endif

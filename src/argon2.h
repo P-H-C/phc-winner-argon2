@@ -204,7 +204,7 @@ extern  int hash( void *out, size_t outlen, const void *in, size_t inlen, const 
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2d( Argon2_Context *context );
+extern int argon2d( Argon2_Context *context );
 
 /*
  *  * **************Argon2i: Version of Argon2 that picks memory blocks independent on the password and salt. Good for side-channels,
@@ -213,21 +213,21 @@ extern int Argon2d( Argon2_Context *context );
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2i( Argon2_Context *context );
+extern int argon2i( Argon2_Context *context );
 
 /*
  *   * **************Argon2di: Reserved name***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2di( Argon2_Context *context );
+extern int argon2di( Argon2_Context *context );
 
 /*
  *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20% slower***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2ds( Argon2_Context *context );
+extern int argon2ds( Argon2_Context *context );
 
 
 /*
@@ -236,7 +236,7 @@ extern int Argon2ds( Argon2_Context *context );
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int Argon2id( Argon2_Context *context );
+extern int argon2id( Argon2_Context *context );
 
 /*
  * Verify if a given password is correct for Argon2d hashing
@@ -244,12 +244,12 @@ extern int Argon2id( Argon2_Context *context );
  * @param  hash  The password hash to verify. The length of the hash is specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-extern int VerifyD( Argon2_Context *context, const char *hash );
+extern int verify_d( Argon2_Context *context, const char *hash );
 
 /*
  * Get the associated error message for given error code
  * @return  The error message associated with the given error code
  */
-const char *ErrorMessage( int error_code );
+const char *error_message( int error_code );
 
 #endif

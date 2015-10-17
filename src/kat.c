@@ -19,7 +19,7 @@
 
 
 
-void InitialKat( const uint8_t *blockhash, const Argon2_Context *context, Argon2_type type )
+void initial_kat( const uint8_t *blockhash, const Argon2_Context *context, Argon2_type type )
 {
     FILE *fp = fopen( ARGON2_KAT_FILENAME, "a+" );
 
@@ -111,7 +111,7 @@ void InitialKat( const uint8_t *blockhash, const Argon2_Context *context, Argon2
     }
 }
 
-void PrintTag( const void *out, uint32_t outlen )
+void print_tag( const void *out, uint32_t outlen )
 {
     FILE *fp = fopen( ARGON2_KAT_FILENAME, "a+" );
 
@@ -130,7 +130,7 @@ void PrintTag( const void *out, uint32_t outlen )
     }
 }
 
-void InternalKat( const Argon2_instance_t *instance, uint32_t pass )
+void internal_kat( const Argon2_instance_t *instance, uint32_t pass )
 {
     FILE *fp = fopen( ARGON2_KAT_FILENAME, "a+" );
 

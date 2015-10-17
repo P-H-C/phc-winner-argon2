@@ -52,17 +52,17 @@
 #endif
 
 /***************Instance and Position constructors**********/
-void InitBlockValue( block *b, uint8_t in )
+void init_block_value( block *b, uint8_t in )
 {
     memset( b->v,in,sizeof( b->v ) );
 }
 
-void CopyBlock( block *dst, const block *src )
+void copy_block( block *dst, const block *src )
 {
     memcpy( dst->v,src->v,sizeof( uint64_t )*ARGON2_WORDS_IN_BLOCK );
 }
 
-void XORBlock( block *dst, const  block *src )
+void xor_block( block *dst, const  block *src )
 {
     int i;
 
@@ -74,7 +74,7 @@ void XORBlock( block *dst, const  block *src )
 
 
 /***************Memory allocators*****************/
-int AllocateMemory( block **memory, uint32_t m_cost )
+int allocate_memory( block **memory, uint32_t m_cost )
 {
     if ( memory != NULL )
     {
@@ -128,7 +128,7 @@ const uint32_t ARGON2_PREHASH_SEED_LENGTH = 72;/*Dependent values!*/
 
 /*********Memory functions*/
 
-void ClearMemory( Argon2_instance_t *instance, bool clear )
+void clear_memory( Argon2_instance_t *instance, bool clear )
 {
     if ( instance->memory != NULL && clear )
     {
@@ -136,7 +136,7 @@ void ClearMemory( Argon2_instance_t *instance, bool clear )
     }
 }
 
-void FreeMemory( block *memory )
+void free_memory( block *memory )
 {
     if ( memory != NULL )
     {
@@ -144,18 +144,18 @@ void FreeMemory( block *memory )
     }
 }
 
-void Finalize( const Argon2_Context *context, Argon2_instance_t *instance )
+void finalize( const Argon2_Context *context, Argon2_instance_t *instance )
 {
     if ( context != NULL && instance != NULL )
     {
         block blockhash;
-        CopyBlock( &blockhash, instance->memory+ instance->lane_length - 1 );
+        copy_block( &blockhash, instance->memory+ instance->lane_length - 1 );
 
         // XOR the last blocks
         for ( uint32_t l = 1; l < instance->lanes; ++l )
         {
             uint32_t last_block_in_lane = l * instance->lane_length + ( instance->lane_length - 1 );
-            XORBlock( &blockhash,instance->memory + last_block_in_lane );
+            xor_block( &blockhash,instance->memory + last_block_in_lane );
 
         }
 
@@ -165,11 +165,11 @@ void Finalize( const Argon2_Context *context, Argon2_instance_t *instance )
 
         if( context->print ) //Shall we print the output tag?
         {
-            PrintTag( context->out, context->outlen );
+            print_tag( context->out, context->outlen );
         }
 
         // Clear memory
-        ClearMemory( instance, context->clear_memory );
+        clear_memory( instance, context->clear_memory );
 
         // Deallocate the memory
         if ( NULL != context->free_cbk )
@@ -178,13 +178,13 @@ void Finalize( const Argon2_Context *context, Argon2_instance_t *instance )
         }
         else
         {
-            FreeMemory( instance->memory );
+            free_memory( instance->memory );
         }
 
     }
 }
 
-uint32_t IndexAlpha( const Argon2_instance_t *instance, const Argon2_position_t *position, uint32_t pseudo_rand, bool same_lane )
+uint32_t index_alpha( const Argon2_instance_t *instance, const Argon2_position_t *position, uint32_t pseudo_rand, bool same_lane )
 {
     /*
      * Pass 0:
@@ -248,7 +248,7 @@ uint32_t IndexAlpha( const Argon2_instance_t *instance, const Argon2_position_t 
     return absolute_position;
 }
 
-void FillMemoryBlocks( Argon2_instance_t *instance )
+void fill_memory_blocks( Argon2_instance_t *instance )
 {
     if ( instance == NULL )
     {
@@ -287,7 +287,7 @@ void FillMemoryBlocks( Argon2_instance_t *instance )
                 Argon2_position_t position = {r,l,s,0};
                 thr_data[l].instance_ptr = instance;//preparing the thread input
                 memcpy( &( thr_data[l].pos ), &position, sizeof( Argon2_position_t ) );
-                rc =pthread_create( &thread[l],&attr,FillSegmentThr,( void * )&thr_data[l] );
+                rc =pthread_create( &thread[l],&attr,fill_segment_thr,( void * )&thr_data[l] );
 
 
                 //FillSegment(instance, position);  //Non-thread equivalent of the lines above
@@ -312,14 +312,14 @@ void FillMemoryBlocks( Argon2_instance_t *instance )
 
         if( instance->print_internals )
         {
-            InternalKat( instance, r ); // Print all memory blocks
+            internal_kat( instance, r ); // Print all memory blocks
         }
     }
 
 
 }
 
-int ValidateInputs( const Argon2_Context *context )
+int validate_inputs( const Argon2_Context *context )
 {
     if ( NULL == context )
     {
@@ -483,7 +483,7 @@ int ValidateInputs( const Argon2_Context *context )
     return ARGON2_OK;
 }
 
-void FillFirstBlocks( uint8_t *blockhash, const Argon2_instance_t *instance )
+void fill_first_blocks( uint8_t *blockhash, const Argon2_instance_t *instance )
 {
     // Make the first and second block in each lane as G(H0||i||0) or G(H0||i||1)
     for ( uint32_t l = 0; l < instance->lanes; ++l )
@@ -497,7 +497,7 @@ void FillFirstBlocks( uint8_t *blockhash, const Argon2_instance_t *instance )
     }
 }
 
-void InitialHash( uint8_t *blockhash, Argon2_Context *context, Argon2_type type )
+void initial_hash( uint8_t *blockhash, Argon2_Context *context, Argon2_type type )
 {
     blake2b_state BlakeHash;
     uint8_t value[sizeof ( uint32_t )];
@@ -574,7 +574,7 @@ void InitialHash( uint8_t *blockhash, Argon2_Context *context, Argon2_type type 
     blake2b_final( &BlakeHash, blockhash, ARGON2_PREHASH_DIGEST_LENGTH );
 }
 
-int Initialize( Argon2_instance_t *instance, Argon2_Context *context )
+int initialize( Argon2_instance_t *instance, Argon2_Context *context )
 {
     if ( instance == NULL || context == NULL )
         return ARGON2_INCORRECT_PARAMETER;
@@ -588,7 +588,7 @@ int Initialize( Argon2_instance_t *instance, Argon2_Context *context )
     }
     else
     {
-        result = AllocateMemory( &( instance->memory ), instance->memory_blocks );
+        result = allocate_memory( &( instance->memory ), instance->memory_blocks );
     }
 
     if ( ARGON2_OK != result )
@@ -600,27 +600,27 @@ int Initialize( Argon2_instance_t *instance, Argon2_Context *context )
     // H_0 + 8 extra bytes to produce the first blocks
     uint8_t blockhash[ARGON2_PREHASH_SEED_LENGTH];
     // Hashing all inputs
-    InitialHash( blockhash, context, instance->type );
+    initial_hash( blockhash, context, instance->type );
     // Zeroing 8 extra bytes
     secure_wipe_memory( blockhash + ARGON2_PREHASH_DIGEST_LENGTH, ARGON2_PREHASH_SEED_LENGTH - ARGON2_PREHASH_DIGEST_LENGTH );
 
     if( context->print )
     {
-        InitialKat( blockhash, context, instance->type );
+        initial_kat( blockhash, context, instance->type );
     }
 
     // 3. Creating first blocks, we always have at least two blocks in a slice
-    FillFirstBlocks( blockhash, instance );
+    fill_first_blocks( blockhash, instance );
     // Clearing the hash
     secure_wipe_memory( blockhash, ARGON2_PREHASH_SEED_LENGTH );
 
     return ARGON2_OK;
 }
 
-int Argon2Core( Argon2_Context *context, Argon2_type type )
+int argon2_core( Argon2_Context *context, Argon2_type type )
 {
     /* 1. Validate all inputs */
-    int result = ValidateInputs( context );
+    int result = validate_inputs( context );
 
     if ( ARGON2_OK != result )
     {
@@ -650,7 +650,7 @@ int Argon2Core( Argon2_Context *context, Argon2_type type )
                                  };
 
     /* 3. Initialization: Hashing inputs, allocating memory, filling first blocks */
-    result = Initialize( &instance, context );
+    result = initialize( &instance, context );
 
     if ( ARGON2_OK != result )
     {
@@ -658,18 +658,18 @@ int Argon2Core( Argon2_Context *context, Argon2_type type )
     }
 
     /* 4. Filling memory */
-    FillMemoryBlocks( &instance );
+    fill_memory_blocks( &instance );
 
     /* 5. Finalization */
-    Finalize( context, &instance );
+    finalize( context, &instance );
 
     return ARGON2_OK;
 }
 
 
-void *FillSegmentThr( void *thread_data )
+void *fill_segment_thr( void *thread_data )
 {
     Argon2_thread_data *my_data = ( Argon2_thread_data * )thread_data;
-    FillSegment( my_data->instance_ptr, my_data->pos );
+    fill_segment( my_data->instance_ptr, my_data->pos );
     pthread_exit( thread_data );
 }
