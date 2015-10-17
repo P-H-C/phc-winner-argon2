@@ -26,11 +26,13 @@ Example use of libargon2...
 
 ## Intellectual property
 
-Argon2 code is copyright (c) Daniel Dinu and Dmitry Khovratovich, 2014,
-and under CC0 license.
+Argon2 code is copyright (c) 2015 Daniel Dinu and Dmitry Khovratovich,
+with modifications copyright (c) 2015 Jean-Philippe Aumasson and Samuel
+Neves. The Argon2 code is under [CC0
+license](https://creativecommons.org/about/cc0).
 
-BLAKE2 code is copyright (c) Samuel Neves, 2013-2015, and under CC0
-license.
+BLAKE2 code is copyright (c) Samuel Neves, 2013-2015, and under [CC0
+license](https://creativecommons.org/about/cc0).
 
 [`blake2/brg-endian.h`](src/blake2/brg-endian.h) is copyright (c) Brian
 Gladman, 1998-2008, and under permissive license defined in the file
