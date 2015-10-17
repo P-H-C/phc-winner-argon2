@@ -11,8 +11,8 @@
  */
 
 
-#include "stdio.h"
-#include "inttypes.h"
+#include <stdio.h>
+#include <inttypes.h>
 
 #include "argon2.h"
 #include "argon2-core.h"

@@ -10,10 +10,10 @@
  */
 
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
-#include "stdio.h"
+#include <stdio.h>
 
 #include "argon2.h"
 #include "argon2-core.h"
