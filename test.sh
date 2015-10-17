@@ -18,8 +18,6 @@ KAT_REF=kat-argon2-ref.log
 KAT_OPT=kat-argon2-opt.log
 
 
-# Default arguments
-
 for implementation in ${IMPLEMENTATIONS[@]}
 do
 	echo "$implementation implementation"

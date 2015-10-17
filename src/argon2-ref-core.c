@@ -20,9 +20,9 @@
 #include "kat.h"
 
 
-#include "blamka-round-ref.h"
-#include "blake2-impl.h"
-#include "blake2.h"
+#include "blake2/blamka-round-ref.h"
+#include "blake2/blake2-impl.h"
+#include "blake2/blake2.h"
 
 
 /* The KAT file name */

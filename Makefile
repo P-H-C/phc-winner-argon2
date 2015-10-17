@@ -13,6 +13,7 @@ DIST = phc-winner-argon2
 CC = gcc
 SRC = src/argon2.c src/argon2-core.c src/kat.c src/blake2/blake2b-ref.c
 SRC_MAIN = src/argon2-test.c
+OBJ = $(SRC:.c=.o)
 
 CFLAGS = -std=c99 -pthread -O3 -Wall
 CFLAGS_OPT = $(CFLAGS) 
@@ -41,22 +42,30 @@ ifeq ($(KERNEL_NAME), Darwin)
 	LIB_PATH := -Xlinker -rpath -Xlinker $(BUILD_PATH)
 endif
 
-LIB := lib$(LIB_NAME).$(LIB_EXT)
+LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
+LIB_ST := lib$(LIB_NAME).a
 
 .PHONY: clean test
 
-all: clean $(BIN) $(LIB)
+all: clean $(BIN) $(LIB_SH) $(LIB_ST)
+bin: $(BIN)
+libs: $(LIB_SH) $(LIB_ST)
 
-$(BIN): $(SRC) $(SRC_MAIN)
-	$(CC) $(CFLAGS) $^ -Isrc -Isrc/blake2 -o $@
+$(BIN): 	$(SRC) $(SRC_MAIN)
+		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
-$(LIB): $(SRC)
-	$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -Isrc/blake2 -o $@
+$(LIB_SH): 	$(SRC)
+		$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -o $@
+
+$(LIB_ST): 	$(OBJ)
+		ar rcs $@ $^
 
 clean:
-	rm -f $(BIN) $(LIB) kat-argon2* 
-	cd test-vectors/ &&  rm -f kat-* diff* run_* make_*
+		rm -f $(BIN) $(LIB_SH) $(LIB_ST) kat-argon2* 
+		cd src/ && rm -f *.o
+		cd src/blake2/ && rm -f *.o
+		cd test-vectors/ &&  rm -f kat-* diff* run_* make_*
 
 dist:
-	cd ..; \
-	tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
+		cd ..; \
+		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
