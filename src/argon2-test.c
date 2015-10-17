@@ -178,25 +178,19 @@ void run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     const unsigned out_length = 32;
     const unsigned pwd_length = 32;
     const unsigned salt_length = 16;
-    const unsigned secret_length = 8;
-    const unsigned ad_length = 12;
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
     uint8_t pwd[pwd_length];
     uint8_t salt[salt_length];
-    uint8_t secret[secret_length];
-    uint8_t ad[ad_length];
 
     UNUSED_PARAMETER( threads );
 
     memset( pwd, 1, pwd_length );
     memset( salt, 2, salt_length );
-    memset( secret, 3, secret_length );
-    memset( ad, 4, ad_length );
 
     Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
-                             secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
+                             NULL, 0, NULL, 0, t_cost, m_cost, lanes, lanes,
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
                             };
