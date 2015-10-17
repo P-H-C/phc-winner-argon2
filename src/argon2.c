@@ -125,6 +125,8 @@ int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *sa
     bool c_m=true;
     bool pr=false;
 
+     
+
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
                               ( uint8_t * ) in, ( uint32_t ) inlen,
                               ( uint8_t * ) salt, ( uint32_t ) saltlen,
