@@ -24,7 +24,7 @@ Both Argon2i and Argon2d are parametrized by
     - `threads`, the number of threads allocated to the parallel
       execution (actual parallelism)
 
-You'll find detailed specifications and design ratinoale in the [Argon2
+You'll find detailed specifications and design rationale in the [Argon2
 document](argon2-specs.pdf).
 
 Please report bugs as issues on this repository (after searching if
