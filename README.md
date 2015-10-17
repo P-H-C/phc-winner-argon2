@@ -9,7 +9,7 @@ function that won the [Password Hashing Competition
 You should use Argon2 whenever you need to hash passwords for credential
 storage, key derivation, or other applications.
 
-There are two main versions of Argon2, *Argon2i* and *Argon2d*. Argon2i
+There are two main versions of Argon2, **Argon2i** and **Argon2d**. Argon2i
 is the safest against side-channel attacks, while Argon2d provides the
 highest resistance against GPU cracking attacks.
 
