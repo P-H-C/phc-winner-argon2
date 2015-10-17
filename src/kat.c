@@ -37,14 +37,6 @@ void InitialKat( const uint8_t *blockhash, const Argon2_Context *context, Argon2
             fprintf( fp, "Argon2i\n" );
             break;
 
-        case Argon2_id:
-            fprintf( fp, "Argon2id\n" );
-            break;
-
-        case Argon2_ds:
-            fprintf( fp, "Argon2ds\n" );
-            break;
-
         default:
             break;
         }

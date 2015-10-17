@@ -17,10 +17,9 @@
  * @param state Pointer to the just produced block. Content will be updated(!)
  * @param ref_block Pointer to the reference block
  * @param next_block Pointer to the block to be constructed
- * @param Sbox Pointer to the Sbox (used in Argon2_ds only)
  * @pre all block pointers must be valid
  */
-void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, const uint64_t *Sbox );
+void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block );
 
 
 /*
@@ -40,12 +39,6 @@ void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position
  * @pre all block pointers must be valid
  */
 void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position );
-
-/*
- * Generates the Sbox from the first memory block (must be ready at that time)
- * @param instance Pointer to the current instance
- */
-void GenerateSbox( Argon2_instance_t *instance );
 
 #endif  /* ARGON2_OPT_CORE_H */
 

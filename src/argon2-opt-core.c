@@ -41,7 +41,7 @@ const char *ARGON2_KAT_FILENAME = "kat-argon2-opt.log";
 #define r16  (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))
 #define r24 (_mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10))
 
-void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, const uint64_t *Sbox )
+void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
 {
     __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
@@ -61,22 +61,6 @@ void FillBlock( __m128i *state, const uint8_t *ref_block, uint8_t *next_block, c
     }
 
     uint64_t x = 0;
-
-    if ( Sbox != NULL )
-    {
-        x = _mm_extract_epi64( block_XY[0], 0 ) ^ _mm_extract_epi64( block_XY[ARGON2_QWORDS_IN_BLOCK - 1], 1 );
-
-        for ( int i = 0; i < 6 * 16; ++i )
-        {
-            uint32_t x1 = x >> 32;
-            uint32_t x2 = x & 0xFFFFFFFF;
-            uint64_t y = Sbox[x1 & ARGON2_SBOX_MASK];
-            uint64_t z = Sbox[( x2 & ARGON2_SBOX_MASK ) + ARGON2_SBOX_SIZE / 2];
-            x = ( uint64_t ) x1 * ( uint64_t ) x2;
-            x += y;
-            x ^= z;
-        }
-    }
 
     BLAKE2_ROUND( state[0], state[1], state[2], state[3],
                   state[4], state[5], state[6], state[7] );
@@ -167,8 +151,8 @@ void GenerateAddresses( const Argon2_instance_t *instance, const Argon2_position
                 block zero_block, zero2_block;
                 InitBlockValue( &zero_block,0 );
                 InitBlockValue( &zero2_block,0 );
-                FillBlock( ( __m128i * ) & zero_block.v, ( uint8_t * ) & input_block.v, ( uint8_t * ) & address_block.v, NULL );
-                FillBlock( ( __m128i * ) & zero2_block.v, ( uint8_t * ) & address_block.v, ( uint8_t * ) & address_block.v, NULL );
+                FillBlock( ( __m128i * ) & zero_block.v, ( uint8_t * ) & input_block.v, ( uint8_t * ) & address_block.v );
+                FillBlock( ( __m128i * ) & zero2_block.v, ( uint8_t * ) & address_block.v, ( uint8_t * ) & address_block.v );
             }
 
             pseudo_rands[i] = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
@@ -186,7 +170,7 @@ void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position 
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     __m128i state[64];
-    bool data_independent_addressing = ( instance->type == Argon2_i ) || ( instance->type == Argon2_id && ( position.pass == 0 ) && ( position.slice < ARGON2_SYNC_POINTS / 2 ) );
+    bool data_independent_addressing = ( instance->type == Argon2_i );
 
 
     // Pseudo-random values that determine the reference block position
@@ -260,37 +244,9 @@ void FillSegment( const Argon2_instance_t *instance, Argon2_position_t position 
         /* 2 Creating a new block */
         block *ref_block = instance->memory + instance->lane_length * ref_lane + ref_index;
         block *curr_block = instance->memory + curr_offset;
-        FillBlock( state, ( uint8_t * ) ref_block->v, ( uint8_t * ) curr_block->v, instance->Sbox );
+        FillBlock( state, ( uint8_t * ) ref_block->v, ( uint8_t * ) curr_block->v );
     }
 
     free( pseudo_rands );
 
-}
-
-void GenerateSbox( Argon2_instance_t *instance )
-{
-    if ( instance == NULL )
-    {
-        return;
-    }
-
-    block zero_block;
-    InitBlockValue( &zero_block,0 );
-    block out_block = zero_block;
-    block start_block = instance->memory[0];
-
-    if ( instance->Sbox == NULL )
-    {
-        instance->Sbox = ( uint64_t * ) malloc( sizeof( uint64_t )*ARGON2_SBOX_SIZE );
-    }
-
-    for ( uint32_t i = 0; i < ARGON2_SBOX_SIZE / ARGON2_WORDS_IN_BLOCK; ++i )
-    {
-        block zero_block, zero2_block;
-        InitBlockValue( &zero_block,0 );
-        InitBlockValue( &zero2_block,0 );
-        FillBlock( ( __m128i * ) zero_block.v, ( uint8_t * ) start_block.v, ( uint8_t * ) out_block.v, NULL );
-        FillBlock( ( __m128i * ) zero2_block.v, ( uint8_t * ) out_block.v, ( uint8_t * ) start_block.v, NULL );
-        memcpy( instance->Sbox + i * ARGON2_WORDS_IN_BLOCK, start_block.v, ARGON2_BLOCK_SIZE );
-    }
 }

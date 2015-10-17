@@ -32,19 +32,11 @@ extern const uint32_t ARGON2_ADDRESSES_IN_BLOCK;
 extern const uint32_t ARGON2_PREHASH_DIGEST_LENGTH ;
 extern const uint32_t ARGON2_PREHASH_SEED_LENGTH ;/*Dependent values!*/
 
-
-
-/*****SM-related constants******/
-extern const uint32_t ARGON2_SBOX_SIZE;
-extern const uint32_t ARGON2_SBOX_MASK ;
-
 /* Argon2 primitive type */
 typedef enum _Argon2_type
 {
     Argon2_d=0,
     Argon2_i=1,
-    Argon2_id=2,
-    Argon2_ds=4
 } Argon2_type;
 
 /*************************Argon2 internal data types**************************************************/
@@ -57,12 +49,12 @@ typedef enum _Argon2_type
 typedef struct _block
 {
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} __attribute__ ((aligned (16))) block;
+} __attribute__ ( ( aligned ( 16 ) ) ) block;
 #else
 typedef struct _block
 {
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} __declspec(align(16)) block;
+} __declspec( align( 16 ) ) block;
 #endif
 
 /*****************Functions that work with the block******************/
@@ -91,7 +83,6 @@ typedef struct _Argon2_instance_t
     const uint32_t lanes;
     const uint32_t threads;
     const Argon2_type type;
-    uint64_t *Sbox; //S-boxes for Argon2_ds
     const bool print_internals;  //whether to print the memory blocks
 } Argon2_instance_t;
 
@@ -230,7 +221,5 @@ void FillMemoryBlocks( Argon2_instance_t *instance );
  */
 int Argon2Core( Argon2_Context *context, Argon2_type type );
 
-
-extern void GenerateSbox( Argon2_instance_t *instance );
 
 #endif

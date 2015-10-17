@@ -126,24 +126,12 @@ const uint32_t ARGON2_ADDRESSES_IN_BLOCK = 128;
 const uint32_t ARGON2_PREHASH_DIGEST_LENGTH = 64;
 const uint32_t ARGON2_PREHASH_SEED_LENGTH = 72;/*Dependent values!*/
 
-
-
-/*****SM-related constants******/
-const uint32_t ARGON2_SBOX_SIZE = 1 << 10;
-const uint32_t ARGON2_SBOX_MASK = ( 1<<9 ) - 1;
-
-
 /*********Memory functions*/
 
 void ClearMemory( Argon2_instance_t *instance, bool clear )
 {
     if ( instance->memory != NULL && clear )
     {
-        if ( instance->type == Argon2_ds && instance->Sbox != NULL )
-        {
-            secure_wipe_memory( instance->Sbox, ARGON2_SBOX_SIZE * sizeof ( uint64_t ) );
-        }
-
         secure_wipe_memory( instance->memory, sizeof ( block ) * instance->memory_blocks );
     }
 }
@@ -182,12 +170,6 @@ void Finalize( const Argon2_Context *context, Argon2_instance_t *instance )
 
         // Clear memory
         ClearMemory( instance, context->clear_memory );
-
-        // Deallocate Sbox memory
-        if ( instance->memory != NULL && instance->Sbox != NULL )
-        {
-            free( instance->Sbox );
-        }
 
         // Deallocate the memory
         if ( NULL != context->free_cbk )
@@ -275,11 +257,6 @@ void FillMemoryBlocks( Argon2_instance_t *instance )
 
     for ( uint32_t r = 0; r < instance->passes; ++r )
     {
-        if ( Argon2_ds == instance->type )
-        {
-            GenerateSbox( instance );
-        }
-
         for ( uint8_t s = 0; s < ARGON2_SYNC_POINTS; ++s )
         {
             //1. Allocating space for threads
@@ -650,7 +627,7 @@ int Argon2Core( Argon2_Context *context, Argon2_type type )
         return result;
     }
 
-    if ( Argon2_d != type && Argon2_i != type && Argon2_id != type && Argon2_ds != type )
+    if ( Argon2_d != type && Argon2_i != type )
     {
         return ARGON2_INCORRECT_TYPE;
     }
@@ -669,7 +646,7 @@ int Argon2Core( Argon2_Context *context, Argon2_type type )
     // Ensure that all segments have equal length
     memory_blocks = segment_length * ( context->lanes * ARGON2_SYNC_POINTS );
     Argon2_instance_t instance = { NULL, context->t_cost, memory_blocks, segment_length,
-                                   segment_length * ARGON2_SYNC_POINTS, context->lanes, context->threads, type, NULL,print_internals
+                                   segment_length * ARGON2_SYNC_POINTS, context->lanes, context->threads, type, print_internals
                                  };
 
     /* 3. Initialization: Hashing inputs, allocating memory, filling first blocks */

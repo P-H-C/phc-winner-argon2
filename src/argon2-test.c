@@ -78,7 +78,7 @@ void usage( const char *cmd )
     printf( "\tg\tgenerates test vectors for given Argon2 type\n" );
     printf( "\tb\tbenchmarks various Argon2 versions\n" );
     printf( "Parameters (for run mode):\n" );
-    printf( "\t-y, --type [d | i | id | ds]\n" );
+    printf( "\t-y, --type [d or i, default i]\n" );
     printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
     printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
@@ -92,13 +92,14 @@ void fatal( const char *error )
     exit( 1 );
 }
 
-void print_bytes(const void *s, size_t len)
+void print_bytes( const void *s, size_t len )
 {
-  for(size_t i = 0; i < len; i++)
-  {
-    printf("%02x", ((const unsigned char *) s)[i] & 0xff);
-  }
-  printf("\n");
+    for( size_t i = 0; i < len; i++ )
+    {
+        printf( "%02x", ( ( const unsigned char * ) s )[i] & 0xff );
+    }
+
+    printf( "\n" );
 }
 
 
@@ -129,7 +130,7 @@ void Benchmark()
         {
             uint32_t thread_n = thread_test[i];
 #ifdef _MEASURE
-            uint64_t start_cycles, stop_cycles, stop_cycles_i, stop_cycles_di, stop_cycles_ds;
+            uint64_t start_cycles, stop_cycles, stop_cycles_i;
 
             clock_t start_time = clock();
             start_cycles = rdtsc();
@@ -139,35 +140,20 @@ void Benchmark()
                                       NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false, false
                                      };
             Argon2d( &context );
-
 #ifdef _MEASURE
             stop_cycles = rdtsc();
 #endif
             Argon2i( &context );
 #ifdef _MEASURE
             stop_cycles_i = rdtsc();
-#endif
-            Argon2id( &context );
-#ifdef _MEASURE
-            stop_cycles_di = rdtsc();
-#endif
-            Argon2ds( &context );
-#ifdef _MEASURE
-            stop_cycles_ds = rdtsc();
             clock_t stop_time = clock();
 
             uint64_t delta_d = ( stop_cycles - start_cycles ) / ( m_cost );
             uint64_t delta_i = ( stop_cycles_i - stop_cycles ) / ( m_cost );
-            uint64_t delta_id = ( stop_cycles_di - stop_cycles_i ) / m_cost;
-            uint64_t delta_ds = ( stop_cycles_ds - stop_cycles_di ) / m_cost;
             float mcycles_d = ( float ) ( stop_cycles - start_cycles ) / ( 1 << 20 );
             float mcycles_i = ( float ) ( stop_cycles_i - stop_cycles ) / ( 1 << 20 );
-            float mcycles_id = ( float ) ( stop_cycles_di - stop_cycles_i ) / ( 1 << 20 );
-            float mcycles_ds = ( float ) ( stop_cycles_ds - stop_cycles_di ) / ( 1 << 20 );
             printf( "Argon2d %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f Mcycles \n", t_cost, m_cost >> 10, thread_n, ( float ) delta_d / 1024, mcycles_d );
             printf( "Argon2i %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f Mcycles \n", t_cost, m_cost >> 10, thread_n, ( float ) delta_i / 1024, mcycles_i );
-            printf( "Argon2id %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f Mcycles \n", t_cost, m_cost >> 10, thread_n, ( float ) delta_id / 1024, mcycles_id );
-            printf( "Argon2ds %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f Mcycles \n", t_cost, m_cost >> 10, thread_n, ( float ) delta_ds / 1024, mcycles_ds );
 
             float run_time = ( ( float ) stop_time - start_time ) / ( CLOCKS_PER_SEC );
             printf( "%2.4f seconds\n\n", run_time );
@@ -213,16 +199,14 @@ void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
                             };
-    printf("Argon2%s with\n", type);
-    printf("\tt_cost = %d\n", t_cost);
-    printf("\tm_cost = %d\n", m_cost);
-    printf("\tpassword = "); print_bytes(pwd, pwd_length);
-    printf("\tsalt = "); print_bytes(salt, salt_length);
+    printf( "Argon2%s with\n", type );
+    printf( "\tt_cost = %d\n", t_cost );
+    printf( "\tm_cost = %d\n", m_cost );
+    printf( "\tpassword = " ); print_bytes( pwd, pwd_length );
+    printf( "\tsalt = " ); print_bytes( salt, salt_length );
 
     if ( !strcmp( type,"d" ) )  Argon2d( &context );
     else if ( !strcmp( type,"i" ) ) Argon2i( &context );
-    else if ( !strcmp( type,"ds" ) ) Argon2ds( &context );
-    else if ( !strcmp( type,"id" ) ) Argon2id( &context );
     else fatal( "wrong Argon2 type" );
 
 
@@ -238,7 +222,7 @@ void Run( uint8_t *out, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32
     printf( "(%.3f mebicycles)\n", mcycles );
 #endif
 
-    printf("hash = "); print_bytes(out, out_length);
+    printf( "hash = " ); print_bytes( out, out_length );
 }
 
 void GenerateTestVectors( const char *type )
@@ -279,8 +263,6 @@ void GenerateTestVectors( const char *type )
 
     if ( !strcmp( type,"d" ) ) Argon2d( &context );
     else if ( !strcmp( type,"i" ) ) Argon2i( &context );
-    else if ( !strcmp( type,"ds" ) ) Argon2ds( &context );
-    else if ( !strcmp( type,"id" ) ) Argon2id( &context );
     else  fatal( "wrong Argon2 type" );
 }
 
@@ -294,7 +276,7 @@ int main( int argc, char *argv[] )
     uint32_t threads = THREADS_DEF;
 
     bool generate_test_vectors = false;
-    const char *type= "d";
+    const char *type= "i";
 
     remove( ARGON2_KAT_FILENAME );
 
@@ -358,22 +340,22 @@ int main( int argc, char *argv[] )
             }
             else fatal( "missing type argument" );
         }
-        else if ( !strcmp( a, "r" ))
+        else if ( !strcmp( a, "r" ) )
         {
             generate_test_vectors = false;
             continue;
         }
-        else if ( !strcmp( a, "g" ))
+        else if ( !strcmp( a, "g" ) )
         {
             generate_test_vectors = true;
             continue;
         }
-        else if ( !strcmp( a, "b" ))
+        else if ( !strcmp( a, "b" ) )
         {
             Benchmark();
             return 0;
         }
-        else fatal("unknown argument");
+        else fatal( "unknown argument" );
     }
 
     if ( generate_test_vectors )

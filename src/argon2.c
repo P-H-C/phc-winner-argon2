@@ -111,7 +111,7 @@ const char *Argon2_ErrorMessage[] =
 };
 
 int hash( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
-         size_t saltlen, unsigned int t_cost, unsigned int m_cost )
+          size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
     uint8_t *default_ad_ptr = NULL;
     uint32_t default_ad_length = 0;
@@ -146,16 +146,6 @@ int Argon2d( Argon2_Context *context )
 int Argon2i( Argon2_Context *context )
 {
     return Argon2Core( context, Argon2_i );
-}
-
-int Argon2id( Argon2_Context *context )
-{
-    return Argon2Core( context, Argon2_id );
-}
-
-int Argon2ds( Argon2_Context *context )
-{
-    return Argon2Core( context, Argon2_ds );
 }
 
 int VerifyD( Argon2_Context *context, const char *hash )
