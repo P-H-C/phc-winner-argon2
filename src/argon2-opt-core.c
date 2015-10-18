@@ -45,9 +45,6 @@ void fill_block( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
 {
     __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
-    //__m128i state[64];
-
-
 
     for ( uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++ )
     {
@@ -116,9 +113,6 @@ void fill_block( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
         // Feedback
         state[i] = _mm_xor_si128( state[i], block_XY[i] );
     }
-
-    state[0] = _mm_add_epi64( state[0], _mm_set_epi64x( 0, x ) );
-    state[ARGON2_QWORDS_IN_BLOCK - 1] = _mm_add_epi64( state[ARGON2_QWORDS_IN_BLOCK - 1], _mm_set_epi64x( x, 0 ) );
 
     for ( uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++ )
     {

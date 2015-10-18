@@ -37,8 +37,6 @@ void fill_block( const block *prev_block, const block *ref_block, block *next_bl
     block block_tmp;
     copy_block( &block_tmp, &blockR );
 
-    uint64_t x = 0;
-
     // Apply Blake2 on columns of 64-bit words: (0,1,...,15) , then (16,17,..31)... finally (112,113,...127)
     for ( unsigned i = 0; i < 8; ++i )
     {
@@ -59,8 +57,6 @@ void fill_block( const block *prev_block, const block *ref_block, block *next_bl
 
     copy_block( next_block,&block_tmp );
     xor_block( next_block,&blockR );
-    next_block->v[0] += x;
-    next_block->v[ARGON2_WORDS_IN_BLOCK - 1] += x;
 }
 
 void generate_addresses( const Argon2_instance_t *instance, const Argon2_position_t *position, uint64_t *pseudo_rands )
