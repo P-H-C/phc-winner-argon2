@@ -111,13 +111,13 @@ const char *Argon2_ErrorMessage[] =
 };
 
 int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
-          size_t saltlen, unsigned int t_cost, unsigned int m_cost )
+             size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
                               ( uint8_t * ) in, ( uint32_t ) inlen,
                               ( uint8_t * ) salt, ( uint32_t ) saltlen,
                               NULL, 0, NULL, 0,
-                              ( uint32_t ) t_cost, ( uint32_t ) m_cost, 
+                              ( uint32_t ) t_cost, ( uint32_t ) m_cost,
                               1, 1, NULL, NULL,
                               true, true, true, false
                              };
@@ -126,13 +126,13 @@ int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void 
 }
 
 int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, const void *salt,
-          size_t saltlen, unsigned int t_cost, unsigned int m_cost )
+              size_t saltlen, unsigned int t_cost, unsigned int m_cost )
 {
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
                               ( uint8_t * ) in, ( uint32_t ) inlen,
                               ( uint8_t * ) salt, ( uint32_t ) saltlen,
                               NULL, 0, NULL, 0,
-                              ( uint32_t ) t_cost, ( uint32_t ) m_cost, 
+                              ( uint32_t ) t_cost, ( uint32_t ) m_cost,
                               1, 1, NULL, NULL,
                               true, true, true, false
                              };

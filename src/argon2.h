@@ -62,7 +62,7 @@ const uint32_t ARGON2_MAX_AD_LENGTH ;
 
 /* Minimum and maximum salt length in bytes */
 const uint32_t ARGON2_MIN_SALT_LENGTH ;
- const uint32_t ARGON2_MAX_SALT_LENGTH;
+const uint32_t ARGON2_MAX_SALT_LENGTH;
 
 /* Minimum and maximum key length in bytes */
 const uint32_t ARGON2_MIN_SECRET ;
@@ -197,11 +197,11 @@ typedef struct _Argon2_Context
  * @return Zero if successful, 1 otherwise.
  */
 int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
-                  unsigned int t_cost, unsigned int m_cost );
+             unsigned int t_cost, unsigned int m_cost );
 
 /* same for argon2d */
 int hashpwd2( void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
-                  unsigned int t_cost, unsigned int m_cost );
+              unsigned int t_cost, unsigned int m_cost );
 
 /*
  * **************Argon2d: Version of Argon2 that picks memory blocks depending on the password and salt. Only for side-channel-free environment!!***************

@@ -84,7 +84,7 @@ void usage( const char *cmd )
     printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
     printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
-    printf( "\t-i, --password [password, default \"%s\"]\n", PWD_DEF);
+    printf( "\t-i, --password [password, default \"%s\"]\n", PWD_DEF );
 }
 
 
@@ -107,7 +107,7 @@ void print_bytes( const void *s, size_t len )
 
 /*
  * Benchmarks Argon2 with salt length 16, password length 16, t_cost 1,
-   and different m_cost and threads 
+   and different m_cost and threads
  */
 void benchmark()
 {
@@ -184,13 +184,16 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
     uint8_t salt[salt_length];
     uint8_t *in = NULL;
 
-    if (pwd) {
-        in = (uint8_t *)strdup(pwd);
+    if ( pwd )
+    {
+        in = ( uint8_t * )strdup( pwd );
     }
-    else {
-        in = (uint8_t *)strdup(PWD_DEF);
+    else
+    {
+        in = ( uint8_t * )strdup( PWD_DEF );
     }
-    const unsigned in_length = strlen((char *)in);
+
+    const unsigned in_length = strlen( ( char * )in );
 
     UNUSED_PARAMETER( threads );
 
@@ -204,7 +207,7 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
     printf( "Argon2%s with\n", type );
     printf( "\tt_cost = %d\n", t_cost );
     printf( "\tm_cost = %d\n", m_cost );
-    printf( "\tpassword = %s\n", in ); 
+    printf( "\tpassword = %s\n", in );
     printf( "\tsalt = " ); print_bytes( salt, salt_length );
 
     if ( !strcmp( type,"d" ) )  argon2d( &context );

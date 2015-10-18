@@ -274,7 +274,7 @@ void fill_memory_blocks( Argon2_instance_t *instance )
                 //2.1 Join a thread if limit is exceeded
                 if( l>=instance->threads )
                 {
-                    rc=pthread_join( thread[l-instance->threads],&status );
+                    rc = pthread_join( thread[l-instance->threads],&status );
 
                     if ( rc )
                     {
@@ -287,8 +287,7 @@ void fill_memory_blocks( Argon2_instance_t *instance )
                 Argon2_position_t position = {r,l,s,0};
                 thr_data[l].instance_ptr = instance;//preparing the thread input
                 memcpy( &( thr_data[l].pos ), &position, sizeof( Argon2_position_t ) );
-                rc =pthread_create( &thread[l],&attr,fill_segment_thr,( void * )&thr_data[l] );
-
+                rc = pthread_create( &thread[l],&attr,fill_segment_thr,( void * )&thr_data[l] );
 
                 //FillSegment(instance, position);  //Non-thread equivalent of the lines above
             }
@@ -296,7 +295,7 @@ void fill_memory_blocks( Argon2_instance_t *instance )
             //3. Joining remaining threads
             for ( uint32_t l = instance->lanes - instance->threads; l < instance->lanes; ++l )
             {
-                rc=pthread_join( thread[l],&status );
+                rc = pthread_join( thread[l],&status );
 
                 if ( rc )
                 {
