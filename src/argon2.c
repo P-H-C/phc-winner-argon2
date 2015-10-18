@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 #include "argon2.h"
-#include "argon2-core.h"
+#include "core.h"
 
 
 /*************************Argon2 input parameter restrictions**************************************************/

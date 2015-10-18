@@ -22,13 +22,13 @@
 
 
 #include <inttypes.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "argon2.h"
-#include "argon2-core.h"
+#include "core.h"
 #include "kat.h"
 
 

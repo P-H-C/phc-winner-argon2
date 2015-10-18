@@ -24,8 +24,8 @@
 
 
 #include "argon2.h"
-#include "argon2-core.h"
-#include "argon2-opt-core.h"
+#include "core.h"
+#include "opt.h"
 #include "kat.h"
 
 

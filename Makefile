@@ -11,8 +11,8 @@ BIN = argon2
 DIST = phc-winner-argon2
 
 CC = gcc
-SRC = src/argon2.c src/argon2-core.c src/kat.c src/blake2/blake2b-ref.c
-SRC_MAIN = src/argon2-test.c
+SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c
+SRC_MAIN = src/main.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS = -std=c99 -pthread -O3 -Wall
@@ -21,9 +21,9 @@ CFLAGS_OPT = $(CFLAGS)
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
 	CFLAGS += -m64 -mavx
-	SRC += src/argon2-opt-core.c
+	SRC += src/opt.c
 else
-	SRC += src/argon2-ref-core.c
+	SRC += src/ref.c
 endif
 
 
