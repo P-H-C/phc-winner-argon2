@@ -32,7 +32,7 @@ anyone has already reported it).
 
 ## Usage
 
-`make` builds the executable `argon2` and the shared library
+`make` builds the executable `argon2`, the static library `libargon2.a`, and the shared library
 `libargon2.so` (or `libargon2.dylib` on OSX). Make sure to run `test.sh`
 to verify that your build produces valid test vectors.
 
