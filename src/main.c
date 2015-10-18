@@ -31,6 +31,9 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
+#include "encoding.h"
+
+
 static inline uint64_t rdtsc( void )
 {
 #ifdef _MSC_VER
@@ -227,6 +230,11 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
 #endif
 
     print_bytes( out, out_length );
+
+    // show string encoding
+    char string[300];
+    encode_string( string, sizeof string, &context );
+    printf( "%s\n", string );
 }
 
 void generate_testvectors( const char *type )

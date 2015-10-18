@@ -15,7 +15,7 @@ SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c
 SRC_MAIN = src/main.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS = -std=c99 -pthread -O3 -Wall
+CFLAGS = -std=c99 -pthread -O3 -Wall -g
 CFLAGS_OPT = $(CFLAGS) 
 
 #OPT=TRUE
