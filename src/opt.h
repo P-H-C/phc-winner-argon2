@@ -9,8 +9,8 @@
  * this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef ARGON2_OPT_CORE_H
-#define ARGON2_OPT_CORE_H
+#ifndef OPT_H
+#define OPT_H
 
 /*
  * Function fills a new memory block. Differs from the

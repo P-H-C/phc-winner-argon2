@@ -9,8 +9,8 @@
  * this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef ARGON2_REF_CORE_H
-#define ARGON2_REF_CORE_H
+#ifndef REF_H
+#define REF_H
 
 
 /*
