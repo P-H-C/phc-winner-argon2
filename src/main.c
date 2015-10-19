@@ -194,13 +194,13 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
         in = ( uint8_t * )strdup( PWD_DEF );
     }
 
-    const unsigned in_length = strlen( ( char * )in );
+    const size_t in_length = strlen( ( char * )in );
 
     UNUSED_PARAMETER( threads );
 
     memset( salt, 0x00, salt_length );
 
-    Argon2_Context context= {out, out_length, in, in_length, salt, salt_length,
+    Argon2_Context context= {out, out_length, in, (uint32_t)in_length, salt, salt_length,
                              NULL, 0, NULL, 0, t_cost, m_cost, lanes, lanes,
                              NULL, NULL,
                              clear_password, clear_secret, clear_memory, print
