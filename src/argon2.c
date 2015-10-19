@@ -116,10 +116,18 @@ int hashpwd( void *out, size_t outlen, const void *in, size_t inlen, const void 
     Argon2_Context context = {( uint8_t * ) out, ( uint32_t ) outlen,
                               ( uint8_t * ) in, ( uint32_t ) inlen,
                               ( uint8_t * ) salt, ( uint32_t ) saltlen,
-                              NULL, 0, NULL, 0,
+                              NULL,  /*Pointer to the secret*/
+                              0,   /*Secret length*/
+                              NULL, /*Pointer to the associated data*/
+                              0,   /*Associated data length*/
                               ( uint32_t ) t_cost, ( uint32_t ) m_cost,
-                              1, 1, NULL, NULL,
-                              true, true, true, false
+                              1, /*Number of lanes*/
+                              1, /*Number of threads*/
+                              NULL, NULL,  /*Pointers to external memory (de)allocators*/
+                              true, /*Clear the password after use*/
+                              false, /*Not use the secret so  not clear it*/
+                              true, /*Clear the memory after use*/
+                              false /*Not printing the memory content to the file*/
                              };
 
     return argon2_core( &context, Argon2_i );
