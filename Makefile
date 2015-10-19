@@ -11,7 +11,7 @@ BIN = argon2
 DIST = phc-winner-argon2
 
 CC = gcc
-SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c
+SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c src/thread.c
 SRC_MAIN = src/main.c
 OBJ = $(SRC:.c=.o)
 
