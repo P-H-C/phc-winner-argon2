@@ -235,6 +235,8 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
     char string[300];
     encode_string( string, sizeof string, &context );
     printf( "%s\n", string );
+
+    free(in);
 }
 
 void generate_testvectors( const char *type )
