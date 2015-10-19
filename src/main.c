@@ -14,9 +14,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-#include "time.h"
 #include "argon2.h"
+#include "encoding.h"
 #ifdef _MSC_VER
 #include "intrin.h"
 #endif
@@ -31,7 +32,6 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
-#include "encoding.h"
 
 
 static inline uint64_t rdtsc( void )

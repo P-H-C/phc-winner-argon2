@@ -16,35 +16,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* ==================================================================== */
-/*
- * Common code; could be shared between different hash functions.
- *
- * Note: the Base64 functions below assume that uppercase letters (resp.
- * lowercase letters) have consecutive numerical codes, that fit on 8
- * bits. All modern systems use ASCII-compatible charsets, where these
- * properties are true. If you are stuck with a dinosaur of a system
- * that still defaults to EBCDIC then you already have much bigger
- * interoperability issues to deal with.
- */
+#include <limits.h>
 
 /*
- * Some functions for constant-time comparisons. These work over values in
+ * Some macros for constant-time comparisons. These work over values in
  * the 0..255 range. Returned value is 0x00 on "false", 0xFF on "true".
  */
-static inline unsigned
-EQ( unsigned x, unsigned y )
-{
-    return ( ( ( -( x ^ y ) ) >> 8 ) & 0xFF ) ^ 0xFF;
-}
-
-static inline unsigned
-GT( unsigned x, unsigned y )
-{
-    return ( ( y - x ) >> 8 ) & 0xFF;
-}
-
+#define EQ(x, y)   ((((-((unsigned)(x) ^ (unsigned)(y))) >> 8) & 0xFF) ^ 0xFF)
+#define GT(x, y)   ((((unsigned)(y) - (unsigned)(x)) >> 8) & 0xFF)
 #define GE(x, y)   (GT(y, x) ^ 0xFF)
 #define LT(x, y)   GT(y, x)
 #define LE(x, y)   GE(y, x)
@@ -53,12 +32,12 @@ GT( unsigned x, unsigned y )
  * Convert value x (0..63) to corresponding Base64 character.
  */
 static int
-b64_byte_to_char( unsigned x )
+b64_byte_to_char(unsigned x)
 {
-    return ( LT( x, 26 ) & ( x + 'A' ) )
-           | ( GE( x, 26 ) & LT( x, 52 ) & ( x + ( 'a' - 26 ) ) )
-           | ( GE( x, 52 ) & LT( x, 62 ) & ( x + ( '0' - 52 ) ) )
-           | ( EQ( x, 62 ) & '+' ) | ( EQ( x, 63 ) & '/' );
+	return (LT(x, 26) & (x + 'A'))
+		| (GE(x, 26) & LT(x, 52) & (x + ('a' - 26)))
+		| (GE(x, 52) & LT(x, 62) & (x + ('0' - 52)))
+		| (EQ(x, 62) & '+') | (EQ(x, 63) & '/');
 }
 
 
@@ -71,54 +50,43 @@ b64_byte_to_char( unsigned x )
  * zero) is returned.
  */
 static size_t
-to_base64( char *dst, size_t dst_len, const void *src, size_t src_len )
+to_base64(char *dst, size_t dst_len, const void *src, size_t src_len)
 {
-    size_t olen;
-    const unsigned char *buf;
-    unsigned acc, acc_len;
+	size_t olen;
+	const unsigned char *buf;
+	unsigned acc, acc_len;
 
-    olen = ( src_len / 3 ) << 2;
-
-    switch ( src_len % 3 )
-    {
-    case 2:
-        olen ++;
-
-    /* fall through */
-    case 1:
-        olen += 2;
-        break;
-    }
-
-    if ( dst_len <= olen )
-    {
-        return ( size_t )-1;
-    }
-
-    acc = 0;
-    acc_len = 0;
-    buf = ( const unsigned char * )src;
-
-    while ( src_len -- > 0 )
-    {
-        acc = ( acc << 8 ) + ( *buf ++ );
-        acc_len += 8;
-
-        while ( acc_len >= 6 )
-        {
-            acc_len -= 6;
-            *dst ++ = b64_byte_to_char( ( acc >> acc_len ) & 0x3F );
-        }
-    }
-
-    if ( acc_len > 0 )
-    {
-        *dst ++ = b64_byte_to_char( ( acc << ( 6 - acc_len ) ) & 0x3F );
-    }
-
-    *dst ++ = 0;
-    return olen;
+	olen = (src_len / 3) << 2;
+	switch (src_len % 3) {
+	case 2:
+		olen ++;
+		/* fall through */
+	case 1:
+		olen += 2;
+		break;
+	}
+	if (dst_len <= olen) {
+		return (size_t)-1;
+	}
+	acc = 0;
+	acc_len = 0;
+	buf = (const unsigned char *)src;
+	while (src_len -- > 0) {
+		acc = (acc << 8) + (*buf ++);
+		acc_len += 8;
+		while (acc_len >= 6) {
+			acc_len -= 6;
+			*dst ++ = b64_byte_to_char((acc >> acc_len) & 0x3F);
+		}
+	}
+	if (acc_len > 0) {
+		*dst ++ = b64_byte_to_char((acc << (6 - acc_len)) & 0x3F);
+	}
+	*dst ++ = 0;
+	return olen;
 }
+
+
 
 /* ==================================================================== */
 /*
@@ -182,18 +150,12 @@ encode_string( char *dst, size_t dst_len, Argon2_Context *ctx )
         SB( ctx->ad, ctx->adlen );
     }
 
-    if ( ctx->saltlen == 0 )
-    {
-        return 1;
-    }
+    if ( ctx->saltlen == 0 ) return 1;
 
     SS( "$" );
     SB( ctx->salt, ctx->saltlen );
 
-    if ( ctx->outlen == 0 )
-    {
-        return 1;
-    }
+    if ( ctx->outlen == 0 ) return 1;
 
     SS( "$" );
     SB( ctx->out, ctx->outlen );

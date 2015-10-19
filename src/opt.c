@@ -57,8 +57,6 @@ void fill_block( __m128i *state, const uint8_t *ref_block, uint8_t *next_block )
         block_XY[i] = state[i] = _mm_xor_si128( state[i], block_XY[i] );
     }
 
-    uint64_t x = 0;
-
     BLAKE2_ROUND( state[0], state[1], state[2], state[3],
                   state[4], state[5], state[6], state[7] );
 
