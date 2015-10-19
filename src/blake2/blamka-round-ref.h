@@ -26,7 +26,7 @@
 
 
 /*designed by the Lyra PHC team */
-static inline uint64_t fBlaMka( uint64_t x, uint64_t y )
+static __inline uint64_t fBlaMka( uint64_t x, uint64_t y )
 {
     uint32_t lessX = ( uint32_t )x;
     uint32_t lessY = ( uint32_t )y;

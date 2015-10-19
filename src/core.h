@@ -29,8 +29,8 @@ extern const uint32_t ARGON2_QWORDS_IN_BLOCK ; /*Dependent values!*/
 extern const uint32_t ARGON2_ADDRESSES_IN_BLOCK;
 
 /* Pre-hashing digest length and its extension*/
-extern const uint32_t ARGON2_PREHASH_DIGEST_LENGTH ;
-extern const uint32_t ARGON2_PREHASH_SEED_LENGTH ;/*Dependent values!*/
+#define ARGON2_PREHASH_DIGEST_LENGTH  64
+#define ARGON2_PREHASH_SEED_LENGTH  72 /*Dependent values!*/
 
 /* Argon2 primitive type */
 typedef enum _Argon2_type

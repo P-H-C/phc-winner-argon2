@@ -43,14 +43,14 @@ static const uint8_t blake2b_sigma[12][16] =
 };
 
 
-static inline int blake2b_set_lastnode( blake2b_state *S )
+static __inline int blake2b_set_lastnode( blake2b_state *S )
 {
     S->f[1] = ~0ULL;
     return 0;
 }
 
 /* Some helper functions, not necessarily useful */
-static inline int blake2b_set_lastblock( blake2b_state *S )
+static __inline int blake2b_set_lastblock( blake2b_state *S )
 {
     if( S->last_node ) blake2b_set_lastnode( S );
 
@@ -58,7 +58,7 @@ static inline int blake2b_set_lastblock( blake2b_state *S )
     return 0;
 }
 
-static inline int blake2b_increment_counter( blake2b_state *S, const uint64_t inc )
+static __inline int blake2b_increment_counter( blake2b_state *S, const uint64_t inc )
 {
     S->t[0] += inc;
     S->t[1] += ( S->t[0] < inc );
@@ -66,7 +66,7 @@ static inline int blake2b_increment_counter( blake2b_state *S, const uint64_t in
 }
 
 
-static inline int blake2b_init0( blake2b_state *S )
+static __inline int blake2b_init0( blake2b_state *S )
 {
     memset( S, 0, sizeof( blake2b_state ) );
 

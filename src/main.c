@@ -34,7 +34,7 @@
 
 
 
-static inline uint64_t rdtsc( void )
+static __inline uint64_t rdtsc( void )
 {
 #ifdef _MSC_VER
     return __rdtsc();
@@ -114,11 +114,15 @@ void print_bytes( const void *s, size_t len )
  */
 void benchmark()
 {
-    const uint32_t inlen = 16;
-    const unsigned outlen = 16;
-    unsigned char out[outlen];
-    unsigned char pwd_array[inlen];
-    unsigned char salt_array[inlen];
+#define BENCH_OUTLEN 16
+#define BENCH_INLEN 16
+	const uint32_t inlen = BENCH_INLEN;
+	const unsigned outlen = BENCH_OUTLEN;
+	unsigned char out[BENCH_OUTLEN];
+	unsigned char pwd_array[BENCH_INLEN];
+	unsigned char salt_array[BENCH_INLEN];
+#undef BENCH_INLEN
+#undef BENCH_OUTLEN
 
     uint32_t t_cost = 1;
 
@@ -135,22 +139,17 @@ void benchmark()
         for ( i=0; i <6; ++i )
         {
             uint32_t thread_n = thread_test[i];
-#ifdef _MEASURE
             uint64_t start_cycles, stop_cycles, stop_cycles_i;
 
             clock_t start_time = clock();
             start_cycles = rdtsc();
-#endif
 
             Argon2_Context context = {out, outlen, pwd_array, inlen, salt_array, inlen,
                                       NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false, false
                                      };
             argon2d( &context );
-#ifdef _MEASURE
             stop_cycles = rdtsc();
-#endif
             argon2i( &context );
-#ifdef _MEASURE
             stop_cycles_i = rdtsc();
             clock_t stop_time = clock();
 
@@ -163,7 +162,6 @@ void benchmark()
 
             float run_time = ( ( float ) stop_time - start_time ) / ( CLOCKS_PER_SEC );
             printf( "%2.4f seconds\n\n", run_time );
-#endif
         }
     }
 }
@@ -171,20 +169,20 @@ void benchmark()
 
 void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,const char *type, bool print )
 {
-#ifdef _MEASURE
     uint64_t start_cycles, stop_cycles;
 
     clock_t start_time = clock();
     start_cycles = rdtsc();
-#endif
 
+#define SALT_LEN 16
     /*Fixed parameters*/
     const unsigned out_length = 32;
-    const unsigned salt_length = 16;
+	const unsigned salt_length = SALT_LEN;
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
-    uint8_t salt[salt_length];
+	uint8_t salt[SALT_LEN];
+#undef SALT_LEN
     uint8_t *in = NULL;
 
     if ( pwd )
@@ -217,7 +215,6 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
     else if ( !strcmp( type,"i" ) ) argon2i( &context );
     else fatal( "wrong Argon2 type" );
 
-#ifdef _MEASURE
     stop_cycles = rdtsc();
     clock_t finish_time = clock();
 
@@ -227,7 +224,6 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
 
     float mcycles = ( float ) ( stop_cycles - start_cycles ) / ( 1 << 20 );
     printf( "(%.3f mebicycles)\n", mcycles );
-#endif
 
     print_bytes( out, out_length );
 
@@ -241,20 +237,22 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
 
 void generate_testvectors( const char *type )
 {
-    const unsigned out_length = 32;
-    const unsigned pwd_length = 32;
-    const unsigned salt_length = 16;
-    const unsigned secret_length = 8;
-    const unsigned ad_length = 12;
+#define TEST_OUTLEN 32
+#define TEST_PWDLEN 32
+#define TEST_SALTLEN 16
+#define TEST_SECRETLEN 8
+#define TEST_ADLEN 12
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
     bool print_internals = true;
-    unsigned char out[out_length];
-    unsigned char pwd[pwd_length];
-    unsigned char salt[salt_length];
-    unsigned char secret[secret_length];
-    unsigned char ad[ad_length];
+
+
+	unsigned char out[TEST_OUTLEN];
+	unsigned char pwd[TEST_PWDLEN];
+	unsigned char salt[TEST_SALTLEN];
+	unsigned char secret[TEST_SECRETLEN];
+	unsigned char ad[TEST_ADLEN];
     const AllocateMemoryCallback myown_allocator = NULL;
     const FreeMemoryCallback myown_deallocator = NULL;
 
@@ -262,18 +260,23 @@ void generate_testvectors( const char *type )
     unsigned m_cost = 16;
     unsigned lanes = 4;
 
-    memset( pwd, 1, pwd_length );
-    memset( salt, 2, salt_length );
-    memset( secret, 3, secret_length );
-    memset( ad, 4, ad_length );
+	memset(pwd, 1, TEST_OUTLEN);
+	memset(salt, 2, TEST_SALTLEN);
+	memset(secret, 3, TEST_SECRETLEN);
+	memset(ad, 4, TEST_ADLEN);
 
     printf( "Generating test vectors for Argon2%s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
 
-    Argon2_Context context= {out, out_length, pwd, pwd_length, salt, salt_length,
-                             secret, secret_length, ad, ad_length, t_cost, m_cost, lanes, lanes,
+	Argon2_Context context = { out, TEST_OUTLEN, pwd, TEST_PWDLEN, salt, TEST_SALTLEN,
+		secret, TEST_SECRETLEN, ad, TEST_ADLEN, t_cost, m_cost, lanes, lanes,
                              myown_allocator, myown_deallocator,
                              clear_password, clear_secret, clear_memory, print_internals
                             };
+#undef TEST_OUTLEN 
+#undef TEST_PWDLEN 
+#undef TEST_SALTLEN 
+#undef TEST_SECRETLEN 
+#undef TEST_ADLEN 
 
     if ( !strcmp( type,"d" ) ) argon2d( &context );
     else if ( !strcmp( type,"i" ) ) argon2i( &context );
