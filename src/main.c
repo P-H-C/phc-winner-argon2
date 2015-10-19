@@ -19,7 +19,7 @@
 #include "argon2.h"
 #include "encoding.h"
 #ifdef _MSC_VER
-#include "intrin.h"
+#include <intrin.h>
 #endif
 /* Enable timing measurements */
 #define _MEASURE
