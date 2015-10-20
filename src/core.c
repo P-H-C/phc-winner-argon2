@@ -81,7 +81,7 @@ int allocate_memory( block **memory, uint32_t m_cost )
     if ( memory != NULL )
     {
 		size_t memory_size = sizeof( block )*m_cost;
-		if(m_cost != 0 && memory_size / m_cost != 0)
+		if(m_cost != 0 && memory_size / m_cost != sizeof(block))
 		{
 			return ARGON2_MEMORY_ALLOCATION_ERROR;
 		}
