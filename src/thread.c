@@ -1,9 +1,12 @@
 #include "thread.h"
+#if defined(_MSC_VER)
 #include <Windows.h>
+#endif
 
-int argon2_thread_create(argon2_thread_handle_t * handle, argon2_thread_func_t func, void * args)
+int argon2_thread_create(argon2_thread_handle_t * handle,
+                         argon2_thread_func_t func, void * args)
 {
-  if (NULL == handle) {
+  if (NULL == handle || func == NULL) {
     return -1;
   }
 #if defined(_MSC_VER)
@@ -17,23 +20,20 @@ int argon2_thread_create(argon2_thread_handle_t * handle, argon2_thread_func_t f
 int argon2_thread_join(argon2_thread_handle_t handle)
 {
 #if defined(_MSC_VER)
-  switch (WaitForSingleObject((HANDLE)handle, INFINITE)) {
-  default:
-    return -1;
-  case WAIT_OBJECT_0:
+  if(WaitForSingleObject((HANDLE)handle, INFINITE) == WAIT_OBJECT_0) {
     return CloseHandle((HANDLE)handle) != 0 ? 0 : -1;
   }
+  return -1;
 #else
   return pthread_join(handle, NULL);
 #endif
 }
 
-int argon2_thread_exit(void)
+void argon2_thread_exit(void)
 {
 #if defined(_MSC_VER)
   _endthreadex(0);
 #else
   pthread_exit(NULL);
 #endif
-  return 0;
 }
