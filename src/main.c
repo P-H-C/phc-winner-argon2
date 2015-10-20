@@ -195,11 +195,13 @@ void run( uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost, uint32_t la
 
     if ( pwd )
     {
-        in = ( uint8_t * )strdup( pwd );
+        in = malloc( strlen(pwd) + 1 );
+        strcpy( (char *)in, pwd );
     }
     else
     {
-        in = ( uint8_t * )strdup( PWD_DEF );
+        in = malloc( strlen(PWD_DEF) + 1 );
+        strcpy( (char *)in, PWD_DEF );
     }
 
     const unsigned in_length = strlen( ( char * )in );
