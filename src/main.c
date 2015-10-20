@@ -257,12 +257,11 @@ void generate_testvectors( const char *type )
     bool clear_password = false;
     bool print_internals = true;
 
-
-	unsigned char out[TEST_OUTLEN];
-	unsigned char pwd[TEST_PWDLEN];
-	unsigned char salt[TEST_SALTLEN];
-	unsigned char secret[TEST_SECRETLEN];
-	unsigned char ad[TEST_ADLEN];
+    unsigned char out[TEST_OUTLEN];
+    unsigned char pwd[TEST_PWDLEN];
+    unsigned char salt[TEST_SALTLEN];
+    unsigned char secret[TEST_SECRETLEN];
+    unsigned char ad[TEST_ADLEN];
     const AllocateMemoryCallback myown_allocator = NULL;
     const FreeMemoryCallback myown_deallocator = NULL;
 
@@ -270,18 +269,18 @@ void generate_testvectors( const char *type )
     unsigned m_cost = 16;
     unsigned lanes = 4;
 
-	memset(pwd, 1, TEST_OUTLEN);
-	memset(salt, 2, TEST_SALTLEN);
-	memset(secret, 3, TEST_SECRETLEN);
-	memset(ad, 4, TEST_ADLEN);
+    memset(pwd, 1, TEST_OUTLEN);
+    memset(salt, 2, TEST_SALTLEN);
+    memset(secret, 3, TEST_SECRETLEN);
+    memset(ad, 4, TEST_ADLEN);
 
     printf( "Generating test vectors for Argon2%s in file \"%s\".\n", type, ARGON2_KAT_FILENAME );
 
-	Argon2_Context context = { out, TEST_OUTLEN, pwd, TEST_PWDLEN, salt, TEST_SALTLEN,
-		secret, TEST_SECRETLEN, ad, TEST_ADLEN, t_cost, m_cost, lanes, lanes,
-                             myown_allocator, myown_deallocator,
-                             clear_password, clear_secret, clear_memory, print_internals
-                            };
+    Argon2_Context context = { out, TEST_OUTLEN, pwd, TEST_PWDLEN, salt, TEST_SALTLEN,
+        secret, TEST_SECRETLEN, ad, TEST_ADLEN, t_cost, m_cost, lanes, lanes,
+        myown_allocator, myown_deallocator,
+        clear_password, clear_secret, clear_memory, print_internals
+    };
 #undef TEST_OUTLEN 
 #undef TEST_PWDLEN 
 #undef TEST_SALTLEN 
@@ -295,7 +294,6 @@ void generate_testvectors( const char *type )
 
 int main( int argc, char *argv[] )
 {
-
     unsigned char out[32];
     uint32_t m_cost = 1<<LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
