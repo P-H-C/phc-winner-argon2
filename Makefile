@@ -45,7 +45,7 @@ endif
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
 
-.PHONY: clean test
+.PHONY: clean dist format
 
 all: clean $(BIN) $(LIB_SH) $(LIB_ST)
 bin: $(BIN)
@@ -69,3 +69,6 @@ clean:
 dist:
 		cd ..; \
 		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
+
+format:
+		clang-format -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
