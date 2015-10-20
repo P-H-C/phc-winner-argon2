@@ -32,26 +32,27 @@ anyone has already reported it).
 
 ## Usage
 
-`make` builds the executable `argon2`, the static library `libargon2.a`, and the shared library
-`libargon2.so` (or `libargon2.dylib` on OSX). Make sure to run `test.sh`
-to verify that your build produces valid test vectors.
+`make` builds the executable `argon2`, the static library `libargon2.a`,
+and the shared library `libargon2.so` (or `libargon2.dylib` on OSX).
+Make sure to run `test.sh` to verify that your build produces valid test
+vectors.
 
 `argon2` is a command-line utility to test specific Argon2 instances
-on your system and run benchmarks. To show instructions run `./argon2`
+on your system and run benchmarks. To show instructions, run `./argon2`
 without arguments.
 
 `libargon2` provides an API to both low-level and high-level functions
 for using Argon2.
 
-The example program below hashes "password" with Argon2i using the
-high-level API and then using the low-level API. While the high-level
-API only takes input/output buffers and the two cost parameters, the
-low-level API additionally takes parallelism parameters and several
-others, as defined in [`argon2.h`](src/argon2.h#L129).
+The example program below hashes the string "password" with Argon2i
+using the high-level API and then using the low-level API. While the
+high-level API only takes input/output buffers and the two cost
+parameters, the low-level API additionally takes parallelism parameters
+and several others, as defined in [`argon2.h`](src/argon2.h).
 
-Here `t_cost` is set to 2 passes, `m_cost` is set to 50 times
-2<sup>10</sup> kibibytes (that is, 50 mebibytes), and there's no
-parallelism (single-lane, single-thread).
+Here `t_cost` is set to 2 passes, `m_cost` is set to 2<sup>16</sup>
+kibibytes (that is, 64 mebibytes), and there's no parallelism
+(single-lane, single-thread).
 
 ```c
 #include "argon2.h"
@@ -74,7 +75,7 @@ int main()
     uint32_t inlen = strlen((char *)in);
 
     uint32_t t_cost = 2;            // 1-pass computation
-    uint32_t m_cost = 50*(1<<10);   // 50 mebibytes memory usage
+    uint32_t m_cost = (1<<16);      // 64 mebibytes memory usage
 
     // high-level API
     hashpwd( out1, OUTLEN, in, inlen, salt, SALTLEN, t_cost, m_cost );
