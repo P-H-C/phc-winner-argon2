@@ -25,7 +25,7 @@
 #define _MEASURE
 
 #define T_COST_DEF 3
-#define M_COST_DEF 50*(1<<10)
+#define LOG_M_COST_DEF 12  /*4 MB*/
 #define LANES_DEF 4
 #define THREADS_DEF 4
 #define PWD_DEF "password"
@@ -92,7 +92,7 @@ void usage( const char *cmd )
     printf( "Parameters (for run mode):\n" );
     printf( "\t-y, --type [d or i, default i]\n" );
     printf( "\t-t, --tcost [time cost in 0..2^24, default %d]\n", T_COST_DEF );
-    printf( "\t-m, --mcost [base 2 log of memory cost in 0..23, default %d]\n", M_COST_DEF );
+    printf( "\t-m, --mcost [base 2 log of memory cost in 0..21, default %d]\n", LOG_M_COST_DEF );
     printf( "\t-l, --lanes [number of lanes in %u..%u, default %d]\n", ARGON2_MIN_LANES, ARGON2_MAX_LANES, LANES_DEF );
     printf( "\t-p, --threads [number of threads in %u..%u, default %d]\n", ARGON2_MIN_THREADS, ARGON2_MAX_THREADS, THREADS_DEF );
     printf( "\t-i, --password [password, default \"%s\"]\n", PWD_DEF );
@@ -297,7 +297,7 @@ int main( int argc, char *argv[] )
 {
 
     unsigned char out[32];
-    uint32_t m_cost = M_COST_DEF;
+    uint32_t m_cost = 1<<LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
@@ -323,7 +323,7 @@ int main( int argc, char *argv[] )
             if ( i < argc - 1 )
             {
                 i++;
-                m_cost = ( uint8_t ) 1 << ( ( uint8_t )atoi( argv[i] ) % 24 );
+                m_cost = ( uint8_t ) 1 << ( ( uint8_t )atoi( argv[i] ) % 22 );
                 continue;
             }
             else fatal( "missing memory cost argument" );
