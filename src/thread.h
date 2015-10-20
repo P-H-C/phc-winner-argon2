@@ -3,7 +3,7 @@
 
 #if defined(_MSC_VER)
 #include <process.h>
-typedef _beginthreadex_proc_type argon2_thread_func_t;
+typedef unsigned (__stdcall * argon2_thread_func_t)(void *);
 typedef uintptr_t argon2_thread_handle_t;
 #else
 #include <pthread.h>
