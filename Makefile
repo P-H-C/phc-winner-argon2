@@ -45,9 +45,9 @@ endif
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
 
-.PHONY: clean dist format
+.PHONY: clean dist format 
 
-all: clean $(BIN) $(LIB_SH) $(LIB_ST)
+all: clean bin libs
 bin: $(BIN)
 libs: $(LIB_SH) $(LIB_ST)
 
