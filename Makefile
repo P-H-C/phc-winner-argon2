@@ -62,7 +62,7 @@ $(LIB_ST): 	$(OBJ)
 
 clean:
 		rm -f $(BIN) $(LIB_SH) $(LIB_ST) kat-argon2* 
-		rm -f *.dSYM
+		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
 		cd test-vectors/ &&  rm -f kat-* diff* run_* make_*
