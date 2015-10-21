@@ -201,12 +201,6 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         NULL,         0,          NULL, 0,         t_cost,         m_cost,
         lanes,        lanes,      NULL, NULL,      clear_password, clear_secret,
         clear_memory, false};
-    printf("Argon2%s with\n", type);
-    printf("\tt_cost = %d\n", t_cost);
-    printf("\tm_cost = %d\n", m_cost);
-    printf("\tpassword = %s\n", in);
-    printf("\tsalt = ");
-    print_bytes(salt, salt_length);
 
     if (!strcmp(type, "d"))
         argon2d(&context);
@@ -218,18 +212,16 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     stop_cycles = rdtsc();
     clock_t finish_time = clock();
 
-    float run_time = ((float)finish_time - start_time) / (CLOCKS_PER_SEC);
-    printf("%2.3f seconds ", run_time);
-
-    float mcycles = (float)(stop_cycles - start_cycles) / (1 << 20);
-    printf("(%.3f mebicycles)\n", mcycles);
-
-    print_bytes(out, out_length);
-
     // show string encoding
     char string[300];
     encode_string(string, sizeof string, &context);
     printf("%s\n", string);
+
+    float run_time = ((float)finish_time - start_time) / (CLOCKS_PER_SEC);
+    float mcycles = (float)(stop_cycles - start_cycles) / (1 << 20);
+    printf("%2.3f seconds ", run_time);
+    printf("(%.3f mebicycles)\n", mcycles);
+
 
     free(in);
 }
