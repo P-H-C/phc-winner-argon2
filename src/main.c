@@ -129,9 +129,7 @@ void benchmark() {
     uint32_t m_cost;
 
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
-        uint32_t i;
-
-        for (i = 0; i < 6; ++i) {
+        for (uint32_t i = 0; i < 6; ++i) {
             uint32_t thread_n = thread_test[i];
             uint64_t start_cycles, stop_cycles, stop_cycles_i;
 
@@ -190,6 +188,10 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         fatal("password missing");
 
     in = malloc(strlen(pwd) + 1);
+    if(!in)
+    {
+        fatal("Memory allocation error in the initialization phase");
+    }
     strcpy((char *)in, pwd);
 
     const unsigned in_length = strlen((char *)in);
@@ -207,7 +209,10 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     else if (!strcmp(type, "i"))
         argon2i(&context);
     else
+    {
+        free(in);
         fatal("wrong Argon2 type");
+    }
 
     stop_cycles = rdtsc();
     clock_t finish_time = clock();
