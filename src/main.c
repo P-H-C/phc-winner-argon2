@@ -22,8 +22,7 @@
 #ifdef _MSC_VER
 #include <intrin.h>
 #endif
-/* Enable timing measurements */
-#define _MEASURE
+
 
 #define T_COST_DEF 3
 #define LOG_M_COST_DEF 12 /*4 MB*/
