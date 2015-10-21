@@ -307,7 +307,10 @@ int main(int argc, char *argv[]) {
     return ARGON2_OK;
 #endif
 #ifdef GENKAT
-    type = argv[1];
+    if(argc>1)
+    {
+        type[0] = argv[1][0];
+    }
     generate_testvectors(type);
     return ARGON2_OK;
 #endif
