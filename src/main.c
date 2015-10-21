@@ -288,8 +288,12 @@ void generate_testvectors(const char *type) {
 #undef TEST_ADLEN
 
     if (!strcmp(type, "d"))
+    {
+        printf("Generating test vectors for Argon2d in file \"%s\".\n", ARGON2_KAT_FILENAME);
         argon2d(&context);
+    }
     else if (!strcmp(type, "i"))
+    {
         argon2i(&context);
     else
         fatal("wrong Argon2 type");
