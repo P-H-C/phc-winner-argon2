@@ -218,9 +218,9 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
 }
 
 #ifdef _MSC_VER
-static DWORD WINAPI fill_segment_thr(void * thread_data)
+static DWORD WINAPI fill_segment_thr(void *thread_data)
 #else
-static void *fill_segment_thr(void * thread_data)
+static void *fill_segment_thr(void *thread_data)
 #endif
 {
   Argon2_thread_data *my_data = (Argon2_thread_data *)thread_data;
@@ -590,4 +590,3 @@ int argon2_core(Argon2_Context *context, Argon2_type type) {
 
   return ARGON2_OK;
 }
-

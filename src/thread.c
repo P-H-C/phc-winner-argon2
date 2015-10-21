@@ -3,9 +3,8 @@
 #include <Windows.h>
 #endif
 
-int argon2_thread_create(argon2_thread_handle_t * handle,
-                         argon2_thread_func_t func, void * args)
-{
+int argon2_thread_create(argon2_thread_handle_t *handle,
+                         argon2_thread_func_t func, void *args) {
   if (NULL == handle || func == NULL) {
     return -1;
   }
@@ -17,10 +16,9 @@ int argon2_thread_create(argon2_thread_handle_t * handle,
 #endif
 }
 
-int argon2_thread_join(argon2_thread_handle_t handle)
-{
+int argon2_thread_join(argon2_thread_handle_t handle) {
 #if defined(_MSC_VER)
-  if(WaitForSingleObject((HANDLE)handle, INFINITE) == WAIT_OBJECT_0) {
+  if (WaitForSingleObject((HANDLE)handle, INFINITE) == WAIT_OBJECT_0) {
     return CloseHandle((HANDLE)handle) != 0 ? 0 : -1;
   }
   return -1;
@@ -29,8 +27,7 @@ int argon2_thread_join(argon2_thread_handle_t handle)
 #endif
 }
 
-void argon2_thread_exit(void)
-{
+void argon2_thread_exit(void) {
 #if defined(_MSC_VER)
   _endthreadex(0);
 #else
