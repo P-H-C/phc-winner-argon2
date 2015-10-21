@@ -119,6 +119,8 @@ typedef enum _Argon2_ErrorCodes {
     ARGON2_THREADS_TOO_FEW = 28,
     ARGON2_THREADS_TOO_MANY = 29,
 
+    ARGON2_MISSING_ARGS = 30,
+
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
                                  error code */

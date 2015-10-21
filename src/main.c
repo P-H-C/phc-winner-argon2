@@ -222,7 +222,6 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     printf("%2.3f seconds ", run_time);
     printf("(%.3f mebicycles)\n", mcycles);
 
-
     free(in);
 }
 
@@ -305,17 +304,17 @@ int main(int argc, char *argv[]) {
 
 #ifdef BENCH
     benchmark();
-    return 0;
+    return ARGON2_OK;
 #endif
 #ifdef GENKAT
     type = argv[1];
     generate_testvectors(type);
-    return 0;
+    return ARGON2_OK;
 #endif
 
     if (argc < 3) {
         usage(argv[0]);
-        return 1;
+        return ARGON2_MISSING_ARGS;
     }
 
     // get password and salt from command line
@@ -363,5 +362,5 @@ int main(int argc, char *argv[]) {
 
     run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
-    return 0;
+    return ARGON2_OK;
 }
