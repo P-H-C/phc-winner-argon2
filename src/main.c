@@ -167,6 +167,17 @@ void benchmark() {
     }
 }
 
+/*
+Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the Base64-encoded hash string
+@out output array with at least 32 bytes allocated
+@pwd NULL-terminated string, presumably from argv[]
+@salt salt array with at least SALTLEN_DEF bytes allocated
+@t_cost number of iterations
+@m_cost amount of requested memory in KB
+@lanes amount of requested parallelism
+@threads actual parallelism
+@type String, only "d" and "i" are accepted
+*/
 void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
          uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type) {
     uint64_t start_cycles, stop_cycles;
@@ -185,7 +196,7 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     if (!pwd)
         fatal("password missing");
     if (!salt)
-        fatal("password missing");
+        fatal("salt missing");
 
     in = malloc(strlen(pwd) + 1);
     if(!in)
