@@ -13,12 +13,12 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#include "argon2.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+
+#include "argon2.h"
 
 /*
  * Some macros for constant-time comparisons. These work over values in

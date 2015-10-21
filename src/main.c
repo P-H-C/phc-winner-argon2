@@ -29,6 +29,7 @@
 #define LOG_M_COST_DEF 12 /*4 MB*/
 #define LANES_DEF 4
 #define THREADS_DEF 4
+#define SALTLEN_DEF 16
 #define PWD_DEF "password"
 
 #define UNUSED_PARAMETER(x) (void)(x)
@@ -77,9 +78,12 @@ void CustomFreeMemory(uint8_t *memory, size_t length) {
 
 void usage(const char *cmd) {
     printf("Usage:  %s pwd salt [-y version] [-t t_cost] [-m m_cost] [-l "
-           "#lanes] [-p #threads]\n", cmd);
+           "#lanes] [-p #threads]\n",
+           cmd);
 
     printf("Options:\n");
+    printf("\tpwd\t\tThe password to hash (required)\n");
+    printf("\tsalt\t\tThe salt to use, at most 16 characters (required)\n");
     printf("\t-y version\tArgon2 version, either d or i (default)\n");
     printf("\t-t t_cost\tNumber of rounds to t_cost between 1 and 2^24, "
            "default %d\n",
@@ -166,43 +170,38 @@ void benchmark() {
     }
 }
 
-void run(uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost,
-         uint32_t lanes, uint32_t threads, const char *type, bool print) {
+void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
+         uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type) {
     uint64_t start_cycles, stop_cycles;
 
     clock_t start_time = clock();
     start_cycles = rdtsc();
 
-#define SALT_LEN 16
     /*Fixed parameters*/
     const unsigned out_length = 32;
-    const unsigned salt_length = SALT_LEN;
+    const unsigned salt_length = SALTLEN_DEF;
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = false;
-    uint8_t salt[SALT_LEN];
-#undef SALT_LEN
     uint8_t *in = NULL;
 
-    if (pwd) {
-        in = malloc(strlen(pwd) + 1);
-        strcpy((char *)in, pwd);
-    } else {
-        in = malloc(strlen(PWD_DEF) + 1);
-        strcpy((char *)in, PWD_DEF);
-    }
+    if (!pwd)
+        fatal("password missing");
+    if (!salt)
+        fatal("password missing");
+
+    in = malloc(strlen(pwd) + 1);
+    strcpy((char *)in, pwd);
 
     const unsigned in_length = strlen((char *)in);
 
     UNUSED_PARAMETER(threads);
 
-    memset(salt, 0x00, salt_length);
-
     Argon2_Context context = {
         out,          out_length, in,   in_length, salt,           salt_length,
         NULL,         0,          NULL, 0,         t_cost,         m_cost,
         lanes,        lanes,      NULL, NULL,      clear_password, clear_secret,
-        clear_memory, print};
+        clear_memory, false};
     printf("Argon2%s with\n", type);
     printf("\tt_cost = %d\n", t_cost);
     printf("\tm_cost = %d\n", m_cost);
@@ -308,12 +307,10 @@ int main(int argc, char *argv[]) {
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
-
-    bool testvectors = false;
+    uint8_t salt[SALTLEN_DEF];
     const char *type = "i";
 
     remove(ARGON2_KAT_FILENAME);
-
 
 #ifdef BENCH
     benchmark();
@@ -325,14 +322,19 @@ int main(int argc, char *argv[]) {
     return 0;
 #endif
 
-    if (argc < 4) {
+    if (argc < 3) {
         usage(argv[0]);
         return 1;
     }
 
+    // get password and salt from command line
+    pwd = argv[1];
+    if (strlen(argv[2]) > SALTLEN_DEF)
+        fatal("salt too long");
+    memset(salt, 0x00, SALTLEN_DEF); // padding
+    memcpy(salt, (uint8_t *)argv[2], strlen(argv[2]));
 
-
-    for (int i = 1; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
         char *a = argv[i];
 
         if (!strcmp(a, "-m")) {
@@ -368,8 +370,7 @@ int main(int argc, char *argv[]) {
             fatal("unknown argument");
     }
 
-
-    run(out, pwd, t_cost, m_cost, lanes, threads, type, testvectors);
+    run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
     return 0;
 }

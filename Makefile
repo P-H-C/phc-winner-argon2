@@ -47,7 +47,7 @@ LIB_ST := lib$(LIB_NAME).a
 
 .PHONY: clean dist format genkat
 
-all: clean bin libs benchmark gentests 
+all: clean bin libs 
 bin: $(BIN)
 libs: $(LIB_SH) $(LIB_ST)
 
@@ -67,7 +67,7 @@ $(LIB_ST): 	$(OBJ)
 		ar rcs $@ $^
 
 clean:
-		rm -f $(BIN) $(LIB_SH) $(LIB_ST) kat-argon2* 
+		rm -f $(BIN) $(LIB_SH) $(LIB_ST) kat-argon2* bench genkat
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
