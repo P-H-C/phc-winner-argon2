@@ -45,14 +45,20 @@ endif
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
 
-.PHONY: clean dist format 
+.PHONY: clean dist format genkat
 
-all: clean bin libs
+all: clean bin libs benchmark gentests 
 bin: $(BIN)
 libs: $(LIB_SH) $(LIB_ST)
 
 $(BIN): 	$(SRC) $(SRC_MAIN)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
+
+bench: 	        $(SRC) $(SRC_MAIN)
+		$(CC) $(CFLAGS) -DBENCH $^ -Isrc  -o $@
+
+genkat:         $(SRC) $(SRC_MAIN)
+		$(CC) $(CFLAGS) -DGENKAT $^ -Isrc  -o $@
 
 $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -o $@
@@ -72,4 +78,4 @@ dist:
 		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
 
 format:
-		clang-format -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
+		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h

@@ -34,9 +34,10 @@
  * Convert value x (0..63) to corresponding Base64 character.
  */
 static int b64_byte_to_char(unsigned x) {
-  return (LT(x, 26) & (x + 'A')) | (GE(x, 26) & LT(x, 52) & (x + ('a' - 26))) |
-         (GE(x, 52) & LT(x, 62) & (x + ('0' - 52))) | (EQ(x, 62) & '+') |
-         (EQ(x, 63) & '/');
+    return (LT(x, 26) & (x + 'A')) |
+           (GE(x, 26) & LT(x, 52) & (x + ('a' - 26))) |
+           (GE(x, 52) & LT(x, 62) & (x + ('0' - 52))) | (EQ(x, 62) & '+') |
+           (EQ(x, 63) & '/');
 }
 
 /*
@@ -49,38 +50,38 @@ static int b64_byte_to_char(unsigned x) {
  */
 static size_t to_base64(char *dst, size_t dst_len, const void *src,
                         size_t src_len) {
-  size_t olen;
-  const unsigned char *buf;
-  unsigned acc, acc_len;
+    size_t olen;
+    const unsigned char *buf;
+    unsigned acc, acc_len;
 
-  olen = (src_len / 3) << 2;
-  switch (src_len % 3) {
-  case 2:
-    olen++;
-  /* fall through */
-  case 1:
-    olen += 2;
-    break;
-  }
-  if (dst_len <= olen) {
-    return (size_t)-1;
-  }
-  acc = 0;
-  acc_len = 0;
-  buf = (const unsigned char *)src;
-  while (src_len-- > 0) {
-    acc = (acc << 8) + (*buf++);
-    acc_len += 8;
-    while (acc_len >= 6) {
-      acc_len -= 6;
-      *dst++ = b64_byte_to_char((acc >> acc_len) & 0x3F);
+    olen = (src_len / 3) << 2;
+    switch (src_len % 3) {
+    case 2:
+        olen++;
+    /* fall through */
+    case 1:
+        olen += 2;
+        break;
     }
-  }
-  if (acc_len > 0) {
-    *dst++ = b64_byte_to_char((acc << (6 - acc_len)) & 0x3F);
-  }
-  *dst++ = 0;
-  return olen;
+    if (dst_len <= olen) {
+        return (size_t)-1;
+    }
+    acc = 0;
+    acc_len = 0;
+    buf = (const unsigned char *)src;
+    while (src_len-- > 0) {
+        acc = (acc << 8) + (*buf++);
+        acc_len += 8;
+        while (acc_len >= 6) {
+            acc_len -= 6;
+            *dst++ = b64_byte_to_char((acc >> acc_len) & 0x3F);
+        }
+    }
+    if (acc_len > 0) {
+        *dst++ = b64_byte_to_char((acc << (6 - acc_len)) & 0x3F);
+    }
+    *dst++ = 0;
+    return olen;
 }
 
 /* ==================================================================== */
@@ -105,57 +106,57 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
 
 int encode_string(char *dst, size_t dst_len, Argon2_Context *ctx) {
 #define SS(str)                                                                \
-  do {                                                                         \
-    size_t pp_len = strlen(str);                                               \
-    if (pp_len >= dst_len) {                                                   \
-      return 0;                                                                \
-    }                                                                          \
-    memcpy(dst, str, pp_len + 1);                                              \
-    dst += pp_len;                                                             \
-    dst_len -= pp_len;                                                         \
-  } while (0)
+    do {                                                                       \
+        size_t pp_len = strlen(str);                                           \
+        if (pp_len >= dst_len) {                                               \
+            return 0;                                                          \
+        }                                                                      \
+        memcpy(dst, str, pp_len + 1);                                          \
+        dst += pp_len;                                                         \
+        dst_len -= pp_len;                                                     \
+    } while (0)
 
 #define SX(x)                                                                  \
-  do {                                                                         \
-    char tmp[30];                                                              \
-    sprintf(tmp, "%lu", (unsigned long)(x));                                   \
-    SS(tmp);                                                                   \
-  } while (0);
+    do {                                                                       \
+        char tmp[30];                                                          \
+        sprintf(tmp, "%lu", (unsigned long)(x));                               \
+        SS(tmp);                                                               \
+    } while (0);
 
 #define SB(buf, len)                                                           \
-  do {                                                                         \
-    size_t sb_len = to_base64(dst, dst_len, buf, len);                         \
-    if (sb_len == (size_t)-1) {                                                \
-      return 0;                                                                \
-    }                                                                          \
-    dst += sb_len;                                                             \
-    dst_len -= sb_len;                                                         \
-  } while (0);
+    do {                                                                       \
+        size_t sb_len = to_base64(dst, dst_len, buf, len);                     \
+        if (sb_len == (size_t)-1) {                                            \
+            return 0;                                                          \
+        }                                                                      \
+        dst += sb_len;                                                         \
+        dst_len -= sb_len;                                                     \
+    } while (0);
 
-  SS("$argon2i$m=");
-  SX(ctx->m_cost);
-  SS(",t=");
-  SX(ctx->t_cost);
-  SS(",p=");
-  SX(ctx->lanes);
+    SS("$argon2i$m=");
+    SX(ctx->m_cost);
+    SS(",t=");
+    SX(ctx->t_cost);
+    SS(",p=");
+    SX(ctx->lanes);
 
-  if (ctx->adlen > 0) {
-    SS(",data=");
-    SB(ctx->ad, ctx->adlen);
-  }
+    if (ctx->adlen > 0) {
+        SS(",data=");
+        SB(ctx->ad, ctx->adlen);
+    }
 
-  if (ctx->saltlen == 0)
+    if (ctx->saltlen == 0)
+        return 1;
+
+    SS("$");
+    SB(ctx->salt, ctx->saltlen);
+
+    if (ctx->outlen == 0)
+        return 1;
+
+    SS("$");
+    SB(ctx->out, ctx->outlen);
     return 1;
-
-  SS("$");
-  SB(ctx->salt, ctx->saltlen);
-
-  if (ctx->outlen == 0)
-    return 1;
-
-  SS("$");
-  SB(ctx->out, ctx->outlen);
-  return 1;
 
 #undef SS
 #undef SX

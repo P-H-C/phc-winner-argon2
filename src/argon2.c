@@ -141,57 +141,57 @@ const char *Argon2_ErrorMessage[] = {
 int hashpwd(void *out, size_t outlen, const void *in, size_t inlen,
             const void *salt, size_t saltlen, unsigned int t_cost,
             unsigned int m_cost) {
-  Argon2_Context context = {
-      (uint8_t *)out,
-      (uint32_t)outlen,
-      (uint8_t *)in,
-      (uint32_t)inlen,
-      (uint8_t *)salt,
-      (uint32_t)saltlen,
-      NULL, /*Pointer to the secret*/
-      0,    /*Secret length*/
-      NULL, /*Pointer to the associated data*/
-      0,    /*Associated data length*/
-      (uint32_t)t_cost,
-      (uint32_t)m_cost,
-      1, /*Number of lanes*/
-      1, /*Number of threads*/
-      NULL,
-      NULL,  /*Pointers to external memory (de)allocators*/
-      true,  /*Clear the password after use*/
-      false, /*Not use the secret so  not clear it*/
-      true,  /*Clear the memory after use*/
-      false  /*Not printing the memory content to the file*/
-  };
+    Argon2_Context context = {
+        (uint8_t *)out,
+        (uint32_t)outlen,
+        (uint8_t *)in,
+        (uint32_t)inlen,
+        (uint8_t *)salt,
+        (uint32_t)saltlen,
+        NULL, /*Pointer to the secret*/
+        0,    /*Secret length*/
+        NULL, /*Pointer to the associated data*/
+        0,    /*Associated data length*/
+        (uint32_t)t_cost,
+        (uint32_t)m_cost,
+        1, /*Number of lanes*/
+        1, /*Number of threads*/
+        NULL,
+        NULL,  /*Pointers to external memory (de)allocators*/
+        true,  /*Clear the password after use*/
+        false, /*Not use the secret so  not clear it*/
+        true,  /*Clear the memory after use*/
+        false  /*Not printing the memory content to the file*/
+    };
 
-  return argon2_core(&context, Argon2_i);
+    return argon2_core(&context, Argon2_i);
 }
 
 int hashpwd2(void *out, size_t outlen, const void *in, size_t inlen,
              const void *salt, size_t saltlen, unsigned int t_cost,
              unsigned int m_cost) {
-  Argon2_Context context = {(uint8_t *)out,
-                            (uint32_t)outlen,
-                            (uint8_t *)in,
-                            (uint32_t)inlen,
-                            (uint8_t *)salt,
-                            (uint32_t)saltlen,
-                            NULL,
-                            0,
-                            NULL,
-                            0,
-                            (uint32_t)t_cost,
-                            (uint32_t)m_cost,
-                            1,
-                            1,
-                            NULL,
-                            NULL,
-                            true,
-                            true,
-                            true,
-                            false};
+    Argon2_Context context = {(uint8_t *)out,
+                              (uint32_t)outlen,
+                              (uint8_t *)in,
+                              (uint32_t)inlen,
+                              (uint8_t *)salt,
+                              (uint32_t)saltlen,
+                              NULL,
+                              0,
+                              NULL,
+                              0,
+                              (uint32_t)t_cost,
+                              (uint32_t)m_cost,
+                              1,
+                              1,
+                              NULL,
+                              NULL,
+                              true,
+                              true,
+                              true,
+                              false};
 
-  return argon2_core(&context, Argon2_d);
+    return argon2_core(&context, Argon2_d);
 }
 
 int argon2d(Argon2_Context *context) { return argon2_core(context, Argon2_d); }
@@ -199,23 +199,23 @@ int argon2d(Argon2_Context *context) { return argon2_core(context, Argon2_d); }
 int argon2i(Argon2_Context *context) { return argon2_core(context, Argon2_i); }
 
 int verify_d(Argon2_Context *context, const char *hash) {
-  if (0 == context->outlen || NULL == hash) {
-    return ARGON2_OUT_PTR_MISMATCH;
-  }
+    if (0 == context->outlen || NULL == hash) {
+        return ARGON2_OUT_PTR_MISMATCH;
+    }
 
-  int result = argon2_core(context, Argon2_d);
+    int result = argon2_core(context, Argon2_d);
 
-  if (ARGON2_OK != result) {
-    return result;
-  }
+    if (ARGON2_OK != result) {
+        return result;
+    }
 
-  return 0 == memcmp(hash, context->out, context->outlen);
+    return 0 == memcmp(hash, context->out, context->outlen);
 }
 
 const char *error_message(int error_code) {
-  if (error_code < ARGON2_ERROR_CODES_LENGTH) {
-    return Argon2_ErrorMessage[(Argon2_ErrorCodes)error_code];
-  }
+    if (error_code < ARGON2_ERROR_CODES_LENGTH) {
+        return Argon2_ErrorMessage[(Argon2_ErrorCodes)error_code];
+    }
 
-  return "Unknown error code.";
+    return "Unknown error code.";
 }

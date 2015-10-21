@@ -30,7 +30,7 @@ do
 		flags="OPT=TRUE"
 	fi
 
-	make $flags &> $make_log
+	make genkat $flags &> $make_log
 
 	if [ 0 -ne $? ] ; then
 		echo -e "\tFAIL: make error, see $make_log"
@@ -49,7 +49,7 @@ do
 		rm -f $kat_file
 
 		run_log=$TEST_PATH"run_"$type"_"$implementation".log"
-		./argon2 g --type $type > $run_log
+		./genkat $type > $run_log
 		if [ 0 -ne $? ] ; then
 			echo -e "\tFAIL: run error, see $run_log"
 			continue
