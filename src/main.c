@@ -30,7 +30,6 @@
 #define LANES_DEF 4
 #define THREADS_DEF 4
 #define SALTLEN_DEF 16
-#define PWD_DEF "password"
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
