@@ -182,7 +182,6 @@ void run(uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost,
   bool clear_password = false;
   uint8_t salt[SALT_LEN];
 #undef SALT_LEN
-<<<<<<< HEAD
   uint8_t *in = NULL;
 
   if (pwd) {
@@ -235,58 +234,6 @@ void run(uint8_t *out, char *pwd, uint32_t t_cost, uint32_t m_cost,
   printf("%s\n", string);
 
   free(in);
-=======
-    uint8_t *in = NULL;
-
-    if ( pwd )
-    {
-        in = ( uint8_t * )strdup( pwd );
-    }
-    else
-    {
-        in = ( uint8_t * )strdup( PWD_DEF );
-    }
-
-    const size_t in_length = strlen( ( char * )in );
-
-    UNUSED_PARAMETER( threads );
-
-    memset( salt, 0x00, salt_length );
-
-    Argon2_Context context= {out, out_length, in, (uint32_t)in_length, salt, salt_length,
-                             NULL, 0, NULL, 0, t_cost, m_cost, lanes, lanes,
-                             NULL, NULL,
-                             clear_password, clear_secret, clear_memory, print
-                            };
-    printf( "Argon2%s with\n", type );
-    printf( "\tt_cost = %d\n", t_cost );
-    printf( "\tm_cost = %d\n", m_cost );
-    printf( "\tpassword = %s\n", in );
-    printf( "\tsalt = " ); print_bytes( salt, salt_length );
-
-    if ( !strcmp( type,"d" ) )  argon2d( &context );
-    else if ( !strcmp( type,"i" ) ) argon2i( &context );
-    else fatal( "wrong Argon2 type" );
-
-    stop_cycles = rdtsc();
-    clock_t finish_time = clock();
-
-
-    float run_time = ( ( float ) finish_time - start_time ) / ( CLOCKS_PER_SEC );
-    printf( "%2.3f seconds ", run_time );
-
-    float mcycles = ( float ) ( stop_cycles - start_cycles ) / ( 1 << 20 );
-    printf( "(%.3f mebicycles)\n", mcycles );
-
-    print_bytes( out, out_length );
-
-    // show string encoding
-    char string[300];
-    encode_string( string, sizeof string, &context );
-    printf( "%s\n", string );
-
-    free(in);
->>>>>>> portable_threads
 }
 
 void generate_testvectors(const char *type) {
