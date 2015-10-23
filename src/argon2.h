@@ -275,4 +275,10 @@ int verify_d(Argon2_Context *context, const char *hash);
  */
 const char *error_message(int error_code);
 
+/* Function that securely cleans the memory
+* @param mem Pointer to the memory
+* @param s Memory size in bytes
+*/
+__inline void  secure_wipe_memory(void *v, size_t n);
+
 #endif

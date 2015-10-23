@@ -189,21 +189,25 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     const unsigned salt_length = SALTLEN_DEF;
     bool clear_memory = false;
     bool clear_secret = false;
-    bool clear_password = false;
+    bool clear_password = true;
     uint8_t *in = NULL;
 
     if (!pwd)
         fatal("password missing");
-    if (!salt)
-        fatal("salt missing");
+	if (!salt)
+	{
+		secure_wipe_memory(pwd, strlen(pwd));
+		fatal("salt missing");
+	}
 
     in = malloc(strlen(pwd) + 1);
     if(!in)
     {
+		secure_wipe_memory(pwd, strlen(pwd));
         fatal("Memory allocation error in the initialization phase");
     }
     strcpy((char *)in, pwd);
-
+	secure_wipe_memory(pwd, strlen(pwd));
     const unsigned in_length = strlen((char *)in);
 
     UNUSED_PARAMETER(threads);
