@@ -86,12 +86,7 @@ int allocate_memory(block **memory, uint32_t m_cost) {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
 }
 
-/* Function that securely cleans the memory
- * @param mem Pointer to the memory
- * @param s Memory size in bytes
- */
-
- __inline void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
+void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
 #if defined(_MSC_VER) && VC_GE_2005(_MSC_VER)
     SecureZeroMemory(v, n);
 #elif defined memset_s
@@ -390,11 +385,11 @@ int validate_inputs(const Argon2_Context *context) {
         return ARGON2_MEMORY_TOO_MUCH;
     }
 
-	if (sizeof(uint32_t*) == 4){//32-bit machine 
-		if ((1 << 21) < context->m_cost) { //2^21 blocks (2 GB) maximum
-			return ARGON2_MEMORY_TOO_MUCH;
-		}
-	}
+    if (sizeof(uint32_t *) == 4) { // 32-bit machine
+        if ((1 << 21) < context->m_cost) { // 2^21 blocks (2 GB) maximum
+            return ARGON2_MEMORY_TOO_MUCH;
+        }
+    }
 
     /* Validate time cost */
     if (ARGON2_MIN_TIME > context->t_cost) {

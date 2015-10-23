@@ -18,11 +18,11 @@
 #include <time.h>
 
 #include "argon2.h"
+#include "core.h"
 #include "encoding.h"
 #ifdef _MSC_VER
 #include <intrin.h>
 #endif
-
 
 #define T_COST_DEF 3
 #define LOG_M_COST_DEF 12 /*4 MB*/
@@ -167,7 +167,8 @@ void benchmark() {
 }
 
 /*
-Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the Base64-encoded hash string
+Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the
+Base64-encoded hash string
 @out output array with at least 32 bytes allocated
 @pwd NULL-terminated string, presumably from argv[]
 @salt salt array with at least SALTLEN_DEF bytes allocated
@@ -194,20 +195,18 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     if (!pwd)
         fatal("password missing");
-	if (!salt)
-	{
-		secure_wipe_memory(pwd, strlen(pwd));
-		fatal("salt missing");
-	}
+    if (!salt) {
+        secure_wipe_memory(pwd, strlen(pwd));
+        fatal("salt missing");
+    }
 
     in = malloc(strlen(pwd) + 1);
-    if(!in)
-    {
-		secure_wipe_memory(pwd, strlen(pwd));
+    if (!in) {
+        secure_wipe_memory(pwd, strlen(pwd));
         fatal("Memory allocation error in the initialization phase");
     }
     strcpy((char *)in, pwd);
-	secure_wipe_memory(pwd, strlen(pwd));
+    secure_wipe_memory(pwd, strlen(pwd));
     const unsigned in_length = strlen((char *)in);
 
     UNUSED_PARAMETER(threads);
@@ -222,8 +221,7 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         argon2d(&context);
     else if (!strcmp(type, "i"))
         argon2i(&context);
-    else
-    {
+    else {
         free(in);
         fatal("wrong Argon2 type");
     }
@@ -301,16 +299,15 @@ void generate_testvectors(const char *type) {
 #undef TEST_SECRETLEN
 #undef TEST_ADLEN
 
-    if (!strcmp(type, "d")){
-        printf("Generating test vectors for Argon2d in file \"%s\".\n", ARGON2_KAT_FILENAME);
+    if (!strcmp(type, "d")) {
+        printf("Generating test vectors for Argon2d in file \"%s\".\n",
+               ARGON2_KAT_FILENAME);
         argon2d(&context);
-    }
-    else if (!strcmp(type, "i"))
-    {
-        printf("Generating test vectors for Argon2i in file \"%s\".\n", ARGON2_KAT_FILENAME);
+    } else if (!strcmp(type, "i")) {
+        printf("Generating test vectors for Argon2i in file \"%s\".\n",
+               ARGON2_KAT_FILENAME);
         argon2i(&context);
-    }
-    else
+    } else
         fatal("wrong Argon2 type");
 }
 
@@ -322,7 +319,7 @@ int main(int argc, char *argv[]) {
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
     uint8_t salt[SALTLEN_DEF];
-    const char *type = "i";
+    char *type = "i";
 
     remove(ARGON2_KAT_FILENAME);
 
@@ -331,9 +328,8 @@ int main(int argc, char *argv[]) {
     return ARGON2_OK;
 #endif
 #ifdef GENKAT
-    if(argc>1)
-    {
-        type[0] = argv[1][0];
+    if (argc > 1) {
+        type = argv[1];
     }
     generate_testvectors(type);
     return ARGON2_OK;

@@ -139,8 +139,8 @@ const char *Argon2_ErrorMessage[] = {
 };
 
 int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
-            const void *salt, size_t saltlen, unsigned int t_cost,
-            unsigned int m_cost) {
+                 const void *salt, size_t saltlen, unsigned int t_cost,
+                 unsigned int m_cost) {
     Argon2_Context context = {
         (uint8_t *)out,
         (uint32_t)outlen,
@@ -168,8 +168,8 @@ int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
 }
 
 int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
-             const void *salt, size_t saltlen, unsigned int t_cost,
-             unsigned int m_cost) {
+                 const void *salt, size_t saltlen, unsigned int t_cost,
+                 unsigned int m_cost) {
     Argon2_Context context = {(uint8_t *)out,
                               (uint32_t)outlen,
                               (uint8_t *)in,

@@ -125,6 +125,12 @@ typedef struct _Argon2_thread_data {
  */
 int allocate_memory(block **memory, uint32_t m_cost);
 
+/* Function that securely cleans the memory
+ * @param mem Pointer to the memory
+ * @param s Memory size in bytes
+ */
+void secure_wipe_memory(void *v, size_t n);
+
 /* Clears memory
  * @param instance pointer to the current instance
  * @param clear_memory indicates if we clear the memory with zeros.
