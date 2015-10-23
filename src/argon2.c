@@ -138,7 +138,7 @@ const char *Argon2_ErrorMessage[] = {
 {ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch" /*}*/
 };
 
-int hashpwd(void *out, size_t outlen, const void *in, size_t inlen,
+int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
             const void *salt, size_t saltlen, unsigned int t_cost,
             unsigned int m_cost) {
     Argon2_Context context = {
@@ -167,7 +167,7 @@ int hashpwd(void *out, size_t outlen, const void *in, size_t inlen,
     return argon2_core(&context, Argon2_i);
 }
 
-int hashpwd2(void *out, size_t outlen, const void *in, size_t inlen,
+int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
              const void *salt, size_t saltlen, unsigned int t_cost,
              unsigned int m_cost) {
     Argon2_Context context = {(uint8_t *)out,

@@ -390,6 +390,12 @@ int validate_inputs(const Argon2_Context *context) {
         return ARGON2_MEMORY_TOO_MUCH;
     }
 
+	if (sizeof(uint32_t*) == 4){//32-bit machine 
+		if ((1 << 21) < context->m_cost) { //2^21 blocks (2 GB) maximum
+			return ARGON2_MEMORY_TOO_MUCH;
+		}
+	}
+
     /* Validate time cost */
     if (ARGON2_MIN_TIME > context->t_cost) {
         return ARGON2_TIME_TOO_SMALL;

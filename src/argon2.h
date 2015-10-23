@@ -207,12 +207,12 @@ typedef struct _Argon2_Context {
  * @pre    @a saltlen must be at least @saltlen bytes long
  * @return Zero if successful, 1 otherwise.
  */
-int hashpwd(void *out, size_t outlen, const void *in, size_t inlen,
+int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
             const void *salt, size_t saltlen, unsigned int t_cost,
             unsigned int m_cost);
 
 /* same for argon2d */
-int hashpwd2(void *out, size_t outlen, const void *in, size_t inlen,
+int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
              const void *salt, size_t saltlen, unsigned int t_cost,
              unsigned int m_cost);
 
