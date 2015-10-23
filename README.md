@@ -78,7 +78,7 @@ int main()
     uint32_t m_cost = (1<<16);      // 64 mebibytes memory usage
 
     // high-level API
-    hashpwd( out1, OUTLEN, in, inlen, salt, SALTLEN, t_cost, m_cost );
+    hash_argon2i( out1, OUTLEN, in, inlen, salt, SALTLEN, t_cost, m_cost );
 
     // low-level API
     uint32_t lanes = 1;             // lanes 1 by default
@@ -100,9 +100,9 @@ int main()
 }
 ```
 
-To use Argon2d instead of Argon2i call `hashpwd2` instead of `hashpwd`
-using the high-level API, and `argon2d` instead of `argon2i` using the
-low-level API.
+To use Argon2d instead of Argon2i call `hash_argon2d` instead of
+`hash_argon2i` using the high-level API, and `argon2d` instead of
+`argon2i` using the low-level API.
 
 *Note: in this example the salt is set to the all-`0x00` string, but in
 your application you should use a random salt.*
