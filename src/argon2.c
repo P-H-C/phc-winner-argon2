@@ -19,53 +19,8 @@
 #include "argon2.h"
 #include "core.h"
 
-/*************************Argon2 input parameter
- * restrictions**************************************************/
 
-/* Minimum and maximum number of lanes (degree of parallelism) */
-const uint32_t ARGON2_MIN_LANES = 1;
-const uint32_t ARGON2_MAX_LANES = 0xFFFFFF;
-
-/* Minimum and maximum number of threads */
-const uint32_t ARGON2_MIN_THREADS = 1;
-const uint32_t ARGON2_MAX_THREADS = 0xFFFFFF;
-
-/* Number of synchronization points between lanes per pass */
-#define __ARGON_SYNC_POINTS 4
-const uint32_t ARGON2_SYNC_POINTS = __ARGON_SYNC_POINTS;
-
-/* Minimum and maximum digest size in bytes */
-const uint32_t ARGON2_MIN_OUTLEN = 4;
-const uint32_t ARGON2_MAX_OUTLEN = 0xFFFFFFFF;
-
-/* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
-const uint32_t ARGON2_MIN_MEMORY =
-    2 * __ARGON_SYNC_POINTS;                   // 2 blocks per slice
-const uint32_t ARGON2_MAX_MEMORY = 0xFFFFFFFF; // 2^32-1 blocks
-
-/* Minimum and maximum number of passes */
-const uint32_t ARGON2_MIN_TIME = 1;
-const uint32_t ARGON2_MAX_TIME = 0xFFFFFFFF;
-
-/* Minimum and maximum password length in bytes */
-const uint32_t ARGON2_MIN_PWD_LENGTH = 0;
-const uint32_t ARGON2_MAX_PWD_LENGTH = 0xFFFFFFFF;
-
-/* Minimum and maximum associated data length in bytes */
-const uint32_t ARGON2_MIN_AD_LENGTH = 0;
-const uint32_t ARGON2_MAX_AD_LENGTH = 0xFFFFFFFF;
-
-/* Minimum and maximum salt length in bytes */
-const uint32_t ARGON2_MIN_SALT_LENGTH = 8;
-const uint32_t ARGON2_MAX_SALT_LENGTH = 0xFFFFFFFF;
-
-/* Minimum and maximum key length in bytes */
-const uint32_t ARGON2_MIN_SECRET = 0;
-const uint32_t ARGON2_MAX_SECRET = 0xFFFFFFFF;
-
-/************************* Error messages
- * *********************************************************************************/
-
+/* Error messages */
 const char *Argon2_ErrorMessage[] = {
     /*{ARGON2_OK, */ "OK",
     /*},

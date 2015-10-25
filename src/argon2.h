@@ -19,11 +19,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-/************************* Constants to enable Known Answer Tests (KAT)
- * **************************************************/
-/* Enable ARGON2_KAT */
-//#define ARGON2_KAT
-//#define ARGON2_KAT_INTERNAL
 
 /* The KAT file name */
 const char *ARGON2_KAT_FILENAME;
@@ -32,46 +27,47 @@ const char *ARGON2_KAT_FILENAME;
  * restrictions**************************************************/
 
 /* Minimum and maximum number of lanes (degree of parallelism) */
-const uint32_t ARGON2_MIN_LANES;
-const uint32_t ARGON2_MAX_LANES;
+#define ARGON2_MIN_LANES 1
+#define ARGON2_MAX_LANES 0xFFFFFF
 
-const uint32_t ARGON2_MIN_THREADS;
-const uint32_t ARGON2_MAX_THREADS;
+/* Minimum and maximum number of threads */
+#define ARGON2_MIN_THREADS 1
+#define ARGON2_MAX_THREADS 0xFFFFFF
 
 /* Number of synchronization points between lanes per pass */
 #define __ARGON_SYNC_POINTS 4
-const uint32_t ARGON2_SYNC_POINTS;
+#define ARGON2_SYNC_POINTS __ARGON_SYNC_POINTS
 
 /* Minimum and maximum digest size in bytes */
-const uint32_t ARGON2_MIN_OUTLEN;
-const uint32_t ARGON2_MAX_OUTLEN;
+#define ARGON2_MIN_OUTLEN 4
+#define ARGON2_MAX_OUTLEN 0xFFFFFFFF
 
 /* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
-const uint32_t ARGON2_MIN_MEMORY; // 2 blocks per slice
-const uint32_t ARGON2_MAX_MEMORY; // 2^32-1 blocks
+#define ARGON2_MIN_MEMORY (2 *(__ARGON_SYNC_POINTS)) // 2 blocks per slice
+#define ARGON2_MAX_MEMORY 0xFFFFFFFF // 2^32-1 blocks
 
 /* Minimum and maximum number of passes */
-const uint32_t ARGON2_MIN_TIME;
-const uint32_t ARGON2_MAX_TIME;
+#define ARGON2_MIN_TIME 1
+#define ARGON2_MAX_TIME 0xFFFFFFFF
 
 /* Minimum and maximum password length in bytes */
-const uint32_t ARGON2_MIN_PWD_LENGTH;
-const uint32_t ARGON2_MAX_PWD_LENGTH;
+#define ARGON2_MIN_PWD_LENGTH 0
+#define ARGON2_MAX_PWD_LENGTH 0xFFFFFFFF
 
 /* Minimum and maximum associated data length in bytes */
-const uint32_t ARGON2_MIN_AD_LENGTH;
-const uint32_t ARGON2_MAX_AD_LENGTH;
+#define ARGON2_MIN_AD_LENGTH 0
+#define ARGON2_MAX_AD_LENGTH 0xFFFFFFFF
 
 /* Minimum and maximum salt length in bytes */
-const uint32_t ARGON2_MIN_SALT_LENGTH;
-const uint32_t ARGON2_MAX_SALT_LENGTH;
+#define ARGON2_MIN_SALT_LENGTH 8
+#define ARGON2_MAX_SALT_LENGTH 0xFFFFFFFF
 
 /* Minimum and maximum key length in bytes */
-const uint32_t ARGON2_MIN_SECRET;
-const uint32_t ARGON2_MAX_SECRET;
+#define ARGON2_MIN_SECRET 0
+#define ARGON2_MAX_SECRET 0xFFFFFFFF
 
-/************************* Error codes
- * *********************************************************************************/
+
+/* Error codes */
 typedef enum _Argon2_ErrorCodes {
     ARGON2_OK = 0,
 
@@ -126,15 +122,12 @@ typedef enum _Argon2_ErrorCodes {
                                  error code */
 } Argon2_ErrorCodes;
 
-/********************************************* Memory allocator types --- for
- * external allocation
- * *************************************************************/
+/* Memory allocator types --- for external allocation */
 typedef int (*AllocateMemoryCallback)(uint8_t **memory,
                                       size_t bytes_to_allocate);
 typedef void (*FreeMemoryCallback)(uint8_t *memory, size_t bytes_to_allocate);
 
-/********************************************* Argon2 external data
- * structures*************************************************************/
+/* Argon2 external data structures */
 
 /*
  *****Context: structure to hold Argon2 inputs:
