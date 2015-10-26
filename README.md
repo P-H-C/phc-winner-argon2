@@ -55,7 +55,7 @@ kibibytes (that is, 64 mebibytes), and there's no parallelism
 (single-lane, single-thread).
 
 Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
-below is named `test.c` and placed in the projects' root directory.
+below is named `test.c` and placed in the project's root directory.
 
 ```c
 #include "argon2.h"
