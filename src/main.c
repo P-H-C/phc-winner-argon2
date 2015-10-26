@@ -211,8 +211,16 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         lanes,        lanes,      NULL, NULL,      clear_password, clear_secret,
         clear_memory, false};
 
-    if (!strcmp(type, "d"))      argon2d(&context);
-    else if (!strcmp(type, "i")) argon2i(&context);
+    if (!strcmp(type, "d"))
+    {
+        int result = argon2d(&context);
+        printf("%s\n",error_message(result));
+    }
+    else if (!strcmp(type, "i"))
+    {
+        int result = argon2i(&context);
+        printf("%s\n",error_message(result));
+    }
     else {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("wrong Argon2 type");
