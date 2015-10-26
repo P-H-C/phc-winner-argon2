@@ -181,17 +181,18 @@ Base64-encoded hash string
 void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
          uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type) {
     uint64_t start_cycles, stop_cycles;
+    clock_t start_time, stop_time;
 
-    clock_t start_time = clock();
+    start_time = clock();
     start_cycles = rdtsc();
 
     /*Fixed parameters*/
     const unsigned out_length = 32;
     const unsigned salt_length = SALTLEN_DEF;
+    unsigned pwd_length; 
     bool clear_memory = false;
     bool clear_secret = false;
     bool clear_password = true;
-    uint8_t *in = NULL;
 
     if (!pwd)
         fatal("password missing");
@@ -200,46 +201,36 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         fatal("salt missing");
     }
 
-    in = malloc(strlen(pwd) + 1);
-    if (!in) {
-        secure_wipe_memory(pwd, strlen(pwd));
-        fatal("Memory allocation error in the initialization phase");
-    }
-    strcpy((char *)in, pwd);
-    secure_wipe_memory(pwd, strlen(pwd));
-    const unsigned in_length = strlen((char *)in);
+    pwd_length = strlen(pwd);
 
     UNUSED_PARAMETER(threads);
 
     Argon2_Context context = {
-        out,          out_length, in,   in_length, salt,           salt_length,
+        out,          out_length, (uint8_t*)pwd,   pwd_length, salt,           salt_length,
         NULL,         0,          NULL, 0,         t_cost,         m_cost,
         lanes,        lanes,      NULL, NULL,      clear_password, clear_secret,
         clear_memory, false};
 
-    if (!strcmp(type, "d"))
-        argon2d(&context);
-    else if (!strcmp(type, "i"))
-        argon2i(&context);
+    if (!strcmp(type, "d"))      argon2d(&context);
+    else if (!strcmp(type, "i")) argon2i(&context);
     else {
-        free(in);
+        secure_wipe_memory(pwd, strlen(pwd));
         fatal("wrong Argon2 type");
     }
 
     stop_cycles = rdtsc();
-    clock_t finish_time = clock();
+    stop_time = clock();
 
     // show string encoding
-    char string[300];
-    encode_string(string, sizeof string, &context);
-    printf("%s\n", string);
+    char encoded[300];
+    encode_string(encoded, sizeof encoded, &context);
+    printf("%s\n", encoded);
 
-    float run_time = ((float)finish_time - start_time) / (CLOCKS_PER_SEC);
-    float mcycles = (float)(stop_cycles - start_cycles) / (1 << 20);
+    // show running time/cycles
+    float run_time = ((float)stop_time - start_time) / (CLOCKS_PER_SEC);
+    float run_cycles = (float)(stop_cycles - start_cycles) / (1 << 20);
     printf("%2.3f seconds ", run_time);
-    printf("(%.3f mebicycles)\n", mcycles);
-
-    free(in);
+    printf("(%.3f mebicycles)\n", run_cycles);
 }
 
 void generate_testvectors(const char *type) {
@@ -344,9 +335,10 @@ int main(int argc, char *argv[]) {
     pwd = argv[1];
     if (strlen(argv[2]) > SALTLEN_DEF)
         fatal("salt too long");
-    memset(salt, 0x00, SALTLEN_DEF); // padding
+    memset(salt, 0x00, SALTLEN_DEF); // pad with null bytes
     memcpy(salt, (uint8_t *)argv[2], strlen(argv[2]));
 
+    // parse options
     for (int i = 3; i < argc; i++) {
         char *a = argv[i];
 
