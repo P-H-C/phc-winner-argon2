@@ -63,13 +63,13 @@ typedef struct _block {
 /*****************Functions that work with the block******************/
 
 // Initialize each byte of the block with @in
-extern void init_block_value(block *b, uint8_t in);
+void init_block_value(block *b, uint8_t in);
 
 // Copy block @src to block @dst
-extern void copy_block(block *dst, const block *src);
+void copy_block(block *dst, const block *src);
 
 // XOR @src onto @dst bytewise
-extern void xor_block(block *dst, const block *src);
+void xor_block(block *dst, const block *src);
 
 /*
  * Argon2 instance: memory pointer, number of passes, amount of memory, type,
@@ -217,7 +217,7 @@ void finalize(const Argon2_Context *context, Argon2_instance_t *instance);
  * @param position Current position
  * @pre all block pointers must be valid
  */
-extern void fill_segment(const Argon2_instance_t *instance,
+void fill_segment(const Argon2_instance_t *instance,
                          Argon2_position_t position);
 
 /*
