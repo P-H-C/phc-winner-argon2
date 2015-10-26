@@ -381,7 +381,7 @@ int validate_inputs(const Argon2_Context *context) {
     }
 
     if (sizeof(uint32_t *) == 4) { // 32-bit machine
-        if ((1 << 21) < context->m_cost) { // 2^21 blocks (2 GB) maximum
+        if (ARGON2_32BIT_LIMIT < context->m_cost) { // 2^21 blocks (2 GB) maximum
             return ARGON2_MEMORY_TOO_MUCH;
         }
     }
