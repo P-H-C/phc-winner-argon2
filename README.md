@@ -54,6 +54,9 @@ Here `t_cost` is set to 2 passes, `m_cost` is set to 2<sup>16</sup>
 kibibytes (that is, 64 mebibytes), and there's no parallelism
 (single-lane, single-thread).
 
+Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
+below is named `test.c` and place in the projects' root directory.
+
 ```c
 #include "argon2.h"
 #include <stdio.h>
