@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -86,7 +87,7 @@ void usage(const char *cmd) {
     printf("\t-t t_cost\tNumber of rounds to t_cost between 1 and 2^24, "
            "default %d\n",
            T_COST_DEF);
-    printf("\t-m m_cost\tMemory usage of 2^t_cost kibibytes, default %d]\n",
+    printf("\t-m m_cost\tMemory usage of 2^t_cost kibibytes, default %d\n",
            LOG_M_COST_DEF);
     printf("\t-p N\t\tParallelism, default %d\n", THREADS_DEF);
 }
@@ -353,7 +354,7 @@ int main(int argc, char *argv[]) {
         if (!strcmp(a, "-m")) {
             if (i < argc - 1) {
                 i++;
-                m_cost = (uint8_t)1 << ((uint8_t)atoi(argv[i]) % 22);
+                m_cost = (uint8_t)1 << ((uint8_t)atoi(argv[i]) % 22);               
                 continue;
             } else
                 fatal("missing -m argument");
@@ -382,7 +383,10 @@ int main(int argc, char *argv[]) {
         } else
             fatal("unknown argument");
     }
-
+    printf("Memory blocks requested:  %"PRIu32" \n",m_cost);
+    printf("Iterations requested:  %"PRIu32" \n",t_cost);
+    printf("Lanes and threads requested:  %"PRIu32" \n",lanes);
+    printf("Type requested: %c\n",type[0]);
     run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
     return ARGON2_OK;
