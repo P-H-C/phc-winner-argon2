@@ -11,8 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef OPT_H
-#define OPT_H
+#ifndef ARGON2_OPT_H
+#define ARGON2_OPT_H
 
 /*
  * Function fills a new memory block. Differs from the
@@ -46,4 +46,4 @@ void generate_addresses(const Argon2_instance_t *instance,
 void fill_segment(const Argon2_instance_t *instance,
                   Argon2_position_t position);
 
-#endif /* ARGON2_OPT_CORE_H */
+#endif /* ARGON2_OPT_H */

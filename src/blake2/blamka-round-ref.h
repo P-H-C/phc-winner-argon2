@@ -1,7 +1,5 @@
-#pragma once
-
-#ifndef __BLAKE_ROUND_MKA_H__
-#define __BLAKE_ROUND_MKA_H__
+#ifndef BLAKE_ROUND_MKA_H
+#define BLAKE_ROUND_MKA_H
 
 #define G(a, b, c, d)                                                          \
     a = fBlaMka(a, b);                                                         \

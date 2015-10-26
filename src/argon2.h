@@ -10,15 +10,16 @@
  * this software. If not, see
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
-#pragma once
-
-#ifndef __ARGON2_H__
-#define __ARGON2_H__
+#ifndef ARGON2_H
+#define ARGON2_H
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /* The KAT file name */
 const char *ARGON2_KAT_FILENAME;
@@ -269,10 +270,8 @@ int verify_d(Argon2_Context *context, const char *hash);
  */
 const char *error_message(int error_code);
 
-/* Function that securely cleans the memory
-* @param mem Pointer to the memory
-* @param s Memory size in bytes
-*/
-//__inline void  secure_wipe_memory(void *v, size_t n);
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

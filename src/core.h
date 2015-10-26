@@ -11,7 +11,6 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#pragma once
 #ifndef ARGON2_CORE_H
 #define ARGON2_CORE_H
 

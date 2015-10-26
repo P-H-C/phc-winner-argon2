@@ -12,9 +12,9 @@
    this software. If not, see
    <http://creativecommons.org/publicdomain/zero/1.0/>.
 */
-#pragma once
-#ifndef __BLAKE2_IMPL_H__
-#define __BLAKE2_IMPL_H__
+
+#ifndef BLAKE2_IMPL_H
+#define BLAKE2_IMPL_H
 
 #include <stdint.h>
 

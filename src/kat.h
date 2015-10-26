@@ -11,8 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef __ARGON2_KAT_H__
-#define __ARGON2_KAT_H__
+#ifndef ARGON2_KAT_H
+#define ARGON2_KAT_H
 
 /*
  * Initial KAT function that prints the inputs to the file

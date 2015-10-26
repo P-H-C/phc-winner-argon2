@@ -11,8 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef REF_H
-#define REF_H
+#ifndef ARGON2_REF_H
+#define ARGON2_REF_H
 
 /*
  * Function fills a new memory block
@@ -46,4 +46,4 @@ void generate_addresses(const Argon2_instance_t *instance,
 void fill_segment(const Argon2_instance_t *instance,
                   Argon2_position_t position);
 
-#endif /* ARGON2_REF_CORE_H */
+#endif /* ARGON2_REF_H */
