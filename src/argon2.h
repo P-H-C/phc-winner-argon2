@@ -45,6 +45,7 @@ const char *ARGON2_KAT_FILENAME;
 /* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
 #define ARGON2_MIN_MEMORY (2 *(__ARGON_SYNC_POINTS)) // 2 blocks per slice
 #define ARGON2_MAX_MEMORY 0xFFFFFFFF // 2^32-1 blocks
+#define ARGON2_32BIT_LIMIT 0x200000 //2^21 blocks for 32-bit machines
 
 /* Minimum and maximum number of passes */
 #define ARGON2_MIN_TIME 1
