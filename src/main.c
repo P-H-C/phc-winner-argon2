@@ -379,7 +379,7 @@ int main(int argc, char *argv[]) {
                 type = argv[i];
                 continue;
             } else
-                fatal("missing type argument");
+                fatal("missing -y argument");
         } else
             fatal("unknown argument");
     }
