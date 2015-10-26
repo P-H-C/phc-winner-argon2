@@ -22,7 +22,6 @@
 #define VC_GE_2005(version) (version >= 1400)
 
 #include <inttypes.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,9 +29,7 @@
 #include "argon2.h"
 #include "core.h"
 #include "kat.h"
-
 #include "thread.h"
-
 #include "blake2/blake2.h"
 #include "blake2/blake2-impl.h"
 
@@ -52,16 +49,16 @@
 #endif
 
 /***************Instance and Position constructors**********/
-void init_block_value(block *b, uint8_t in) { memset(b->v, in, sizeof(b->v)); }
+void init_block_value(block *b, uint8_t in) { 
+    memset(b->v, in, sizeof(b->v));
+}
 
 void copy_block(block *dst, const block *src) {
     memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_WORDS_IN_BLOCK);
 }
 
 void xor_block(block *dst, const block *src) {
-    int i;
-
-    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    for (int i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
         dst->v[i] ^= src->v[i];
     }
 }
@@ -128,8 +125,7 @@ void finalize(const Argon2_Context *context, Argon2_instance_t *instance) {
         // Hash the result
         blake2b_long(context->out, (uint8_t *)blockhash.v, context->outlen,
                      ARGON2_BLOCK_SIZE);
-        secure_wipe_memory(blockhash.v,
-                           ARGON2_BLOCK_SIZE); // clear the blockhash
+        secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); // clear blockhash
 
         if (context->print) // Shall we print the output tag?
         {
