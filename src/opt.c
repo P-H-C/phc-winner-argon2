@@ -15,12 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if !defined(_MSC_VER)
-#include <x86intrin.h>
-#else
 #include <immintrin.h>
-#include <intrin.h>
-#endif
 
 #include "argon2.h"
 #include "core.h"
