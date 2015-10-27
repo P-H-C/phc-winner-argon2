@@ -1,6 +1,10 @@
 #!/bin/sh
 
 make genkat
+if [ $? -ne 0 ]
+then
+  exit $?
+fi
 
 printf "argon2i "
 ./genkat i > tmp
@@ -19,6 +23,10 @@ fi
 printf "\n"
 
 make genkat OPT=TRUE
+if [ $? -ne 0 ]
+then
+  exit $?
+fi
 
 printf "argon2i "
 ./genkat i > tmp
