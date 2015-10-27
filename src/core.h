@@ -14,7 +14,13 @@
 #ifndef ARGON2_CORE_H
 #define ARGON2_CORE_H
 
-#include "blake2/blake2.h"
+#if defined(_MSC_VER)
+#define ALIGN(n) __declspec(align(16))
+#elif defined(__GNUC__) || defined(__clang)
+#define ALIGN(x) __attribute__((__aligned__(x)))
+#else
+#define ALIGN(x)
+#endif
 
 /*************************Argon2 internal
  * constants**************************************************/

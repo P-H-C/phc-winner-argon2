@@ -127,8 +127,7 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
         }
 
         /* Hash the result */
-        blake2b_long(context->out, (uint8_t *)blockhash.v, context->outlen,
-                     ARGON2_BLOCK_SIZE);
+        blake2b_long(context->out, context->outlen, blockhash.v, ARGON2_BLOCK_SIZE);
         secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); /* clear blockhash */
 
 #ifdef GENKAT
@@ -437,13 +436,12 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
     for (l = 0; l < instance->lanes; ++l) {
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
-        blake2b_long((uint8_t *)(instance->memory[l * instance->lane_length].v),
-                     blockhash, ARGON2_BLOCK_SIZE, ARGON2_PREHASH_SEED_LENGTH);
+        blake2b_long(instance->memory[l * instance->lane_length].v, ARGON2_BLOCK_SIZE,
+                     blockhash, ARGON2_PREHASH_SEED_LENGTH);
 
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 1);
-        blake2b_long(
-            (uint8_t *)(instance->memory[l * instance->lane_length + 1].v),
-            blockhash, ARGON2_BLOCK_SIZE, ARGON2_PREHASH_SEED_LENGTH);
+        blake2b_long(instance->memory[l * instance->lane_length + 1].v, ARGON2_BLOCK_SIZE,
+            blockhash, ARGON2_PREHASH_SEED_LENGTH);
     }
 }
 

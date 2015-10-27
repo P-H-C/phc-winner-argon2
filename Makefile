@@ -14,7 +14,7 @@ GENKAT = genkat
 DIST = phc-winner-argon2
 
 CC = gcc
-SRC = src/argon2.c src/core.c src/blake2/blake2b-ref.c src/thread.c
+SRC = src/argon2.c src/core.c src/blake2/blake2b.c src/thread.c
 SRC_RUN = src/run.c
 SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
