@@ -136,7 +136,7 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
 #endif
 
         /* Clear memory */
-        clear_memory(instance, context->flags & ARGON2_CLEAR_PASSWORD);
+        clear_memory(instance, context->flags & ARGON2_FLAG_CLEAR_PASSWORD);
 
         /* Deallocate the memory */
         if (NULL != context->free_cbk) {
@@ -392,12 +392,6 @@ int validate_inputs(const argon2_context *context) {
         return ARGON2_MEMORY_TOO_MUCH;
     }
 
-    if (sizeof(uint32_t *) == 4) { /* 32-bit machine */
-        if (ARGON2_32BIT_LIMIT < context->m_cost) { /* 2^21 blocks (2 GB) maximum */
-            return ARGON2_MEMORY_TOO_MUCH;
-        }
-    }
-
     /* Validate time cost */
     if (ARGON2_MIN_TIME > context->t_cost) {
         return ARGON2_TIME_TOO_SMALL;
@@ -489,7 +483,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
         blake2b_update(&BlakeHash, (const uint8_t *)context->pwd,
                        context->pwdlen);
 
-        if (context->flags & ARGON2_CLEAR_PASSWORD) {
+        if (context->flags & ARGON2_FLAG_CLEAR_PASSWORD) {
             secure_wipe_memory(context->pwd, context->pwdlen);
             context->pwdlen = 0;
         }
@@ -510,7 +504,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
         blake2b_update(&BlakeHash, (const uint8_t *)context->secret,
                        context->secretlen);
 
-        if (context->flags & ARGON2_CLEAR_SECRET) {
+        if (context->flags & ARGON2_FLAG_CLEAR_SECRET) {
             secure_wipe_memory(context->secret, context->secretlen);
             context->secretlen = 0;
         }

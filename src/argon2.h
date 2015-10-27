@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <limits.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -43,8 +44,11 @@ const char *ARGON2_KAT_FILENAME;
 
 /* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
 #define ARGON2_MIN_MEMORY (2 * ARGON2_SYNC_POINTS) /* 2 blocks per slice */
-#define ARGON2_MAX_MEMORY  UINT32_C(0xFFFFFFFF) /* 2^32-1 blocks */
-#define ARGON2_32BIT_LIMIT UINT32_C(0x200000) /* 2^21 blocks for 32-bit machines */
+
+#define ARGON2_MIN(a, b) ((a) < (b) ? (a) : (b))
+/* Max memory size is half the addressing space, topping at 2^32 blocks (4 TB) */
+#define ARGON2_MAX_MEMORY_BITS ARGON2_MIN(UINT32_C(32), (sizeof(void *) * CHAR_BIT - 10 - 1))
+#define ARGON2_MAX_MEMORY ARGON2_MIN(UINT32_C(0xFFFFFFFF), UINT64_C(1) << ARGON2_MAX_MEMORY_BITS)
 
 /* Minimum and maximum number of passes */
 #define ARGON2_MIN_TIME UINT32_C(1)
@@ -66,10 +70,10 @@ const char *ARGON2_KAT_FILENAME;
 #define ARGON2_MIN_SECRET UINT32_C(0)
 #define ARGON2_MAX_SECRET UINT32_C(0xFFFFFFFF)
 
-#define ARGON2_CLEAR_PASSWORD (UINT32_C(1) << 0)
-#define ARGON2_CLEAR_SECRET   (UINT32_C(1) << 1)
-#define ARGON2_CLEAR_MEMORY   (UINT32_C(1) << 2)
-#define ARGON2_DEFAULT_FLAGS  (ARGON2_CLEAR_PASSWORD | ARGON2_CLEAR_MEMORY)
+#define ARGON2_FLAG_CLEAR_PASSWORD (UINT32_C(1) << 0)
+#define ARGON2_FLAG_CLEAR_SECRET   (UINT32_C(1) << 1)
+#define ARGON2_FLAG_CLEAR_MEMORY   (UINT32_C(1) << 2)
+#define ARGON2_DEFAULT_FLAGS  (ARGON2_FLAG_CLEAR_PASSWORD | ARGON2_FLAG_CLEAR_MEMORY)
 
 /* Error codes */
 typedef enum Argon2_ErrorCodes {

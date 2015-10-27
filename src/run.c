@@ -113,7 +113,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     context.threads = lanes;
     context.allocate_cbk = NULL;
     context.free_cbk = NULL;
-    context.flags = ARGON2_CLEAR_PASSWORD;
+    context.flags = ARGON2_FLAG_CLEAR_PASSWORD;
 
     if (!strcmp(type, "d"))
     {
@@ -168,46 +168,71 @@ int main(int argc, char *argv[]) {
 
     /* get password and salt from command line */
     pwd = argv[1];
-    if (strlen(argv[2]) > SALTLEN_DEF)
+    if (strlen(argv[2]) > SALTLEN_DEF) {
         fatal("salt too long");
+    }
     memset(salt, 0x00, SALTLEN_DEF); /* pad with null bytes */
-    memcpy(salt, (uint8_t *)argv[2], strlen(argv[2]));
+    memcpy(salt, argv[2], strlen(argv[2]));
 
     /* parse options */
     for (i = 3; i < argc; i++) {
-        char *a = argv[i];
-
+        const char *a = argv[i];
+        unsigned long input = 0;
         if (!strcmp(a, "-m")) {
             if (i < argc - 1) {
                 i++;
-                m_cost = (uint8_t)1 << ((uint8_t)atoi(argv[i]) % 22);               
+                input = strtoul(argv[i], NULL, 10);
+                if( input == 0 || input == ULONG_MAX || input > ARGON2_MAX_MEMORY_BITS ) {
+                    fatal("bad numeric input for -m");
+                }
+                m_cost = ARGON2_MIN(UINT64_C(1) << input, UINT32_C(0xFFFFFFFF));
+                if( m_cost > ARGON2_MAX_MEMORY ) {
+                    fatal("m_cost overflow");
+                }
                 continue;
-            } else
+            } else {
                 fatal("missing -m argument");
+            }
         } else if (!strcmp(a, "-t")) {
             if (i < argc - 1) {
                 i++;
-                t_cost = atoi(argv[i]) & 0xffffff;
+                input = strtoul(argv[i], NULL, 10);
+                if( input == 0 || input == ULONG_MAX || input > ARGON2_MAX_TIME ) {
+                    fatal("bad numeric input for -t");
+                }
+                t_cost = input;
                 continue;
-            } else
+            } else {
                 fatal("missing -t argument");
+            }
         } else if (!strcmp(a, "-p")) {
             if (i < argc - 1) {
                 i++;
-                threads = atoi(argv[i]) % ARGON2_MAX_THREADS;
+                input = strtoul(argv[i], NULL, 10);
+                if( input == 0 || input == ULONG_MAX ||
+                    input > ARGON2_MAX_THREADS || input > ARGON2_MAX_LANES ) {
+                    fatal("bad numeric input for -p");
+                }
+                threads = input;
                 lanes = threads;
                 continue;
-            } else
+            } else {
                 fatal("missing -p argument");
+            }
         } else if (!strcmp(a, "-y")) {
             if (i < argc - 1) {
                 i++;
+                if( strcmp(argv[i], "i") != 0 && strcmp(argv[i], "d") != 0 ) {
+                    fatal("bad input to -y");
+                }
                 type = argv[i];
                 continue;
-            } else
+            } else {
                 fatal("missing -y argument");
-        } else
+            }
+        } else {
             fatal("unknown argument");
+        }
     }
     printf("Type:\t\tArgon2%c\n",type[0]);
     printf("Memory:\t\t%"PRIu32" KiB\n",m_cost);

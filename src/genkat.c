@@ -32,7 +32,7 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
 
         printf( "Password[%d]: ", context->pwdlen);
 
-        if (context->flags & ARGON2_CLEAR_PASSWORD) {
+        if (context->flags & ARGON2_FLAG_CLEAR_PASSWORD) {
             printf( "CLEARED\n");
         } else {
             for (i = 0; i < context->pwdlen; ++i) {
@@ -52,7 +52,7 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
 
         printf( "Secret[%d]: ", context->secretlen);
 
-        if (context->flags & ARGON2_CLEAR_SECRET) {
+        if (context->flags & ARGON2_FLAG_CLEAR_SECRET) {
             printf( "CLEARED\n");
         } else {
             for (i = 0; i < context->secretlen; ++i) {
