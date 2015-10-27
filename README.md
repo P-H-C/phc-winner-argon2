@@ -50,7 +50,7 @@ high-level API only takes input/output buffers and the two cost
 parameters, the low-level API additionally takes parallelism parameters
 and several others, as defined in [`argon2.h`](src/argon2.h).
 
-Here `t_cost` is set to 2 passes, `m_cost` is set to 2<sup>16</sup>
+Here `t_cost` is set to 2 iterations, `m_cost` is set to 2<sup>16</sup>
 kibibytes (that is, 64 mebibytes), and there's no parallelism
 (single-lane, single-thread).
 

@@ -118,12 +118,12 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     if (!strcmp(type, "d"))
     {
         int result = argon2d(&context);
-        printf("%s\n",error_message(result));
+        if (result != ARGON2_OK) printf("%s\n",error_message(result));
     }
     else if (!strcmp(type, "i"))
     {
         int result = argon2i(&context);
-        printf("%s\n",error_message(result));
+        if (result != ARGON2_OK) printf("%s\n",error_message(result));
     }
     else {
         secure_wipe_memory(pwd, strlen(pwd));
@@ -209,10 +209,10 @@ int main(int argc, char *argv[]) {
         } else
             fatal("unknown argument");
     }
-    printf("Memory blocks requested:  %"PRIu32" \n",m_cost);
-    printf("Iterations requested:  %"PRIu32" \n",t_cost);
-    printf("Lanes and threads requested:  %"PRIu32" \n",lanes);
-    printf("Type requested: %c\n",type[0]);
+    printf("Type:\t\tArgon2%c\n",type[0]);
+    printf("Memory:\t\t%"PRIu32" KiB\n",m_cost);
+    printf("Iterations:\t%"PRIu32" \n",t_cost);
+    printf("Parallelism:\t%"PRIu32" \n",lanes);
     run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
     return ARGON2_OK;
