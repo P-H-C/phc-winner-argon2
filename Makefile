@@ -13,6 +13,8 @@ DIST = phc-winner-argon2
 CC = gcc
 SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c src/thread.c
 SRC_MAIN = src/main.c
+SRC_BENCH = src/bench.c
+SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS = -std=c89 -pthread -O3 -Wall -g
@@ -54,11 +56,11 @@ libs: $(LIB_SH) $(LIB_ST)
 $(BIN): 	$(SRC) $(SRC_MAIN)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
-bench: 	        $(SRC) $(SRC_MAIN)
-		$(CC) $(CFLAGS) -DBENCH $^ -Isrc  -o $@
+bench: 	        $(SRC) $(SRC_BENCH)
+		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
-genkat:         $(SRC) $(SRC_MAIN)
-		$(CC) $(CFLAGS) -DGENKAT $^ -Isrc  -o $@
+genkat:         $(SRC) $(SRC_GENKAT)
+		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
 $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -o $@

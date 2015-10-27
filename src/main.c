@@ -20,9 +20,6 @@
 #include "argon2.h"
 #include "core.h"
 #include "encoding.h"
-#ifdef _MSC_VER
-#include <intrin.h>
-#endif
 
 #define T_COST_DEF 3
 #define LOG_M_COST_DEF 12 /*4 MB*/
@@ -32,49 +29,7 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
-static __inline uint64_t rdtsc(void) {
-#ifdef _MSC_VER
-    return __rdtsc();
-#else
-#if defined(__amd64__) || defined(__x86_64__)
-    uint64_t rax, rdx;
-    __asm__ __volatile__("rdtsc" : "=a"(rax), "=d"(rdx) : :);
-    return (rdx << 32) | rax;
-#elif defined(__i386__) || defined(__i386) || defined(__X86__)
-    uint64_t rax;
-    __asm__ __volatile__("rdtsc" : "=A"(rax) : :);
-    return rax;
-#else
-#error "Not implemented!"
-#endif
-#endif
-}
-
-/*
- * Custom allocate memory
- */
-int CustomAllocateMemory(uint8_t **memory, size_t length) {
-    *memory = (uint8_t *)malloc(length);
-
-    if (!*memory) {
-        return ARGON2_MEMORY_ALLOCATION_ERROR;
-    }
-
-    return ARGON2_OK;
-}
-
-/*
- * Custom free memory
- */
-void CustomFreeMemory(uint8_t *memory, size_t length) {
-    UNUSED_PARAMETER(length);
-
-    if (memory) {
-        free(memory);
-    }
-}
-
-void usage(const char *cmd) {
+static void usage(const char *cmd) {
     printf("Usage:  %s pwd salt [-y version] [-t t_cost] [-m m_cost] [-l "
            "#lanes] [-p #threads]\n",
            cmd);
@@ -91,98 +46,9 @@ void usage(const char *cmd) {
     printf("\t-p N\t\tParallelism, default %d\n", THREADS_DEF);
 }
 
-void fatal(const char *error) {
+static void fatal(const char *error) {
     fprintf(stderr, "Error: %s\n", error);
     exit(1);
-}
-
-void print_bytes(const void *s, size_t len) {
-    size_t i;
-    for (i = 0; i < len; i++) {
-        printf("%02x", ((const unsigned char *)s)[i] & 0xff);
-    }
-
-    printf("\n");
-}
-
-/*
- * Benchmarks Argon2 with salt length 16, password length 16, t_cost 1,
-   and different m_cost and threads
- */
-void benchmark() {
-#define BENCH_OUTLEN 16
-#define BENCH_INLEN 16
-    const uint32_t inlen = BENCH_INLEN;
-    const unsigned outlen = BENCH_OUTLEN;
-    unsigned char out[BENCH_OUTLEN];
-    unsigned char pwd_array[BENCH_INLEN];
-    unsigned char salt_array[BENCH_INLEN];
-#undef BENCH_INLEN
-#undef BENCH_OUTLEN
-
-    uint32_t t_cost = 1;
-    uint32_t m_cost;
-    uint32_t thread_test[6] = {1, 2, 4, 6, 8, 16};
-
-    memset(pwd_array, 0, inlen);
-    memset(salt_array, 1, inlen);
-
-    for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
-        unsigned i;
-        for (i = 0; i < 6; ++i) {
-            argon2_context context;
-            uint32_t thread_n = thread_test[i];
-            uint64_t stop_cycles, stop_cycles_i;
-            clock_t stop_time;
-            uint64_t delta_d, delta_i;
-            double mcycles_d, mcycles_i, run_time;
-
-            clock_t start_time = clock();
-            uint64_t start_cycles = rdtsc();
-
-            context.out = out;
-            context.outlen = outlen;
-            context.pwd = pwd_array;
-            context.pwdlen = inlen;
-            context.salt = salt_array;
-            context.saltlen = inlen;
-            context.secret = NULL;
-            context.secretlen = 0;
-            context.ad = NULL;
-            context.adlen = 0;
-            context.t_cost = t_cost;
-            context.m_cost = m_cost;
-            context.lanes = thread_n;
-            context.threads = thread_n;
-            context.allocate_cbk = NULL;
-            context.free_cbk = NULL;
-            context.flags = 0;
-
-            argon2d(&context);
-            stop_cycles = rdtsc();
-            argon2i(&context);
-            stop_cycles_i = rdtsc();
-            stop_time = clock();
-
-            delta_d = (stop_cycles - start_cycles) / (m_cost);
-            delta_i = (stop_cycles_i - stop_cycles) / (m_cost);
-            mcycles_d = (double)(stop_cycles - start_cycles) / (1UL << 20);
-            mcycles_i = (double)(stop_cycles_i - stop_cycles) / (1UL << 20);
-            printf(
-                "Argon2d %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f "
-                "Mcycles \n",
-                t_cost, m_cost >> 10, thread_n, (float)delta_d / 1024,
-                mcycles_d);
-            printf(
-                "Argon2i %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f "
-                "Mcycles \n",
-                t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
-                mcycles_i);
-
-            run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
-            printf("%2.4f seconds\n\n", run_time);
-        }
-    }
 }
 
 /*
@@ -197,12 +63,14 @@ Base64-encoded hash string
 @threads actual parallelism
 @type String, only "d" and "i" are accepted
 */
-void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
-         uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type) {
+static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
+         uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type)
+{
+#if 0
     uint64_t start_cycles, stop_cycles;
     clock_t start_time, stop_time;
     double run_time, run_cycles;
-
+#endif
     /*Fixed parameters*/
     const unsigned out_length = 32;
     const unsigned salt_length = SALTLEN_DEF;
@@ -210,8 +78,10 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     argon2_context context;
     char encoded[300];
 
+#if 0
     start_time = clock();
     start_cycles = rdtsc();
+#endif
 
     if (!pwd) {
         fatal("password missing");
@@ -251,83 +121,25 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         fatal("wrong Argon2 type");
     }
 
+#if 0
     stop_cycles = rdtsc();
     stop_time = clock();
+#endif
 
     /* show string encoding */
     encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
 
+#if 0
     /* show running time/cycles */
     run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
     run_cycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
     printf("%2.3f seconds ", run_time);
     printf("(%.3f mebicycles)\n", run_cycles);
+#endif
 }
 
-void generate_testvectors(const char *type) {
-#define TEST_OUTLEN 32
-#define TEST_PWDLEN 32
-#define TEST_SALTLEN 16
-#define TEST_SECRETLEN 8
-#define TEST_ADLEN 12
-    argon2_context context;
 
-    unsigned char out[TEST_OUTLEN];
-    unsigned char pwd[TEST_PWDLEN];
-    unsigned char salt[TEST_SALTLEN];
-    unsigned char secret[TEST_SECRETLEN];
-    unsigned char ad[TEST_ADLEN];
-    const allocate_fptr myown_allocator = NULL;
-    const deallocate_fptr myown_deallocator = NULL;
-
-    unsigned t_cost = 3;
-    unsigned m_cost = 16;
-    unsigned lanes = 4;
-
-    memset(pwd, 1, TEST_OUTLEN);
-    memset(salt, 2, TEST_SALTLEN);
-    memset(secret, 3, TEST_SECRETLEN);
-    memset(ad, 4, TEST_ADLEN);
-
-    printf("Generating test vectors for Argon2%s in file \"%s\".\n", type,
-           ARGON2_KAT_FILENAME);
-
-    context.out = out;
-    context.outlen = TEST_OUTLEN;
-    context.pwd = pwd;
-    context.pwdlen = TEST_PWDLEN;
-    context.salt = salt;
-    context.saltlen = TEST_SALTLEN;
-    context.secret = secret;
-    context.secretlen = TEST_SECRETLEN;
-    context.ad = ad;
-    context.adlen = TEST_ADLEN;
-    context.t_cost = t_cost;
-    context.m_cost = m_cost;
-    context.lanes = lanes;
-    context.threads = lanes;
-    context.allocate_cbk = myown_allocator;
-    context.free_cbk = myown_deallocator;
-    context.flags = ARGON2_PRINT;
-
-#undef TEST_OUTLEN
-#undef TEST_PWDLEN
-#undef TEST_SALTLEN
-#undef TEST_SECRETLEN
-#undef TEST_ADLEN
-
-    if (!strcmp(type, "d")) {
-        printf("Generating test vectors for Argon2d in file \"%s\".\n",
-               ARGON2_KAT_FILENAME);
-        argon2d(&context);
-    } else if (!strcmp(type, "i")) {
-        printf("Generating test vectors for Argon2i in file \"%s\".\n",
-               ARGON2_KAT_FILENAME);
-        argon2i(&context);
-    } else
-        fatal("wrong Argon2 type");
-}
 
 int main(int argc, char *argv[]) {
     unsigned char out[32];
@@ -337,22 +149,8 @@ int main(int argc, char *argv[]) {
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
     uint8_t salt[SALTLEN_DEF];
-    char *type = "i";
+    const char * type = "i";
     int i;
-
-    remove(ARGON2_KAT_FILENAME);
-
-#ifdef BENCH
-    benchmark();
-    return ARGON2_OK;
-#endif
-#ifdef GENKAT
-    if (argc > 1) {
-        type = argv[1];
-    }
-    generate_testvectors(type);
-    return ARGON2_OK;
-#endif
 
     if (argc < 3) {
         usage(argv[0]);
