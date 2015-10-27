@@ -231,17 +231,18 @@ static void *fill_segment_thr(void *thread_data)
 void fill_memory_blocks(argon2_instance_t *instance) {
     uint32_t r, s;
 
-    if (instance == NULL) {
+    if (instance == NULL || instance->lanes == 0) {
         return;
     }
 
+    /* 1. Allocating space for threads */
+    argon2_thread_handle_t *thread =
+        calloc(instance->lanes, sizeof(argon2_thread_handle_t));
+    argon2_thread_data *thr_data =
+        calloc(instance->lanes, sizeof(argon2_thread_data));
+
     for (r = 0; r < instance->passes; ++r) {
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
-            /* 1. Allocating space for threads */
-            argon2_thread_handle_t *thread =
-                malloc(sizeof(argon2_thread_handle_t) * (instance->lanes));
-            argon2_thread_data *thr_data =
-                malloc(sizeof(argon2_thread_data) * (instance->lanes));
             int rc;
             uint32_t l;
 
@@ -292,15 +293,15 @@ void fill_memory_blocks(argon2_instance_t *instance) {
                     exit(-1);
                 }
             }
-
-            free(thread);
-            free(thr_data);
         }
 
-            #ifdef GENKAT
-            internal_kat(instance, r); /* Print all memory blocks */
-            #endif
+        #ifdef GENKAT
+        internal_kat(instance, r); /* Print all memory blocks */
+        #endif
     }
+
+    free(thread);
+    free(thr_data);
 }
 
 int validate_inputs(const argon2_context *context) {

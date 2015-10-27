@@ -26,8 +26,8 @@
  Changes for ARM 9/9/2010
 */
 
-#ifndef _BRG_ENDIAN_H
-#define _BRG_ENDIAN_H
+#ifndef BRG_ENDIAN_H
+#define BRG_ENDIAN_H
 
 #define IS_BIG_ENDIAN 4321    /* byte 0 is most significant (mc68k) */
 #define IS_LITTLE_ENDIAN 1234 /* byte 0 is least significant (i386) */
