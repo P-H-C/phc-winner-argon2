@@ -1,5 +1,5 @@
 =======================================Argon2d
-Iterations: 3, Memory: 16 KBytes, Parallelism: 4 lanes, Tag length: 32 bytes
+Memory: 16 KiB, Iterations: 3, Parallelism: 4 lanes, Tag length: 32 bytes
 Password[32]: 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 
 Salt[16]: 02 02 02 02 02 02 02 02 02 02 02 02 02 02 02 02 
 Secret[8]: 03 03 03 03 03 03 03 03 

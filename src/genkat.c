@@ -179,5 +179,5 @@ int main(int argc, char *argv[]) {
     const char * type = (argc > 1) ? argv[1] : "i";
     remove(ARGON2_KAT_FILENAME);
     generate_testvectors(type);
-    return 0;
+    return ARGON2_OK;
 }

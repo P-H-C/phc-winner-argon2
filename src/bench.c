@@ -91,12 +91,12 @@ static void benchmark() {
             mcycles_d = (double)(stop_cycles - start_cycles) / (1UL << 20);
             mcycles_i = (double)(stop_cycles_i - stop_cycles) / (1UL << 20);
             printf(
-                "Argon2d %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f "
+                "Argon2d %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
                 "Mcycles \n",
                 t_cost, m_cost >> 10, thread_n, (float)delta_d / 1024,
                 mcycles_d);
             printf(
-                "Argon2i %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f "
+                "Argon2i %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
                 "Mcycles \n",
                 t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
                 mcycles_i);
@@ -109,5 +109,5 @@ static void benchmark() {
 
 int main() {
 	benchmark();
-	return 0;
+	return ARGON2_OK;
 }

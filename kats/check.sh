@@ -8,6 +8,6 @@ do
     then
         echo $file "\t" OK
     else
-        echo $file "\t" FAIL
+        echo $file "\t" ERROR
     fi
 done
