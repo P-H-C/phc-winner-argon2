@@ -31,9 +31,7 @@ static __inline uint64_t fBlaMka(uint64_t x, uint64_t y) {
     lessZ = lessZ * lessY;
     lessZ = lessZ << 1;
 
-    uint64_t z = lessZ + x + y;
-
-    return z;
+    return lessZ + x + y;
 }
 
 #endif

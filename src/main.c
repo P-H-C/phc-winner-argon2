@@ -97,7 +97,8 @@ void fatal(const char *error) {
 }
 
 void print_bytes(const void *s, size_t len) {
-    for (size_t i = 0; i < len; i++) {
+    size_t i;
+    for (i = 0; i < len; i++) {
         printf("%02x", ((const unsigned char *)s)[i] & 0xff);
     }
 
@@ -120,35 +121,53 @@ void benchmark() {
 #undef BENCH_OUTLEN
 
     uint32_t t_cost = 1;
+    uint32_t m_cost;
+    uint32_t thread_test[6] = {1, 2, 4, 6, 8, 16};
 
     memset(pwd_array, 0, inlen);
     memset(salt_array, 1, inlen);
-    uint32_t thread_test[6] = {1, 2, 4, 6, 8, 16};
-
-    uint32_t m_cost;
 
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
-        for (uint32_t i = 0; i < 6; ++i) {
+        unsigned i;
+        for (i = 0; i < 6; ++i) {
+            argon2_context context;
             uint32_t thread_n = thread_test[i];
-            uint64_t start_cycles, stop_cycles, stop_cycles_i;
+            uint64_t stop_cycles, stop_cycles_i;
+            clock_t stop_time;
+            uint64_t delta_d, delta_i;
+            double mcycles_d, mcycles_i, run_time;
 
             clock_t start_time = clock();
-            start_cycles = rdtsc();
+            uint64_t start_cycles = rdtsc();
 
-            Argon2_Context context = {
-                out,  outlen, pwd_array, inlen,  salt_array, inlen,    NULL,
-                0,    NULL,   0,         t_cost, m_cost,     thread_n, thread_n,
-                NULL, NULL,   false,     false,  false,      false};
+            context.out = out;
+            context.outlen = outlen;
+            context.pwd = pwd_array;
+            context.pwdlen = inlen;
+            context.salt = salt_array;
+            context.saltlen = inlen;
+            context.secret = NULL;
+            context.secretlen = 0;
+            context.ad = NULL;
+            context.adlen = 0;
+            context.t_cost = t_cost;
+            context.m_cost = m_cost;
+            context.lanes = thread_n;
+            context.threads = thread_n;
+            context.allocate_cbk = NULL;
+            context.free_cbk = NULL;
+            context.flags = 0;
+
             argon2d(&context);
             stop_cycles = rdtsc();
             argon2i(&context);
             stop_cycles_i = rdtsc();
-            clock_t stop_time = clock();
+            stop_time = clock();
 
-            uint64_t delta_d = (stop_cycles - start_cycles) / (m_cost);
-            uint64_t delta_i = (stop_cycles_i - stop_cycles) / (m_cost);
-            float mcycles_d = (float)(stop_cycles - start_cycles) / (1 << 20);
-            float mcycles_i = (float)(stop_cycles_i - stop_cycles) / (1 << 20);
+            delta_d = (stop_cycles - start_cycles) / (m_cost);
+            delta_i = (stop_cycles_i - stop_cycles) / (m_cost);
+            mcycles_d = (double)(stop_cycles - start_cycles) / (1UL << 20);
+            mcycles_i = (double)(stop_cycles_i - stop_cycles) / (1UL << 20);
             printf(
                 "Argon2d %d pass(es)  %d Mbytes %d threads:  %2.2f cpb %2.2f "
                 "Mcycles \n",
@@ -160,7 +179,7 @@ void benchmark() {
                 t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
                 mcycles_i);
 
-            float run_time = ((float)stop_time - start_time) / (CLOCKS_PER_SEC);
+            run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
             printf("%2.4f seconds\n\n", run_time);
         }
     }
@@ -182,20 +201,22 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
          uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type) {
     uint64_t start_cycles, stop_cycles;
     clock_t start_time, stop_time;
-
-    start_time = clock();
-    start_cycles = rdtsc();
+    double run_time, run_cycles;
 
     /*Fixed parameters*/
     const unsigned out_length = 32;
     const unsigned salt_length = SALTLEN_DEF;
-    unsigned pwd_length; 
-    bool clear_memory = false;
-    bool clear_secret = false;
-    bool clear_password = true;
+    unsigned pwd_length;
+    argon2_context context;
+    char encoded[300];
 
-    if (!pwd)
+    start_time = clock();
+    start_cycles = rdtsc();
+
+    if (!pwd) {
         fatal("password missing");
+    }
+
     if (!salt) {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("salt missing");
@@ -205,11 +226,23 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     UNUSED_PARAMETER(threads);
 
-    Argon2_Context context = {
-        out,          out_length, (uint8_t*)pwd,   pwd_length, salt,           salt_length,
-        NULL,         0,          NULL, 0,         t_cost,         m_cost,
-        lanes,        lanes,      NULL, NULL,      clear_password, clear_secret,
-        clear_memory, false};
+    context.out = out;
+    context.outlen = out_length;
+    context.pwd = (uint8_t *)pwd;
+    context.pwdlen = pwd_length;
+    context.salt = salt;
+    context.saltlen = salt_length;
+    context.secret = NULL;
+    context.secretlen = 0;
+    context.ad = NULL;
+    context.adlen = 0;
+    context.t_cost = t_cost;
+    context.m_cost = m_cost;
+    context.lanes = lanes;
+    context.threads = lanes;
+    context.allocate_cbk = NULL;
+    context.free_cbk = NULL;
+    context.flags = ARGON2_CLEAR_PASSWORD;
 
     if (!strcmp(type, "d"))      argon2d(&context);
     else if (!strcmp(type, "i")) argon2i(&context);
@@ -221,14 +254,13 @@ void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     stop_cycles = rdtsc();
     stop_time = clock();
 
-    // show string encoding
-    char encoded[300];
+    /* show string encoding */
     encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
 
-    // show running time/cycles
-    float run_time = ((float)stop_time - start_time) / (CLOCKS_PER_SEC);
-    float run_cycles = (float)(stop_cycles - start_cycles) / (1 << 20);
+    /* show running time/cycles */
+    run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
+    run_cycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
     printf("%2.3f seconds ", run_time);
     printf("(%.3f mebicycles)\n", run_cycles);
 }
@@ -239,18 +271,15 @@ void generate_testvectors(const char *type) {
 #define TEST_SALTLEN 16
 #define TEST_SECRETLEN 8
 #define TEST_ADLEN 12
-    bool clear_memory = false;
-    bool clear_secret = false;
-    bool clear_password = false;
-    bool print_internals = true;
+    argon2_context context;
 
     unsigned char out[TEST_OUTLEN];
     unsigned char pwd[TEST_PWDLEN];
     unsigned char salt[TEST_SALTLEN];
     unsigned char secret[TEST_SECRETLEN];
     unsigned char ad[TEST_ADLEN];
-    const AllocateMemoryCallback myown_allocator = NULL;
-    const FreeMemoryCallback myown_deallocator = NULL;
+    const allocate_fptr myown_allocator = NULL;
+    const deallocate_fptr myown_deallocator = NULL;
 
     unsigned t_cost = 3;
     unsigned m_cost = 16;
@@ -264,26 +293,24 @@ void generate_testvectors(const char *type) {
     printf("Generating test vectors for Argon2%s in file \"%s\".\n", type,
            ARGON2_KAT_FILENAME);
 
-    Argon2_Context context = {out,
-                              TEST_OUTLEN,
-                              pwd,
-                              TEST_PWDLEN,
-                              salt,
-                              TEST_SALTLEN,
-                              secret,
-                              TEST_SECRETLEN,
-                              ad,
-                              TEST_ADLEN,
-                              t_cost,
-                              m_cost,
-                              lanes,
-                              lanes,
-                              myown_allocator,
-                              myown_deallocator,
-                              clear_password,
-                              clear_secret,
-                              clear_memory,
-                              print_internals};
+    context.out = out;
+    context.outlen = TEST_OUTLEN;
+    context.pwd = pwd;
+    context.pwdlen = TEST_PWDLEN;
+    context.salt = salt;
+    context.saltlen = TEST_SALTLEN;
+    context.secret = secret;
+    context.secretlen = TEST_SECRETLEN;
+    context.ad = ad;
+    context.adlen = TEST_ADLEN;
+    context.t_cost = t_cost;
+    context.m_cost = m_cost;
+    context.lanes = lanes;
+    context.threads = lanes;
+    context.allocate_cbk = myown_allocator;
+    context.free_cbk = myown_deallocator;
+    context.flags = ARGON2_PRINT;
+
 #undef TEST_OUTLEN
 #undef TEST_PWDLEN
 #undef TEST_SALTLEN
@@ -311,6 +338,7 @@ int main(int argc, char *argv[]) {
     char *pwd = NULL;
     uint8_t salt[SALTLEN_DEF];
     char *type = "i";
+    int i;
 
     remove(ARGON2_KAT_FILENAME);
 
@@ -331,15 +359,15 @@ int main(int argc, char *argv[]) {
         return ARGON2_MISSING_ARGS;
     }
 
-    // get password and salt from command line
+    /* get password and salt from command line */
     pwd = argv[1];
     if (strlen(argv[2]) > SALTLEN_DEF)
         fatal("salt too long");
-    memset(salt, 0x00, SALTLEN_DEF); // pad with null bytes
+    memset(salt, 0x00, SALTLEN_DEF); /* pad with null bytes */
     memcpy(salt, (uint8_t *)argv[2], strlen(argv[2]));
 
-    // parse options
-    for (int i = 3; i < argc; i++) {
+    /* parse options */
+    for (i = 3; i < argc; i++) {
         char *a = argv[i];
 
         if (!strcmp(a, "-m")) {

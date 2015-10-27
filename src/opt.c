@@ -43,13 +43,14 @@ const char *ARGON2_KAT_FILENAME = "kat-argon2-opt.log";
 void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
+    uint32_t i;
 
-    for (uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
         block_XY[i] = _mm_loadu_si128((__m128i *)ref_block);
         ref_block += 16;
     }
 
-    for (uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
         block_XY[i] = state[i] = _mm_xor_si128(state[i], block_XY[i]);
     }
 
@@ -101,21 +102,23 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     BLAKE2_ROUND(state[7], state[15], state[23], state[31], state[39],
                  state[47], state[55], state[63]);
 
-    for (uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
-        // Feedback
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+        /* Feedback */
         state[i] = _mm_xor_si128(state[i], block_XY[i]);
     }
 
-    for (uint32_t i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
         _mm_storeu_si128((__m128i *)next_block, state[i]);
         next_block += 16;
     }
 }
 
-void generate_addresses(const Argon2_instance_t *instance,
-                        const Argon2_position_t *position,
+void generate_addresses(const argon2_instance_t *instance,
+                        const argon2_position_t *position,
                         uint64_t *pseudo_rands) {
     block zero_block, address_block, input_block;
+    uint32_t i;
+
     init_block_value(&zero_block, 0);
     copy_block(&address_block, &zero_block);
     copy_block(&input_block, &zero_block);
@@ -128,10 +131,10 @@ void generate_addresses(const Argon2_instance_t *instance,
         input_block.v[4] = instance->passes;
         input_block.v[5] = instance->type;
 
-        for (uint32_t i = 0; i < instance->segment_length; ++i) {
+        for (i = 0; i < instance->segment_length; ++i) {
             if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
-                input_block.v[6]++;
                 block zero_block, zero2_block;
+                input_block.v[6]++;
                 init_block_value(&zero_block, 0);
                 init_block_value(&zero2_block, 0);
                 fill_block((__m128i *)&zero_block.v, (uint8_t *)&input_block.v,
@@ -146,49 +149,53 @@ void generate_addresses(const Argon2_instance_t *instance,
     }
 }
 
-void fill_segment(const Argon2_instance_t *instance,
-                  Argon2_position_t position) {
-    if (instance == NULL)
-        return;
-
+void fill_segment(const argon2_instance_t *instance,
+                  argon2_position_t position) {
+    block * ref_block = NULL, * curr_block = NULL;
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
+    uint32_t starting_index, i;
     __m128i state[64];
-    bool data_independent_addressing = (instance->type == Argon2_i);
+    int data_independent_addressing = (instance->type == Argon2_i);
 
-    // Pseudo-random values that determine the reference block position
-    uint64_t *pseudo_rands =
-        (uint64_t *)malloc(sizeof(uint64_t) * instance->segment_length);
+    /* Pseudo-random values that determine the reference block position */
+    uint64_t *pseudo_rands = NULL;
 
-    if (pseudo_rands == NULL)
+    if (instance == NULL) {
         return;
+    }
+
+    pseudo_rands = (uint64_t *)malloc(sizeof(uint64_t) * instance->segment_length);
+    if (pseudo_rands == NULL) {
+        return;
+    }
 
     if (data_independent_addressing) {
         generate_addresses(instance, &position, pseudo_rands);
     }
 
-    uint32_t starting_index = 0;
+    starting_index = 0;
 
     if ((0 == position.pass) && (0 == position.slice)) {
-        starting_index = 2; // we have already generated the first two blocks
+        starting_index = 2; /* we have already generated the first two blocks */
     }
 
-    // Offset of the current block
+    /* Offset of the current block */
     curr_offset = position.lane * instance->lane_length +
                   position.slice * instance->segment_length + starting_index;
 
     if (0 == curr_offset % instance->lane_length) {
-        // Last block in this lane
+        /* Last block in this lane */
         prev_offset = curr_offset + instance->lane_length - 1;
     } else {
-        // Previous block
+        /* Previous block */
         prev_offset = curr_offset - 1;
     }
 
     memcpy(state, (uint8_t *)((instance->memory + prev_offset)->v),
            ARGON2_BLOCK_SIZE);
 
-    for (uint32_t i = starting_index; i < instance->segment_length;
+    for (i = starting_index; i < instance->segment_length;
          ++i, ++curr_offset, ++prev_offset) {
         /*1.1 Rotating prev_offset if needed */
         if (curr_offset % instance->lane_length == 1) {
@@ -207,7 +214,7 @@ void fill_segment(const Argon2_instance_t *instance,
         ref_lane = ((pseudo_rand >> 32)) % instance->lanes;
 
         if ((position.pass == 0) && (position.slice == 0)) {
-            // Can not reference other lanes yet
+            /* Can not reference other lanes yet */
             ref_lane = position.lane;
         }
 
@@ -219,9 +226,8 @@ void fill_segment(const Argon2_instance_t *instance,
                                 ref_lane == position.lane);
 
         /* 2 Creating a new block */
-        block *ref_block =
-            instance->memory + instance->lane_length * ref_lane + ref_index;
-        block *curr_block = instance->memory + curr_offset;
+        ref_block = instance->memory + instance->lane_length * ref_lane + ref_index;
+        curr_block = instance->memory + curr_offset;
         fill_block(state, (uint8_t *)ref_block->v, (uint8_t *)curr_block->v);
     }
 

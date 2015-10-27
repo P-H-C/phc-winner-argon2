@@ -14,10 +14,12 @@
 #ifndef ARGON2_CORE_H
 #define ARGON2_CORE_H
 
+#include "blake2/blake2.h"
+
 /*************************Argon2 internal
  * constants**************************************************/
 
-enum Argon2_core_constants {
+enum argon2_core_constants {
     /* Version of the algorithm */
     ARGON2_VERSION_NUMBER = 0x10,
 
@@ -37,10 +39,10 @@ enum Argon2_core_constants {
 };
 
 /* Argon2 primitive type */
-typedef enum _Argon2_type {
+typedef enum Argon2_type {
     Argon2_d = 0,
-    Argon2_i = 1,
-} Argon2_type;
+    Argon2_i = 1
+} argon2_type;
 
 /*************************Argon2 internal data
  * types**************************************************/
@@ -50,25 +52,19 @@ typedef enum _Argon2_type {
  * Memory blocks can be copied, XORed. Internal words can be accessed by [] (no
  * bounds checking).
  */
-#ifndef _MSC_VER
 typedef struct _block {
     uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} __attribute__((aligned(16))) block;
-#else
-typedef struct _block {
-    uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} __declspec(align(16)) block;
-#endif
+} ALIGN(16) block;
 
 /*****************Functions that work with the block******************/
 
-// Initialize each byte of the block with @in
+/* Initialize each byte of the block with @in */
 void init_block_value(block *b, uint8_t in);
 
-// Copy block @src to block @dst
+/* Copy block @src to block @dst */
 void copy_block(block *dst, const block *src);
 
-// XOR @src onto @dst bytewise
+/* XOR @src onto @dst bytewise */
 void xor_block(block *dst, const block *src);
 
 /*
@@ -77,42 +73,34 @@ void xor_block(block *dst, const block *src);
  * Used to evaluate the number and location of blocks to construct in each
  * thread
  */
-typedef struct _Argon2_instance_t {
-    block *memory;                // Memory pointer
-    const uint32_t passes;        // Number of passes
-    const uint32_t memory_blocks; // Number of blocks in memory
-    const uint32_t segment_length;
-    const uint32_t lane_length;
-    const uint32_t lanes;
-    const uint32_t threads;
-    const Argon2_type type;
-    const bool print_internals; // whether to print the memory blocks
-} Argon2_instance_t;
+typedef struct Argon2_instance_t {
+    block *memory;                /* Memory pointer */
+    uint32_t passes;        /* Number of passes */
+    uint32_t memory_blocks; /* Number of blocks in memory */
+    uint32_t segment_length;
+    uint32_t lane_length;
+    uint32_t lanes;
+    uint32_t threads;
+    argon2_type type;
+    int print_internals; /* whether to print the memory blocks */
+} argon2_instance_t;
 
 /*
  * Argon2 position: where we construct the block right now. Used to distribute
  * work between threads.
  */
-typedef struct _Argon2_position_t {
-    const uint32_t pass;
-    const uint32_t lane;
-    const uint8_t slice;
+typedef struct Argon2_position_t {
+    uint32_t pass;
+    uint32_t lane;
+    uint8_t slice;
     uint32_t index;
-} Argon2_position_t;
+} argon2_position_t;
 
 /*Struct that holds the inputs for thread handling FillSegment*/
-typedef struct _Argon2_thread_data {
-    Argon2_instance_t *instance_ptr;
-    Argon2_position_t pos;
-} Argon2_thread_data;
-
-/*Macro for endianness conversion*/
-
-#if defined(_MSC_VER)
-#define BSWAP32(x) _byteswap_ulong(x)
-#else
-#define BSWAP32(x) __builtin_bswap32(x)
-#endif
+typedef struct Argon2_thread_data {
+    argon2_instance_t *instance_ptr;
+    argon2_position_t pos;
+} argon2_thread_data;
 
 /*************************Argon2 core
  * functions**************************************************/
@@ -134,7 +122,7 @@ void secure_wipe_memory(void *v, size_t n);
  * @param instance pointer to the current instance
  * @param clear_memory indicates if we clear the memory with zeros.
  */
-void clear_memory(Argon2_instance_t *instance, bool clear);
+void clear_memory(argon2_instance_t *instance, int clear);
 
 /* Deallocates memory
  * @param memory pointer to the blocks
@@ -151,9 +139,9 @@ void free_memory(block *memory);
  * If so we can reference the current segment
  * @pre All pointers must be valid
  */
-uint32_t index_alpha(const Argon2_instance_t *instance,
-                     const Argon2_position_t *position, uint32_t pseudo_rand,
-                     bool same_lane);
+uint32_t index_alpha(const argon2_instance_t *instance,
+                     const argon2_position_t *position, uint32_t pseudo_rand,
+                     int same_lane);
 
 /*
  * Function that validates all inputs against predefined restrictions and return
@@ -162,7 +150,7 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
  * @return ARGON2_OK if everything is all right, otherwise one of error codes
  * (all defined in <argon2.h>
  */
-int validate_inputs(const Argon2_Context *context);
+int validate_inputs(const argon2_context *context);
 
 /*
  * Hashes all the inputs into @a blockhash[PREHASH_DIGEST_LENGTH], clears
@@ -174,8 +162,8 @@ int validate_inputs(const Argon2_Context *context);
  * @pre    @a blockhash must have at least @a PREHASH_DIGEST_LENGTH bytes
  * allocated
  */
-void initial_hash(uint8_t *blockhash, Argon2_Context *context,
-                  Argon2_type type);
+void initial_hash(uint8_t *blockhash, argon2_context *context,
+                  argon2_type type);
 
 /*
  * Function creates first 2 blocks per lane
@@ -183,7 +171,7 @@ void initial_hash(uint8_t *blockhash, Argon2_Context *context,
  * @param blockhash Pointer to the pre-hashing digest
  * @pre blockhash must point to @a PREHASH_SEED_LENGTH allocated values
  */
-void fill_firsts_blocks(uint8_t *blockhash, const Argon2_instance_t *instance);
+void fill_firsts_blocks(uint8_t *blockhash, const argon2_instance_t *instance);
 
 /*
  * Function allocates memory, hashes the inputs with Blake,  and creates first
@@ -195,7 +183,7 @@ void fill_firsts_blocks(uint8_t *blockhash, const Argon2_instance_t *instance);
  * @return Zero if successful, -1 if memory failed to allocate. @context->state
  * will be modified if successful.
  */
-int initialize(Argon2_instance_t *instance, Argon2_Context *context);
+int initialize(argon2_instance_t *instance, argon2_context *context);
 
 /*
  * XORing the last block of each lane, hashing it, making the tag. Deallocates
@@ -208,7 +196,7 @@ int initialize(Argon2_instance_t *instance, Argon2_Context *context);
  * @pre if context->free_cbk is not NULL, it should point to a function that
  * deallocates memory
  */
-void finalize(const Argon2_Context *context, Argon2_instance_t *instance);
+void finalize(const argon2_context *context, argon2_instance_t *instance);
 
 /*
  * Function that fills the segment using previous segments also from other
@@ -217,21 +205,21 @@ void finalize(const Argon2_Context *context, Argon2_instance_t *instance);
  * @param position Current position
  * @pre all block pointers must be valid
  */
-void fill_segment(const Argon2_instance_t *instance,
-                         Argon2_position_t position);
+void fill_segment(const argon2_instance_t *instance,
+                         argon2_position_t position);
 
 /*
  * Function that fills the entire memory t_cost times based on the first two
  * blocks in each lane
  * @param instance Pointer to the current instance
  */
-void fill_memory_blocks(Argon2_instance_t *instance);
+void fill_memory_blocks(argon2_instance_t *instance);
 
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
  * @param  context  Pointer to the Argon2 internal structure
  * @return Error code if smth is wrong, ARGON2_OK otherwise
  */
-int argon2_core(Argon2_Context *context, Argon2_type type);
+int argon2_core(argon2_context *context, argon2_type type);
 
 #endif

@@ -21,9 +21,11 @@
 #include "blake2-impl.h"
 
 static const uint64_t blake2b_IV[8] = {
-    0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL, 0x3c6ef372fe94f82bULL,
-    0xa54ff53a5f1d36f1ULL, 0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-    0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL};
+    UINT64_C(0x6a09e667f3bcc908), UINT64_C(0xbb67ae8584caa73b),
+    UINT64_C(0x3c6ef372fe94f82b), UINT64_C(0xa54ff53a5f1d36f1),
+    UINT64_C(0x510e527fade682d1), UINT64_C(0x9b05688c2b3e6c1f),
+    UINT64_C(0x1f83d9abfb41bd6b), UINT64_C(0x5be0cd19137e2179)
+};
 
 static const uint8_t blake2b_sigma[12][16] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
@@ -40,7 +42,7 @@ static const uint8_t blake2b_sigma[12][16] = {
     {14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3}};
 
 static __inline int blake2b_set_lastnode(blake2b_state *S) {
-    S->f[1] = ~0ULL;
+    S->f[1] = ~UINT64_C(0);
     return 0;
 }
 
@@ -49,7 +51,7 @@ static __inline int blake2b_set_lastblock(blake2b_state *S) {
     if (S->last_node)
         blake2b_set_lastnode(S);
 
-    S->f[0] = ~0ULL;
+    S->f[0] = ~UINT64_C(0);
     return 0;
 }
 
@@ -61,9 +63,9 @@ static __inline int blake2b_increment_counter(blake2b_state *S,
 }
 
 static __inline int blake2b_init0(blake2b_state *S) {
+    int i;
     memset(S, 0, sizeof(blake2b_state));
-
-    for (int i = 0; i < 8; ++i)
+    for (i = 0; i < 8; ++i)
         S->h[i] = blake2b_IV[i];
 
     return 0;
@@ -71,11 +73,12 @@ static __inline int blake2b_init0(blake2b_state *S) {
 
 /* init xors IV with input parameter block */
 int blake2b_init_param(blake2b_state *S, const blake2b_param *P) {
-    blake2b_init0(S);
     const uint8_t *p = (const uint8_t *)(P);
+    int i;
+    blake2b_init0(S);
 
     /* IV XOR ParamBlock */
-    for (size_t i = 0; i < 8; ++i)
+    for (i = 0; i < 8; ++i)
         S->h[i] ^= load64(p + sizeof(S->h[i]) * i);
 
     return 0;
@@ -207,19 +210,19 @@ int blake2b_update(blake2b_state *S, const uint8_t *in, uint64_t inlen) {
         size_t fill = 2 * BLAKE2B_BLOCKBYTES - left;
 
         if (inlen > fill) {
-            memcpy(S->buf + left, in, fill); // Fill buffer
+            memcpy(S->buf + left, in, fill); /* Fill buffer */
             S->buflen += fill;
             blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-            blake2b_compress(S, S->buf); // Compress
+            blake2b_compress(S, S->buf); /* Compress */
             memcpy(S->buf, S->buf + BLAKE2B_BLOCKBYTES,
-                   BLAKE2B_BLOCKBYTES); // Shift buffer left
+                   BLAKE2B_BLOCKBYTES); /* Shift buffer left */
             S->buflen -= BLAKE2B_BLOCKBYTES;
             in += fill;
             inlen -= fill;
-        } else // inlen <= fill
+        } else /* inlen <= fill */
         {
             memcpy(S->buf + left, in, inlen);
-            S->buflen += inlen; // Be lazy, do not compress
+            S->buflen += inlen; /* Be lazy, do not compress */
             in += inlen;
             inlen -= inlen;
         }
@@ -231,6 +234,7 @@ int blake2b_update(blake2b_state *S, const uint8_t *in, uint64_t inlen) {
 /* Is this correct? */
 int blake2b_final(blake2b_state *S, uint8_t *out, uint8_t outlen) {
     uint8_t buffer[BLAKE2B_OUTBYTES] = {0};
+    int i;
 
     if (outlen > BLAKE2B_OUTBYTES)
         return -1;
@@ -248,7 +252,7 @@ int blake2b_final(blake2b_state *S, uint8_t *out, uint8_t outlen) {
            2 * BLAKE2B_BLOCKBYTES - S->buflen); /* Padding */
     blake2b_compress(S, S->buf);
 
-    for (int i = 0; i < 8; ++i) /* Output full hash to temp buffer */
+    for (i = 0; i < 8; ++i) /* Output full hash to temp buffer */
         store64(buffer + sizeof(S->h[i]) * i, S->h[i]);
 
     memcpy(out, buffer, outlen);
@@ -302,6 +306,7 @@ int blake2b_long(uint8_t *out, const void *in, const uint32_t outlen,
         blake2b_update(&blake_state, (const uint8_t *)in, inlen);
         blake2b_final(&blake_state, out, outlen);
     } else {
+        uint32_t toproduce;
         uint8_t out_buffer[BLAKE2B_OUTBYTES];
         uint8_t in_buffer[BLAKE2B_OUTBYTES];
         blake2b_init(&blake_state, BLAKE2B_OUTBYTES);
@@ -311,7 +316,7 @@ int blake2b_long(uint8_t *out, const void *in, const uint32_t outlen,
         blake2b_final(&blake_state, out_buffer, BLAKE2B_OUTBYTES);
         memcpy(out, out_buffer, BLAKE2B_OUTBYTES / 2);
         out += BLAKE2B_OUTBYTES / 2;
-        uint32_t toproduce = outlen - BLAKE2B_OUTBYTES / 2;
+        toproduce = outlen - BLAKE2B_OUTBYTES / 2;
 
         while (toproduce > BLAKE2B_OUTBYTES) {
             memcpy(in_buffer, out_buffer, BLAKE2B_OUTBYTES);
