@@ -74,11 +74,14 @@ clean:
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
-		cd test-vectors/ &&  rm -f kat-* diff* run_* make_*
+		cd kats/ &&  rm -f kat-* diff* run_* make_*
 
 dist:
 		cd ..; \
 		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
+
+test:
+		sh test.sh
 
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h

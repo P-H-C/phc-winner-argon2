@@ -23,9 +23,6 @@
 #include "blake2/blake2-impl.h"
 #include "blake2/blake2.h"
 
-/* The KAT file name */
-const char *ARGON2_KAT_FILENAME = "kat-argon2-ref.log";
-
 void fill_block(const block *prev_block, const block *ref_block,
                 block *next_block) {
     block blockR, block_tmp;
