@@ -42,7 +42,7 @@ static void usage(const char *cmd) {
     printf("\t-t t_cost\tNumber of rounds to t_cost between 1 and 2^24, "
            "default %d\n",
            T_COST_DEF);
-    printf("\t-m m_cost\tMemory usage of 2^t_cost kibibytes, default %d\n",
+    printf("\t-m m_cost\tMemory usage of 2^t_cost KiB, default %d\n",
            LOG_M_COST_DEF);
     printf("\t-p N\t\tParallelism, default %d\n", THREADS_DEF);
 }

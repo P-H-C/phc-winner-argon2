@@ -26,9 +26,9 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
             break;
         }
 
-        printf("Iterations: %d, Memory: %d KBytes, Parallelism: %d lanes, Tag "
+        printf("Memory: %d KiB, Iterations: %d, Parallelism: %d lanes, Tag "
                 "length: %d bytes\n",
-            context->t_cost, context->m_cost, context->lanes, context->outlen);
+            context->m_cost, context->t_cost, context->lanes, context->outlen);
 
         printf( "Password[%d]: ", context->pwdlen);
 
