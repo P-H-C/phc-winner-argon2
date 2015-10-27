@@ -18,7 +18,6 @@
 #include "argon2.h"
 #include "core.h"
 
-
 /* Error messages */
 static const char *Argon2_ErrorMessage[] = {
     /*{ARGON2_OK, */ "OK",

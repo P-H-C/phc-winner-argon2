@@ -46,9 +46,12 @@ const char *ARGON2_KAT_FILENAME;
 #define ARGON2_MIN_MEMORY (2 * ARGON2_SYNC_POINTS) /* 2 blocks per slice */
 
 #define ARGON2_MIN(a, b) ((a) < (b) ? (a) : (b))
-/* Max memory size is half the addressing space, topping at 2^32 blocks (4 TB) */
-#define ARGON2_MAX_MEMORY_BITS ARGON2_MIN(UINT32_C(32), (sizeof(void *) * CHAR_BIT - 10 - 1))
-#define ARGON2_MAX_MEMORY ARGON2_MIN(UINT32_C(0xFFFFFFFF), UINT64_C(1) << ARGON2_MAX_MEMORY_BITS)
+/* Max memory size is half the addressing space, topping at 2^32 blocks (4 TB)
+ */
+#define ARGON2_MAX_MEMORY_BITS                                                 \
+    ARGON2_MIN(UINT32_C(32), (sizeof(void *) * CHAR_BIT - 10 - 1))
+#define ARGON2_MAX_MEMORY                                                      \
+    ARGON2_MIN(UINT32_C(0xFFFFFFFF), UINT64_C(1) << ARGON2_MAX_MEMORY_BITS)
 
 /* Minimum and maximum number of passes */
 #define ARGON2_MIN_TIME UINT32_C(1)
@@ -71,9 +74,10 @@ const char *ARGON2_KAT_FILENAME;
 #define ARGON2_MAX_SECRET UINT32_C(0xFFFFFFFF)
 
 #define ARGON2_FLAG_CLEAR_PASSWORD (UINT32_C(1) << 0)
-#define ARGON2_FLAG_CLEAR_SECRET   (UINT32_C(1) << 1)
-#define ARGON2_FLAG_CLEAR_MEMORY   (UINT32_C(1) << 2)
-#define ARGON2_DEFAULT_FLAGS  (ARGON2_FLAG_CLEAR_PASSWORD | ARGON2_FLAG_CLEAR_MEMORY)
+#define ARGON2_FLAG_CLEAR_SECRET (UINT32_C(1) << 1)
+#define ARGON2_FLAG_CLEAR_MEMORY (UINT32_C(1) << 2)
+#define ARGON2_DEFAULT_FLAGS                                                   \
+    (ARGON2_FLAG_CLEAR_PASSWORD | ARGON2_FLAG_CLEAR_MEMORY)
 
 /* Error codes */
 typedef enum Argon2_ErrorCodes {
@@ -131,8 +135,7 @@ typedef enum Argon2_ErrorCodes {
 } argon2_error_codes;
 
 /* Memory allocator types --- for external allocation */
-typedef int (*allocate_fptr)(uint8_t **memory,
-                                      size_t bytes_to_allocate);
+typedef int (*allocate_fptr)(uint8_t **memory, size_t bytes_to_allocate);
 typedef void (*deallocate_fptr)(uint8_t *memory, size_t bytes_to_allocate);
 
 /* Argon2 external data structures */
@@ -183,7 +186,7 @@ typedef struct Argon2_Context {
     uint32_t threads; /* maximum number of threads */
 
     allocate_fptr allocate_cbk; /* pointer to memory allocator */
-    deallocate_fptr free_cbk;  /* pointer to memory deallocator */
+    deallocate_fptr free_cbk;   /* pointer to memory deallocator */
 
     uint32_t flags; /* array of bool options */
 } argon2_context;

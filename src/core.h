@@ -45,10 +45,7 @@ enum argon2_core_constants {
 };
 
 /* Argon2 primitive type */
-typedef enum Argon2_type {
-    Argon2_d = 0,
-    Argon2_i = 1
-} argon2_type;
+typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 /*************************Argon2 internal data
  * types**************************************************/
@@ -58,9 +55,7 @@ typedef enum Argon2_type {
  * Memory blocks can be copied, XORed. Internal words can be accessed by [] (no
  * bounds checking).
  */
-typedef struct _block {
-    uint64_t v[ARGON2_WORDS_IN_BLOCK];
-} ALIGN(16) block;
+typedef struct _block { uint64_t v[ARGON2_WORDS_IN_BLOCK]; } ALIGN(16) block;
 
 /*****************Functions that work with the block******************/
 
@@ -80,7 +75,7 @@ void xor_block(block *dst, const block *src);
  * thread
  */
 typedef struct Argon2_instance_t {
-    block *memory;                /* Memory pointer */
+    block *memory;          /* Memory pointer */
     uint32_t passes;        /* Number of passes */
     uint32_t memory_blocks; /* Number of blocks in memory */
     uint32_t segment_length;
@@ -212,7 +207,7 @@ void finalize(const argon2_context *context, argon2_instance_t *instance);
  * @pre all block pointers must be valid
  */
 void fill_segment(const argon2_instance_t *instance,
-                         argon2_position_t position);
+                  argon2_position_t position);
 
 /*
  * Function that fills the entire memory t_cost times based on the first two

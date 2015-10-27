@@ -147,7 +147,7 @@ void generate_addresses(const argon2_instance_t *instance,
 
 void fill_segment(const argon2_instance_t *instance,
                   argon2_position_t position) {
-    block * ref_block = NULL, * curr_block = NULL;
+    block *ref_block = NULL, *curr_block = NULL;
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
@@ -161,7 +161,8 @@ void fill_segment(const argon2_instance_t *instance,
         return;
     }
 
-    pseudo_rands = (uint64_t *)malloc(sizeof(uint64_t) * instance->segment_length);
+    pseudo_rands =
+        (uint64_t *)malloc(sizeof(uint64_t) * instance->segment_length);
     if (pseudo_rands == NULL) {
         return;
     }
@@ -222,7 +223,8 @@ void fill_segment(const argon2_instance_t *instance,
                                 ref_lane == position.lane);
 
         /* 2 Creating a new block */
-        ref_block = instance->memory + instance->lane_length * ref_lane + ref_index;
+        ref_block =
+            instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
         fill_block(state, (uint8_t *)ref_block->v, (uint8_t *)curr_block->v);
     }

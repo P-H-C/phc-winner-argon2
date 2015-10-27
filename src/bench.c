@@ -90,16 +90,14 @@ static void benchmark() {
             delta_i = (stop_cycles_i - stop_cycles) / (m_cost);
             mcycles_d = (double)(stop_cycles - start_cycles) / (1UL << 20);
             mcycles_i = (double)(stop_cycles_i - stop_cycles) / (1UL << 20);
-            printf(
-                "Argon2d %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
-                "Mcycles \n",
-                t_cost, m_cost >> 10, thread_n, (float)delta_d / 1024,
-                mcycles_d);
-            printf(
-                "Argon2i %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
-                "Mcycles \n",
-                t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
-                mcycles_i);
+            printf("Argon2d %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
+                   "Mcycles \n",
+                   t_cost, m_cost >> 10, thread_n, (float)delta_d / 1024,
+                   mcycles_d);
+            printf("Argon2i %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
+                   "Mcycles \n",
+                   t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
+                   mcycles_i);
 
             run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
             printf("%2.4f seconds\n\n", run_time);
@@ -108,6 +106,6 @@ static void benchmark() {
 }
 
 int main() {
-	benchmark();
-	return ARGON2_OK;
+    benchmark();
+    return ARGON2_OK;
 }

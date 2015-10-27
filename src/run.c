@@ -65,8 +65,8 @@ Base64-encoded hash string
 @type String, only "d" and "i" are accepted
 */
 static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
-         uint32_t m_cost, uint32_t lanes, uint32_t threads, const char *type)
-{
+                uint32_t m_cost, uint32_t lanes, uint32_t threads,
+                const char *type) {
 #if 0
     uint64_t start_cycles, stop_cycles;
     clock_t start_time, stop_time;
@@ -115,17 +115,15 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     context.free_cbk = NULL;
     context.flags = ARGON2_FLAG_CLEAR_PASSWORD;
 
-    if (!strcmp(type, "d"))
-    {
+    if (!strcmp(type, "d")) {
         int result = argon2d(&context);
-        if (result != ARGON2_OK) printf("%s\n",error_message(result));
-    }
-    else if (!strcmp(type, "i"))
-    {
+        if (result != ARGON2_OK)
+            printf("%s\n", error_message(result));
+    } else if (!strcmp(type, "i")) {
         int result = argon2i(&context);
-        if (result != ARGON2_OK) printf("%s\n",error_message(result));
-    }
-    else {
+        if (result != ARGON2_OK)
+            printf("%s\n", error_message(result));
+    } else {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("wrong Argon2 type");
     }
@@ -148,8 +146,6 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 #endif
 }
 
-
-
 int main(int argc, char *argv[]) {
     unsigned char out[32];
     uint32_t m_cost = 1 << LOG_M_COST_DEF;
@@ -158,7 +154,7 @@ int main(int argc, char *argv[]) {
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
     uint8_t salt[SALTLEN_DEF];
-    const char * type = "i";
+    const char *type = "i";
     int i;
 
     if (argc < 3) {
@@ -182,11 +178,12 @@ int main(int argc, char *argv[]) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
-                if( input == 0 || input == ULONG_MAX || input > ARGON2_MAX_MEMORY_BITS ) {
+                if (input == 0 || input == ULONG_MAX ||
+                    input > ARGON2_MAX_MEMORY_BITS) {
                     fatal("bad numeric input for -m");
                 }
                 m_cost = ARGON2_MIN(UINT64_C(1) << input, UINT32_C(0xFFFFFFFF));
-                if( m_cost > ARGON2_MAX_MEMORY ) {
+                if (m_cost > ARGON2_MAX_MEMORY) {
                     fatal("m_cost overflow");
                 }
                 continue;
@@ -197,7 +194,8 @@ int main(int argc, char *argv[]) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
-                if( input == 0 || input == ULONG_MAX || input > ARGON2_MAX_TIME ) {
+                if (input == 0 || input == ULONG_MAX ||
+                    input > ARGON2_MAX_TIME) {
                     fatal("bad numeric input for -t");
                 }
                 t_cost = input;
@@ -209,8 +207,8 @@ int main(int argc, char *argv[]) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
-                if( input == 0 || input == ULONG_MAX ||
-                    input > ARGON2_MAX_THREADS || input > ARGON2_MAX_LANES ) {
+                if (input == 0 || input == ULONG_MAX ||
+                    input > ARGON2_MAX_THREADS || input > ARGON2_MAX_LANES) {
                     fatal("bad numeric input for -p");
                 }
                 threads = input;
@@ -222,7 +220,7 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-y")) {
             if (i < argc - 1) {
                 i++;
-                if( strcmp(argv[i], "i") != 0 && strcmp(argv[i], "d") != 0 ) {
+                if (strcmp(argv[i], "i") != 0 && strcmp(argv[i], "d") != 0) {
                     fatal("bad input to -y");
                 }
                 type = argv[i];
@@ -234,10 +232,10 @@ int main(int argc, char *argv[]) {
             fatal("unknown argument");
         }
     }
-    printf("Type:\t\tArgon2%c\n",type[0]);
-    printf("Memory:\t\t%"PRIu32" KiB\n",m_cost);
-    printf("Iterations:\t%"PRIu32" \n",t_cost);
-    printf("Parallelism:\t%"PRIu32" \n",lanes);
+    printf("Type:\t\tArgon2%c\n", type[0]);
+    printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
+    printf("Iterations:\t%" PRIu32 " \n", t_cost);
+    printf("Parallelism:\t%" PRIu32 " \n", lanes);
     run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
     return ARGON2_OK;

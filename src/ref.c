@@ -105,7 +105,8 @@ void fill_segment(const argon2_instance_t *instance,
         return;
     }
 
-    pseudo_rands = (uint64_t *)malloc(sizeof(uint64_t) * (instance->segment_length));
+    pseudo_rands =
+        (uint64_t *)malloc(sizeof(uint64_t) * (instance->segment_length));
 
     if (pseudo_rands == NULL) {
         return;
@@ -164,7 +165,8 @@ void fill_segment(const argon2_instance_t *instance,
                                 ref_lane == position.lane);
 
         /* 2 Creating a new block */
-        ref_block = instance->memory + instance->lane_length * ref_lane + ref_index;
+        ref_block =
+            instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
         fill_block(instance->memory + prev_offset, ref_block, curr_block);
     }

@@ -34,7 +34,7 @@
 
 #ifdef GENKAT
 #include "genkat.h"
-#endif 
+#endif
 
 #if defined(__clang__)
 #if __has_attribute(optnone)
@@ -52,9 +52,7 @@
 #endif
 
 /***************Instance and Position constructors**********/
-void init_block_value(block *b, uint8_t in) {
-    memset(b->v, in, sizeof(b->v));
-}
+void init_block_value(block *b, uint8_t in) { memset(b->v, in, sizeof(b->v)); }
 
 void copy_block(block *dst, const block *src) {
     memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_WORDS_IN_BLOCK);
@@ -109,9 +107,7 @@ void clear_memory(argon2_instance_t *instance, int clear) {
     }
 }
 
-void free_memory(block *memory) {
-    free(memory);
-}
+void free_memory(block *memory) { free(memory); }
 
 void finalize(const argon2_context *context, argon2_instance_t *instance) {
     if (context != NULL && instance != NULL) {
@@ -127,11 +123,13 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
         }
 
         /* Hash the result */
-        blake2b_long(context->out, context->outlen, blockhash.v, ARGON2_BLOCK_SIZE);
-        secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); /* clear blockhash */
+        blake2b_long(context->out, context->outlen, blockhash.v,
+                     ARGON2_BLOCK_SIZE);
+        secure_wipe_memory(blockhash.v,
+                           ARGON2_BLOCK_SIZE); /* clear blockhash */
 
 #ifdef GENKAT
-            print_tag(context->out, context->outlen);
+        print_tag(context->out, context->outlen);
 #endif
 
         /* Clear memory */
@@ -168,7 +166,8 @@ uint32_t index_alpha(const argon2_instance_t *instance,
         /* First pass */
         if (0 == position->slice) {
             /* First slice */
-            reference_area_size = position->index - 1; /* all but the previous */
+            reference_area_size =
+                position->index - 1; /* all but the previous */
         } else {
             if (same_lane) {
                 /* The same lane => add current segment */
@@ -212,7 +211,7 @@ uint32_t index_alpha(const argon2_instance_t *instance,
 
     /* 1.2.6. Computing absolute position */
     absolute_position = (start_position + relative_position) %
-                                 instance->lane_length; /* absolute position */
+                        instance->lane_length; /* absolute position */
     return absolute_position;
 }
 
@@ -284,8 +283,8 @@ void fill_memory_blocks(argon2_instance_t *instance) {
             }
 
             /* 3. Joining remaining threads */
-            for (l = instance->lanes - instance->threads;
-                 l < instance->lanes; ++l) {
+            for (l = instance->lanes - instance->threads; l < instance->lanes;
+                 ++l) {
                 rc = argon2_thread_join(thread[l]);
                 if (rc) {
                     printf("ERROR; return code from pthread_join() is %d\n",
@@ -295,9 +294,9 @@ void fill_memory_blocks(argon2_instance_t *instance) {
             }
         }
 
-        #ifdef GENKAT
+#ifdef GENKAT
         internal_kat(instance, r); /* Print all memory blocks */
-        #endif
+#endif
     }
 
     free(thread);
@@ -437,12 +436,12 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
     for (l = 0; l < instance->lanes; ++l) {
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
-        blake2b_long(instance->memory[l * instance->lane_length].v, ARGON2_BLOCK_SIZE,
-                     blockhash, ARGON2_PREHASH_SEED_LENGTH);
+        blake2b_long(instance->memory[l * instance->lane_length].v,
+                     ARGON2_BLOCK_SIZE, blockhash, ARGON2_PREHASH_SEED_LENGTH);
 
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 1);
-        blake2b_long(instance->memory[l * instance->lane_length + 1].v, ARGON2_BLOCK_SIZE,
-            blockhash, ARGON2_PREHASH_SEED_LENGTH);
+        blake2b_long(instance->memory[l * instance->lane_length + 1].v,
+                     ARGON2_BLOCK_SIZE, blockhash, ARGON2_PREHASH_SEED_LENGTH);
     }
 }
 
@@ -552,10 +551,11 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
                            ARGON2_PREHASH_DIGEST_LENGTH);
 
 #ifdef GENKAT
-        initial_kat(blockhash, context, instance->type);
+    initial_kat(blockhash, context, instance->type);
 #endif
 
-    /* 3. Creating first blocks, we always have at least two blocks in a slice */
+    /* 3. Creating first blocks, we always have at least two blocks in a slice
+     */
     fill_first_blocks(blockhash, instance);
     /* Clearing the hash */
     secure_wipe_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);
