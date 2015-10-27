@@ -11,7 +11,7 @@ BIN = argon2
 DIST = phc-winner-argon2
 
 CC = gcc
-SRC = src/argon2.c src/core.c src/kat.c src/blake2/blake2b-ref.c src/thread.c
+SRC = src/argon2.c src/core.c src/blake2/blake2b-ref.c src/thread.c
 SRC_MAIN = src/main.c
 SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
@@ -60,7 +60,7 @@ bench: 	        $(SRC) $(SRC_BENCH)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
 genkat:         $(SRC) $(SRC_GENKAT)
-		$(CC) $(CFLAGS) $^ -Isrc  -o $@
+		$(CC) $(CFLAGS) $^ -Isrc  -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -o $@

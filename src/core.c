@@ -28,10 +28,13 @@
 
 #include "argon2.h"
 #include "core.h"
-#include "kat.h"
 #include "thread.h"
 #include "blake2/blake2.h"
 #include "blake2/blake2-impl.h"
+
+#ifdef GENKAT
+#include "genkat.h"
+#endif 
 
 #if defined(__clang__)
 #if __has_attribute(optnone)
@@ -128,10 +131,9 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
                      ARGON2_BLOCK_SIZE);
         secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); /* clear blockhash */
 
-        if (context->flags & ARGON2_PRINT) /* Shall we print the output tag? */
-        {
+#ifdef GENKAT
             print_tag(context->out, context->outlen);
-        }
+#endif
 
         /* Clear memory */
         clear_memory(instance, context->flags & ARGON2_CLEAR_PASSWORD);
@@ -296,9 +298,9 @@ void fill_memory_blocks(argon2_instance_t *instance) {
             free(thr_data);
         }
 
-        if (instance->print_internals) {
+            #ifdef GENKAT
             internal_kat(instance, r); /* Print all memory blocks */
-        }
+            #endif
     }
 }
 
@@ -556,9 +558,9 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
                        ARGON2_PREHASH_SEED_LENGTH -
                            ARGON2_PREHASH_DIGEST_LENGTH);
 
-    if (context->flags & ARGON2_PRINT) {
+#ifdef GENKAT
         initial_kat(blockhash, context, instance->type);
-    }
+#endif
 
     /* 3. Creating first blocks, we always have at least two blocks in a slice */
     fill_first_blocks(blockhash, instance);
@@ -602,7 +604,6 @@ int argon2_core(argon2_context *context, argon2_type type) {
     instance.lanes = context->lanes;
     instance.threads = context->threads;
     instance.type = type;
-    instance.print_internals = !!(context->flags & ARGON2_PRINT);
 
     /* 3. Initialization: Hashing inputs, allocating memory, filling first
      * blocks

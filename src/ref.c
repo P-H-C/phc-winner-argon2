@@ -18,7 +18,6 @@
 #include "argon2.h"
 #include "core.h"
 #include "ref.h"
-#include "kat.h"
 
 #include "blake2/blamka-round-ref.h"
 #include "blake2/blake2-impl.h"
