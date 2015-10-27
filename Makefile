@@ -7,18 +7,20 @@
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 #
 
-BIN = argon2
+RUN = argon2
+BENCH = bench
+GENKAT = genkat
+
 DIST = phc-winner-argon2
 
 CC = gcc
 SRC = src/argon2.c src/core.c src/blake2/blake2b-ref.c src/thread.c
-SRC_MAIN = src/main.c
+SRC_RUN = src/run.c
 SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS = -std=c89 -pthread -O3 -Wall -g
-CFLAGS_OPT = $(CFLAGS) 
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
@@ -27,7 +29,6 @@ ifeq ($(OPT), TRUE)
 else
 	SRC += src/ref.c
 endif
-
 
 BUILD_PATH := $(shell pwd)
 KERNEL_NAME := $(shell uname -s)
@@ -47,19 +48,18 @@ endif
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
 
-.PHONY: clean dist format genkat
+.PHONY: clean dist format $(GENKAT)
 
-all: clean bin libs 
-bin: $(BIN)
+all: clean $(RUN) libs 
 libs: $(LIB_SH) $(LIB_ST)
 
-$(BIN): 	$(SRC) $(SRC_MAIN)
+$(RUN):	        $(SRC) $(SRC_RUN)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
-bench: 	        $(SRC) $(SRC_BENCH)
+$(BENCH):       $(SRC) $(SRC_BENCH)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
 
-genkat:         $(SRC) $(SRC_GENKAT)
+$(GENKAT):      $(SRC) $(SRC_GENKAT)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
@@ -69,7 +69,8 @@ $(LIB_ST): 	$(OBJ)
 		ar rcs $@ $^
 
 clean:
-		rm -f $(BIN) $(LIB_SH) $(LIB_ST) kat-argon2* bench genkat
+		rm -f $(RUN) $(BENCH) $(GENKAT)
+		rm -f $(LIB_SH) $(LIB_ST) kat-argon2* 
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
