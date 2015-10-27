@@ -11,8 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef REF_H
-#define REF_H
+#ifndef ARGON2_REF_H
+#define ARGON2_REF_H
 
 /*
  * Function fills a new memory block
@@ -32,8 +32,8 @@ void fill_block(const block *prev_block, const block *ref_block,
  * @param pseudo_rands Pointer to the array of 64-bit values
  * @pre pseudo_rands must point to @a instance->segment_length allocated values
  */
-void generate_addresses(const Argon2_instance_t *instance,
-                        const Argon2_position_t *position,
+void generate_addresses(const argon2_instance_t *instance,
+                        const argon2_position_t *position,
                         uint64_t *pseudo_rands);
 
 /*
@@ -43,7 +43,7 @@ void generate_addresses(const Argon2_instance_t *instance,
  * @param position Current position
  * @pre all block pointers must be valid
  */
-void fill_segment(const Argon2_instance_t *instance,
-                  Argon2_position_t position);
+void fill_segment(const argon2_instance_t *instance,
+                  argon2_position_t position);
 
-#endif /* ARGON2_REF_CORE_H */
+#endif /* ARGON2_REF_H */

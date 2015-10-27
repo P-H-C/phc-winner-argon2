@@ -12,9 +12,8 @@
    this software. If not, see
    <http://creativecommons.org/publicdomain/zero/1.0/>.
 */
-#pragma once
-#ifndef __BLAKE2B_ROUND_H__
-#define __BLAKE2B_ROUND_H__
+#ifndef BLAKE2B_ROUND_H
+#define BLAKE2B_ROUND_H
 
 /* Argon2 Team - Begin Code */
 #define LOAD(p) _mm_load_si128((const __m128i *)(p))

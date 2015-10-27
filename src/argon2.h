@@ -10,15 +10,15 @@
  * this software. If not, see
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
-#pragma once
-
-#ifndef __ARGON2_H__
-#define __ARGON2_H__
+#ifndef ARGON2_H
+#define ARGON2_H
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdbool.h>
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /* The KAT file name */
 const char *ARGON2_KAT_FILENAME;
@@ -27,49 +27,53 @@ const char *ARGON2_KAT_FILENAME;
  * restrictions**************************************************/
 
 /* Minimum and maximum number of lanes (degree of parallelism) */
-#define ARGON2_MIN_LANES 1
-#define ARGON2_MAX_LANES 0xFFFFFF
+#define ARGON2_MIN_LANES UINT32_C(1)
+#define ARGON2_MAX_LANES UINT32_C(0xFFFFFF)
 
 /* Minimum and maximum number of threads */
-#define ARGON2_MIN_THREADS 1
-#define ARGON2_MAX_THREADS 0xFFFFFF
+#define ARGON2_MIN_THREADS UINT32_C(1)
+#define ARGON2_MAX_THREADS UINT32_C(0xFFFFFF)
 
 /* Number of synchronization points between lanes per pass */
-#define __ARGON_SYNC_POINTS 4
-#define ARGON2_SYNC_POINTS __ARGON_SYNC_POINTS
+#define ARGON2_SYNC_POINTS UINT32_C(4)
 
 /* Minimum and maximum digest size in bytes */
-#define ARGON2_MIN_OUTLEN 4
-#define ARGON2_MAX_OUTLEN 0xFFFFFFFF
+#define ARGON2_MIN_OUTLEN UINT32_C(4)
+#define ARGON2_MAX_OUTLEN UINT32_C(0xFFFFFFFF)
 
 /* Minimum and maximum number of memory blocks (each of BLOCK_SIZE bytes) */
-#define ARGON2_MIN_MEMORY (2 *(__ARGON_SYNC_POINTS)) // 2 blocks per slice
-#define ARGON2_MAX_MEMORY 0xFFFFFFFF // 2^32-1 blocks
-#define ARGON2_32BIT_LIMIT 0x200000 //2^21 blocks for 32-bit machines
+#define ARGON2_MIN_MEMORY (2 * ARGON2_SYNC_POINTS) /* 2 blocks per slice */
+#define ARGON2_MAX_MEMORY  UINT32_C(0xFFFFFFFF) /* 2^32-1 blocks */
+#define ARGON2_32BIT_LIMIT UINT32_C(0x200000) /* 2^21 blocks for 32-bit machines */
 
 /* Minimum and maximum number of passes */
-#define ARGON2_MIN_TIME 1
-#define ARGON2_MAX_TIME 0xFFFFFFFF
+#define ARGON2_MIN_TIME UINT32_C(1)
+#define ARGON2_MAX_TIME UINT32_C(0xFFFFFFFF)
 
 /* Minimum and maximum password length in bytes */
-#define ARGON2_MIN_PWD_LENGTH 0
-#define ARGON2_MAX_PWD_LENGTH 0xFFFFFFFF
+#define ARGON2_MIN_PWD_LENGTH UINT32_C(0)
+#define ARGON2_MAX_PWD_LENGTH UINT32_C(0xFFFFFFFF)
 
 /* Minimum and maximum associated data length in bytes */
-#define ARGON2_MIN_AD_LENGTH 0
-#define ARGON2_MAX_AD_LENGTH 0xFFFFFFFF
+#define ARGON2_MIN_AD_LENGTH UINT32_C(0)
+#define ARGON2_MAX_AD_LENGTH UINT32_C(0xFFFFFFFF)
 
 /* Minimum and maximum salt length in bytes */
-#define ARGON2_MIN_SALT_LENGTH 8
-#define ARGON2_MAX_SALT_LENGTH 0xFFFFFFFF
+#define ARGON2_MIN_SALT_LENGTH UINT32_C(8)
+#define ARGON2_MAX_SALT_LENGTH UINT32_C(0xFFFFFFFF)
 
 /* Minimum and maximum key length in bytes */
-#define ARGON2_MIN_SECRET 0
-#define ARGON2_MAX_SECRET 0xFFFFFFFF
+#define ARGON2_MIN_SECRET UINT32_C(0)
+#define ARGON2_MAX_SECRET UINT32_C(0xFFFFFFFF)
 
+#define ARGON2_CLEAR_PASSWORD (UINT32_C(1) << 0)
+#define ARGON2_CLEAR_SECRET   (UINT32_C(1) << 1)
+#define ARGON2_CLEAR_MEMORY   (UINT32_C(1) << 2)
+#define ARGON2_PRINT          (UINT32_C(1) << 3)
+#define ARGON2_DEFAULT_FLAGS  (ARGON2_CLEAR_PASSWORD | ARGON2_CLEAR_MEMORY)
 
 /* Error codes */
-typedef enum _Argon2_ErrorCodes {
+typedef enum Argon2_ErrorCodes {
     ARGON2_OK = 0,
 
     ARGON2_OUTPUT_PTR_NULL = 1,
@@ -98,10 +102,10 @@ typedef enum _Argon2_ErrorCodes {
     ARGON2_LANES_TOO_FEW = 16,
     ARGON2_LANES_TOO_MANY = 17,
 
-    ARGON2_PWD_PTR_MISMATCH = 18,    // NULL ptr with non-zero length
-    ARGON2_SALT_PTR_MISMATCH = 19,   // NULL ptr with non-zero length
-    ARGON2_SECRET_PTR_MISMATCH = 20, // NULL ptr with non-zero length
-    ARGON2_AD_PTR_MISMATCH = 21,     // NULL ptr with non-zero length
+    ARGON2_PWD_PTR_MISMATCH = 18,    /* NULL ptr with non-zero length */
+    ARGON2_SALT_PTR_MISMATCH = 19,   /* NULL ptr with non-zero length */
+    ARGON2_SECRET_PTR_MISMATCH = 20, /* NULL ptr with non-zero length */
+    ARGON2_AD_PTR_MISMATCH = 21,     /* NULL ptr with non-zero length */
 
     ARGON2_MEMORY_ALLOCATION_ERROR = 22,
 
@@ -121,12 +125,12 @@ typedef enum _Argon2_ErrorCodes {
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
                                  error code */
-} Argon2_ErrorCodes;
+} argon2_error_codes;
 
 /* Memory allocator types --- for external allocation */
-typedef int (*AllocateMemoryCallback)(uint8_t **memory,
+typedef int (*allocate_fptr)(uint8_t **memory,
                                       size_t bytes_to_allocate);
-typedef void (*FreeMemoryCallback)(uint8_t *memory, size_t bytes_to_allocate);
+typedef void (*deallocate_fptr)(uint8_t *memory, size_t bytes_to_allocate);
 
 /* Argon2 external data structures */
 
@@ -154,39 +158,32 @@ typedef void (*FreeMemoryCallback)(uint8_t *memory, size_t bytes_to_allocate);
  Then you initialize
  Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,4,NULL,NULL,true,false,false,false).
  */
-typedef struct _Argon2_Context {
-    uint8_t *out;    // output array
-    uint32_t outlen; // digest length
+typedef struct Argon2_Context {
+    uint8_t *out;    /* output array */
+    uint32_t outlen; /* digest length */
 
-    uint8_t *pwd;    // password array
-    uint32_t pwdlen; // password length
+    uint8_t *pwd;    /* password array */
+    uint32_t pwdlen; /* password length */
 
-    uint8_t *salt;    // salt array
-    uint32_t saltlen; // salt length
+    uint8_t *salt;    /* salt array */
+    uint32_t saltlen; /* salt length */
 
-    uint8_t *secret;    // key array
-    uint32_t secretlen; // key length
+    uint8_t *secret;    /* key array */
+    uint32_t secretlen; /* key length */
 
-    uint8_t *ad;    // associated data array
-    uint32_t adlen; // associated data length
+    uint8_t *ad;    /* associated data array */
+    uint32_t adlen; /* associated data length */
 
-    uint32_t t_cost;  // number of passes
-    uint32_t m_cost;  // amount of memory requested (KB)
-    uint32_t lanes;   // number of lanes
-    uint32_t threads; // maximum number of threads
+    uint32_t t_cost;  /* number of passes */
+    uint32_t m_cost;  /* amount of memory requested (KB) */
+    uint32_t lanes;   /* number of lanes */
+    uint32_t threads; /* maximum number of threads */
 
-    AllocateMemoryCallback allocate_cbk; // pointer to memory allocator
-    FreeMemoryCallback free_cbk;         // pointer to memory deallocator
+    allocate_fptr allocate_cbk; /* pointer to memory allocator */
+    deallocate_fptr free_cbk;  /* pointer to memory deallocator */
 
-    bool clear_password; // whether to clear the password array
-    bool clear_secret;   // whether to clear the secret array
-    bool clear_memory;   // whether to clear the memory after the run
-
-    bool print; // whether to print starting variables, memory blocks, and the
-                // tag
-                // to the file -- Test vectors only!
-
-} Argon2_Context;
+    uint32_t flags; /* array of bool options */
+} argon2_context;
 
 /**
  * Function to hash the inputs in the memory-hard fashion (uses Argon2i)
@@ -217,7 +214,7 @@ int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2d(Argon2_Context *context);
+int argon2d(argon2_context *context);
 
 /*
  *  * **************Argon2i: Version of Argon2 that picks memory blocks
@@ -227,14 +224,14 @@ int argon2d(Argon2_Context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2i(Argon2_Context *context);
+int argon2i(argon2_context *context);
 
 /*
  *   * **************Argon2di: Reserved name***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2di(Argon2_Context *context);
+int argon2di(argon2_context *context);
 
 /*
  *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20%
@@ -242,7 +239,7 @@ int argon2di(Argon2_Context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2ds(Argon2_Context *context);
+int argon2ds(argon2_context *context);
 
 /*
  *   * **************Argon2id: First half-pass over memory is
@@ -252,7 +249,7 @@ int argon2ds(Argon2_Context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2id(Argon2_Context *context);
+int argon2id(argon2_context *context);
 
 /*
  * Verify if a given password is correct for Argon2d hashing
@@ -261,7 +258,7 @@ int argon2id(Argon2_Context *context);
  * specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-int verify_d(Argon2_Context *context, const char *hash);
+int verify_d(argon2_context *context, const char *hash);
 
 /*
  * Get the associated error message for given error code
@@ -269,10 +266,8 @@ int verify_d(Argon2_Context *context, const char *hash);
  */
 const char *error_message(int error_code);
 
-/* Function that securely cleans the memory
-* @param mem Pointer to the memory
-* @param s Memory size in bytes
-*/
-//__inline void  secure_wipe_memory(void *v, size_t n);
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

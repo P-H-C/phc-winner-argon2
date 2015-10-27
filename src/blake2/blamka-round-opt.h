@@ -11,7 +11,7 @@
                           : _mm_xor_si128(_mm_srli_epi64((x), -(c)),           \
                                           _mm_slli_epi64((x), 64 - (-(c))))
 
-static inline __m128i fBlaMka(__m128i x, __m128i y) {
+static __inline __m128i fBlaMka(__m128i x, __m128i y) {
     const __m128i z = _mm_mul_epu32(x, y);
     return _mm_add_epi64(_mm_add_epi64(x, y), _mm_add_epi64(z, z));
 }

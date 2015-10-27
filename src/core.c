@@ -14,7 +14,7 @@
 /*For memory wiping*/
 #ifdef _MSC_VER
 #include <windows.h>
-#include <winbase.h> //For SecureZeroMemory
+#include <winbase.h> /* For SecureZeroMemory */
 #endif
 #if defined __STDC_LIB_EXT1__
 #define __STDC_WANT_LIB_EXT1__ 1
@@ -49,7 +49,7 @@
 #endif
 
 /***************Instance and Position constructors**********/
-void init_block_value(block *b, uint8_t in) { 
+void init_block_value(block *b, uint8_t in) {
     memset(b->v, in, sizeof(b->v));
 }
 
@@ -58,7 +58,8 @@ void copy_block(block *dst, const block *src) {
 }
 
 void xor_block(block *dst, const block *src) {
-    for (int i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    int i;
+    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
         dst->v[i] ^= src->v[i];
     }
 }
@@ -78,8 +79,9 @@ int allocate_memory(block **memory, uint32_t m_cost) {
         }
 
         return ARGON2_OK;
-    } else
+    } else {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
+    }
 }
 
 void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
@@ -97,7 +99,7 @@ void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
 
 /*********Memory functions*/
 
-void clear_memory(Argon2_instance_t *instance, bool clear) {
+void clear_memory(argon2_instance_t *instance, int clear) {
     if (instance->memory != NULL && clear) {
         secure_wipe_memory(instance->memory,
                            sizeof(block) * instance->memory_blocks);
@@ -105,37 +107,36 @@ void clear_memory(Argon2_instance_t *instance, bool clear) {
 }
 
 void free_memory(block *memory) {
-    if (memory != NULL) {
-        free(memory);
-    }
+    free(memory);
 }
 
-void finalize(const Argon2_Context *context, Argon2_instance_t *instance) {
+void finalize(const argon2_context *context, argon2_instance_t *instance) {
     if (context != NULL && instance != NULL) {
         block blockhash;
+        uint32_t l;
         copy_block(&blockhash, instance->memory + instance->lane_length - 1);
 
-        // XOR the last blocks
-        for (uint32_t l = 1; l < instance->lanes; ++l) {
+        /* XOR the last blocks */
+        for (l = 1; l < instance->lanes; ++l) {
             uint32_t last_block_in_lane =
                 l * instance->lane_length + (instance->lane_length - 1);
             xor_block(&blockhash, instance->memory + last_block_in_lane);
         }
 
-        // Hash the result
+        /* Hash the result */
         blake2b_long(context->out, (uint8_t *)blockhash.v, context->outlen,
                      ARGON2_BLOCK_SIZE);
-        secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); // clear blockhash
+        secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); /* clear blockhash */
 
-        if (context->print) // Shall we print the output tag?
+        if (context->flags & ARGON2_PRINT) /* Shall we print the output tag? */
         {
             print_tag(context->out, context->outlen);
         }
 
-        // Clear memory
-        clear_memory(instance, context->clear_memory);
+        /* Clear memory */
+        clear_memory(instance, context->flags & ARGON2_CLEAR_PASSWORD);
 
-        // Deallocate the memory
+        /* Deallocate the memory */
         if (NULL != context->free_cbk) {
             context->free_cbk((uint8_t *)instance->memory,
                               instance->memory_blocks * sizeof(block));
@@ -145,9 +146,9 @@ void finalize(const Argon2_Context *context, Argon2_instance_t *instance) {
     }
 }
 
-uint32_t index_alpha(const Argon2_instance_t *instance,
-                     const Argon2_position_t *position, uint32_t pseudo_rand,
-                     bool same_lane) {
+uint32_t index_alpha(const argon2_instance_t *instance,
+                     const argon2_position_t *position, uint32_t pseudo_rand,
+                     int same_lane) {
     /*
      * Pass 0:
      *      This lane : all already finished segments plus already constructed
@@ -159,15 +160,17 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
      *      Other lanes : (SYNC_POINTS - 1) last segments
      */
     uint32_t reference_area_size;
+    uint64_t relative_position;
+    uint32_t start_position, absolute_position;
 
     if (0 == position->pass) {
-        // First pass
+        /* First pass */
         if (0 == position->slice) {
-            // First slice
-            reference_area_size = position->index - 1; // all but the previous
+            /* First slice */
+            reference_area_size = position->index - 1; /* all but the previous */
         } else {
             if (same_lane) {
-                // The same lane => add current segment
+                /* The same lane => add current segment */
                 reference_area_size =
                     position->slice * instance->segment_length +
                     position->index - 1;
@@ -178,7 +181,7 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
             }
         }
     } else {
-        // Second pass
+        /* Second pass */
         if (same_lane) {
             reference_area_size = instance->lane_length -
                                   instance->segment_length + position->index -
@@ -192,13 +195,13 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
 
     /* 1.2.4. Mapping pseudo_rand to 0..<reference_area_size-1> and produce
      * relative position */
-    uint64_t relative_position = pseudo_rand;
+    relative_position = pseudo_rand;
     relative_position = relative_position * relative_position >> 32;
     relative_position = reference_area_size - 1 -
                         (reference_area_size * relative_position >> 32);
 
     /* 1.2.5 Computing starting position */
-    uint32_t start_position = 0;
+    start_position = 0;
 
     if (0 != position->pass) {
         start_position = (position->slice == ARGON2_SYNC_POINTS - 1)
@@ -207,8 +210,8 @@ uint32_t index_alpha(const Argon2_instance_t *instance,
     }
 
     /* 1.2.6. Computing absolute position */
-    uint32_t absolute_position = (start_position + relative_position) %
-                                 instance->lane_length; // absolute position
+    absolute_position = (start_position + relative_position) %
+                                 instance->lane_length; /* absolute position */
     return absolute_position;
 }
 
@@ -218,29 +221,34 @@ static DWORD WINAPI fill_segment_thr(void *thread_data)
 static void *fill_segment_thr(void *thread_data)
 #endif
 {
-    Argon2_thread_data *my_data = (Argon2_thread_data *)thread_data;
+    argon2_thread_data *my_data = (argon2_thread_data *)thread_data;
     fill_segment(my_data->instance_ptr, my_data->pos);
     argon2_thread_exit();
     return 0;
 }
 
-void fill_memory_blocks(Argon2_instance_t *instance) {
+void fill_memory_blocks(argon2_instance_t *instance) {
+    uint32_t r, s;
+
     if (instance == NULL) {
         return;
     }
 
-    for (uint32_t r = 0; r < instance->passes; ++r) {
-        for (uint8_t s = 0; s < ARGON2_SYNC_POINTS; ++s) {
-            // 1. Allocating space for threads
+    for (r = 0; r < instance->passes; ++r) {
+        for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
+            /* 1. Allocating space for threads */
             argon2_thread_handle_t *thread =
                 malloc(sizeof(argon2_thread_handle_t) * (instance->lanes));
-            Argon2_thread_data *thr_data =
-                malloc(sizeof(Argon2_thread_data) * (instance->lanes));
+            argon2_thread_data *thr_data =
+                malloc(sizeof(argon2_thread_data) * (instance->lanes));
             int rc;
+            uint32_t l;
 
-            // 2. Calling threads
-            for (uint32_t l = 0; l < instance->lanes; ++l) {
-                // 2.1 Join a thread if limit is exceeded
+            /* 2. Calling threads */
+            for (l = 0; l < instance->lanes; ++l) {
+                argon2_position_t position;
+
+                /* 2.1 Join a thread if limit is exceeded */
                 if (l >= instance->threads) {
                     rc = argon2_thread_join(thread[l - instance->threads]);
                     if (rc) {
@@ -251,12 +259,15 @@ void fill_memory_blocks(Argon2_instance_t *instance) {
                     }
                 }
 
-                // 2.2 Create thread
-                Argon2_position_t position = {r, l, s, 0};
+                /* 2.2 Create thread */
+                position.pass = r;
+                position.lane = l;
+                position.slice = s;
+                position.index = 0;
                 thr_data[l].instance_ptr =
-                    instance; // preparing the thread input
+                    instance; /* preparing the thread input */
                 memcpy(&(thr_data[l].pos), &position,
-                       sizeof(Argon2_position_t));
+                       sizeof(argon2_position_t));
                 rc = argon2_thread_create(&thread[l], fill_segment_thr,
                                           (void *)&thr_data[l]);
                 if (rc) {
@@ -266,13 +277,12 @@ void fill_memory_blocks(Argon2_instance_t *instance) {
                     exit(-1);
                 }
 
-                // FillSegment(instance, position);  //Non-thread equivalent of
-                // the
-                // lines above
+                /* FillSegment(instance, position); */
+                /*Non-thread equivalent of the lines above */
             }
 
-            // 3. Joining remaining threads
-            for (uint32_t l = instance->lanes - instance->threads;
+            /* 3. Joining remaining threads */
+            for (l = instance->lanes - instance->threads;
                  l < instance->lanes; ++l) {
                 rc = argon2_thread_join(thread[l]);
                 if (rc) {
@@ -287,12 +297,12 @@ void fill_memory_blocks(Argon2_instance_t *instance) {
         }
 
         if (instance->print_internals) {
-            internal_kat(instance, r); // Print all memory blocks
+            internal_kat(instance, r); /* Print all memory blocks */
         }
     }
 }
 
-int validate_inputs(const Argon2_Context *context) {
+int validate_inputs(const argon2_context *context) {
     if (NULL == context) {
         return ARGON2_INCORRECT_PARAMETER;
     }
@@ -380,8 +390,8 @@ int validate_inputs(const Argon2_Context *context) {
         return ARGON2_MEMORY_TOO_MUCH;
     }
 
-    if (sizeof(uint32_t *) == 4) { // 32-bit machine
-        if (ARGON2_32BIT_LIMIT < context->m_cost) { // 2^21 blocks (2 GB) maximum
+    if (sizeof(uint32_t *) == 4) { /* 32-bit machine */
+        if (ARGON2_32BIT_LIMIT < context->m_cost) { /* 2^21 blocks (2 GB) maximum */
             return ARGON2_MEMORY_TOO_MUCH;
         }
     }
@@ -424,10 +434,11 @@ int validate_inputs(const Argon2_Context *context) {
     return ARGON2_OK;
 }
 
-void fill_first_blocks(uint8_t *blockhash, const Argon2_instance_t *instance) {
-    // Make the first and second block in each lane as G(H0||i||0) or
-    // G(H0||i||1)
-    for (uint32_t l = 0; l < instance->lanes; ++l) {
+void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
+    uint32_t l;
+    /* Make the first and second block in each lane as G(H0||i||0) or
+       G(H0||i||1) */
+    for (l = 0; l < instance->lanes; ++l) {
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
         blake2b_long((uint8_t *)(instance->memory[l * instance->lane_length].v),
@@ -440,8 +451,8 @@ void fill_first_blocks(uint8_t *blockhash, const Argon2_instance_t *instance) {
     }
 }
 
-void initial_hash(uint8_t *blockhash, Argon2_Context *context,
-                  Argon2_type type) {
+void initial_hash(uint8_t *blockhash, argon2_context *context,
+                  argon2_type type) {
     blake2b_state BlakeHash;
     uint8_t value[sizeof(uint32_t)];
 
@@ -476,7 +487,7 @@ void initial_hash(uint8_t *blockhash, Argon2_Context *context,
         blake2b_update(&BlakeHash, (const uint8_t *)context->pwd,
                        context->pwdlen);
 
-        if (context->clear_password) {
+        if (context->flags & ARGON2_CLEAR_PASSWORD) {
             secure_wipe_memory(context->pwd, context->pwdlen);
             context->pwdlen = 0;
         }
@@ -497,7 +508,7 @@ void initial_hash(uint8_t *blockhash, Argon2_Context *context,
         blake2b_update(&BlakeHash, (const uint8_t *)context->secret,
                        context->secretlen);
 
-        if (context->clear_secret) {
+        if (context->flags & ARGON2_CLEAR_SECRET) {
             secure_wipe_memory(context->secret, context->secretlen);
             context->secretlen = 0;
         }
@@ -514,12 +525,14 @@ void initial_hash(uint8_t *blockhash, Argon2_Context *context,
     blake2b_final(&BlakeHash, blockhash, ARGON2_PREHASH_DIGEST_LENGTH);
 }
 
-int initialize(Argon2_instance_t *instance, Argon2_Context *context) {
+int initialize(argon2_instance_t *instance, argon2_context *context) {
+    uint8_t blockhash[ARGON2_PREHASH_SEED_LENGTH];
+    int result = ARGON2_OK;
+
     if (instance == NULL || context == NULL)
         return ARGON2_INCORRECT_PARAMETER;
 
-    // 1. Memory allocation
-    int result = ARGON2_OK;
+    /* 1. Memory allocation */
 
     if (NULL != context->allocate_cbk) {
         result =
@@ -533,31 +546,33 @@ int initialize(Argon2_instance_t *instance, Argon2_Context *context) {
         return result;
     }
 
-    // 2. Initial hashing
-    // H_0 + 8 extra bytes to produce the first blocks
-    uint8_t blockhash[ARGON2_PREHASH_SEED_LENGTH];
-    // Hashing all inputs
+    /* 2. Initial hashing */
+    /* H_0 + 8 extra bytes to produce the first blocks */
+    /* uint8_t blockhash[ARGON2_PREHASH_SEED_LENGTH]; */
+    /* Hashing all inputs */
     initial_hash(blockhash, context, instance->type);
-    // Zeroing 8 extra bytes
+    /* Zeroing 8 extra bytes */
     secure_wipe_memory(blockhash + ARGON2_PREHASH_DIGEST_LENGTH,
                        ARGON2_PREHASH_SEED_LENGTH -
                            ARGON2_PREHASH_DIGEST_LENGTH);
 
-    if (context->print) {
+    if (context->flags & ARGON2_PRINT) {
         initial_kat(blockhash, context, instance->type);
     }
 
-    // 3. Creating first blocks, we always have at least two blocks in a slice
+    /* 3. Creating first blocks, we always have at least two blocks in a slice */
     fill_first_blocks(blockhash, instance);
-    // Clearing the hash
+    /* Clearing the hash */
     secure_wipe_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);
 
     return ARGON2_OK;
 }
 
-int argon2_core(Argon2_Context *context, Argon2_type type) {
+int argon2_core(argon2_context *context, argon2_type type) {
     /* 1. Validate all inputs */
     int result = validate_inputs(context);
+    uint32_t memory_blocks, segment_length;
+    argon2_instance_t instance;
 
     if (ARGON2_OK != result) {
         return result;
@@ -568,27 +583,26 @@ int argon2_core(Argon2_Context *context, Argon2_type type) {
     }
 
     /* 2. Align memory size */
-    // Minimum memory_blocks = 8L blocks, where L is the number of lanes
-    uint32_t memory_blocks = context->m_cost;
+    /* Minimum memory_blocks = 8L blocks, where L is the number of lanes */
+    memory_blocks = context->m_cost;
 
     if (memory_blocks < 2 * ARGON2_SYNC_POINTS * context->lanes) {
         memory_blocks = 2 * ARGON2_SYNC_POINTS * context->lanes;
     }
 
-    uint32_t segment_length =
-        memory_blocks / (context->lanes * ARGON2_SYNC_POINTS);
-    bool print_internals = context->print;
-    // Ensure that all segments have equal length
+    segment_length = memory_blocks / (context->lanes * ARGON2_SYNC_POINTS);
+    /* Ensure that all segments have equal length */
     memory_blocks = segment_length * (context->lanes * ARGON2_SYNC_POINTS);
-    Argon2_instance_t instance = {NULL,
-                                  context->t_cost,
-                                  memory_blocks,
-                                  segment_length,
-                                  segment_length * ARGON2_SYNC_POINTS,
-                                  context->lanes,
-                                  context->threads,
-                                  type,
-                                  print_internals};
+
+    instance.memory = NULL;
+    instance.passes = context->t_cost;
+    instance.memory_blocks = memory_blocks;
+    instance.segment_length = segment_length;
+    instance.lane_length = segment_length * ARGON2_SYNC_POINTS;
+    instance.lanes = context->lanes;
+    instance.threads = context->threads;
+    instance.type = type;
+    instance.print_internals = !!(context->flags & ARGON2_PRINT);
 
     /* 3. Initialization: Hashing inputs, allocating memory, filling first
      * blocks

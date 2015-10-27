@@ -12,9 +12,8 @@
    this software. If not, see
    <http://creativecommons.org/publicdomain/zero/1.0/>.
 */
-#pragma once
-#ifndef __BLAKE2_CONFIG_H__
-#define __BLAKE2_CONFIG_H__
+#ifndef BLAKE2_CONFIG_H
+#define BLAKE2_CONFIG_H
 
 // These don't work everywhere
 #if defined(__SSE2__)

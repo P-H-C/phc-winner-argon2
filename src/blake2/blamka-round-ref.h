@@ -1,7 +1,5 @@
-#pragma once
-
-#ifndef __BLAKE_ROUND_MKA_H__
-#define __BLAKE_ROUND_MKA_H__
+#ifndef BLAKE_ROUND_MKA_H
+#define BLAKE_ROUND_MKA_H
 
 #define G(a, b, c, d)                                                          \
     a = fBlaMka(a, b);                                                         \
@@ -33,9 +31,7 @@ static __inline uint64_t fBlaMka(uint64_t x, uint64_t y) {
     lessZ = lessZ * lessY;
     lessZ = lessZ << 1;
 
-    uint64_t z = lessZ + x + y;
-
-    return z;
+    return lessZ + x + y;
 }
 
 #endif

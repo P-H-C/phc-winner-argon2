@@ -18,8 +18,9 @@
 #include "argon2.h"
 #include "core.h"
 
-void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
-                 Argon2_type type) {
+void initial_kat(const uint8_t *blockhash, const argon2_context *context,
+                 argon2_type type) {
+    unsigned i;
     FILE *fp = fopen(ARGON2_KAT_FILENAME, "a+");
 
     if (fp && blockhash != NULL && context != NULL) {
@@ -45,10 +46,10 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
         fprintf(fp, "Password[%d]: ", context->pwdlen);
 
-        if (context->clear_password) {
+        if (context->flags & ARGON2_CLEAR_PASSWORD) {
             fprintf(fp, "CLEARED\n");
         } else {
-            for (unsigned i = 0; i < context->pwdlen; ++i) {
+            for (i = 0; i < context->pwdlen; ++i) {
                 fprintf(fp, "%2.2x ", ((unsigned char *)context->pwd)[i]);
             }
 
@@ -57,7 +58,7 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
         fprintf(fp, "Salt[%d]: ", context->saltlen);
 
-        for (unsigned i = 0; i < context->saltlen; ++i) {
+        for (i = 0; i < context->saltlen; ++i) {
             fprintf(fp, "%2.2x ", ((unsigned char *)context->salt)[i]);
         }
 
@@ -65,10 +66,10 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
         fprintf(fp, "Secret[%d]: ", context->secretlen);
 
-        if (context->clear_secret) {
+        if (context->flags & ARGON2_CLEAR_SECRET) {
             fprintf(fp, "CLEARED\n");
         } else {
-            for (unsigned i = 0; i < context->secretlen; ++i) {
+            for (i = 0; i < context->secretlen; ++i) {
                 fprintf(fp, "%2.2x ", ((unsigned char *)context->secret)[i]);
             }
 
@@ -77,7 +78,7 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
         fprintf(fp, "Associated data[%d]: ", context->adlen);
 
-        for (unsigned i = 0; i < context->adlen; ++i) {
+        for (i = 0; i < context->adlen; ++i) {
             fprintf(fp, "%2.2x ", ((unsigned char *)context->ad)[i]);
         }
 
@@ -85,7 +86,7 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
         fprintf(fp, "Pre-hashing digest: ");
 
-        for (unsigned i = 0; i < ARGON2_PREHASH_DIGEST_LENGTH; ++i) {
+        for (i = 0; i < ARGON2_PREHASH_DIGEST_LENGTH; ++i) {
             fprintf(fp, "%2.2x ", ((unsigned char *)blockhash)[i]);
         }
 
@@ -97,11 +98,11 @@ void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
 
 void print_tag(const void *out, uint32_t outlen) {
     FILE *fp = fopen(ARGON2_KAT_FILENAME, "a+");
-
+    unsigned i;
     if (fp && out != NULL) {
         fprintf(fp, "Tag: ");
 
-        for (unsigned i = 0; i < outlen; ++i) {
+        for (i = 0; i < outlen; ++i) {
             fprintf(fp, "%2.2x ", ((uint8_t *)out)[i]);
         }
 
@@ -111,19 +112,20 @@ void print_tag(const void *out, uint32_t outlen) {
     }
 }
 
-void internal_kat(const Argon2_instance_t *instance, uint32_t pass) {
+void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
     FILE *fp = fopen(ARGON2_KAT_FILENAME, "a+");
 
     if (fp && instance != NULL) {
+        uint32_t i, j;
         fprintf(fp, "\n After pass %d:\n", pass);
 
-        for (uint32_t i = 0; i < instance->memory_blocks; ++i) {
+        for (i = 0; i < instance->memory_blocks; ++i) {
             uint32_t how_many_words =
                 (instance->memory_blocks > ARGON2_WORDS_IN_BLOCK)
                     ? 1
                     : ARGON2_WORDS_IN_BLOCK;
 
-            for (uint32_t j = 0; j < how_many_words; ++j)
+            for (j = 0; j < how_many_words; ++j)
                 fprintf(fp, "Block %.4d [%3d]: %016" PRIx64 "\n", i, j,
                         instance->memory[i].v[j]);
         }

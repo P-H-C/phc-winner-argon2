@@ -11,8 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#ifndef __ARGON2_KAT_H__
-#define __ARGON2_KAT_H__
+#ifndef ARGON2_KAT_H
+#define ARGON2_KAT_H
 
 /*
  * Initial KAT function that prints the inputs to the file
@@ -23,8 +23,8 @@
  * @pre context member pointers must point to allocated memory of size according
  * to the length values
  */
-void initial_kat(const uint8_t *blockhash, const Argon2_Context *context,
-                 Argon2_type type);
+void initial_kat(const uint8_t *blockhash, const argon2_context *context,
+                 argon2_type type);
 
 /*
  * Function that prints the output tag
@@ -40,6 +40,6 @@ void print_tag(const void *out, uint32_t outlen);
  * @param  pass current pass number
  * @pre instance must have necessary memory allocated
  **/
-void internal_kat(const Argon2_instance_t *instance, uint32_t pass);
+void internal_kat(const argon2_instance_t *instance, uint32_t pass);
 
 #endif

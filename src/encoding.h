@@ -104,7 +104,7 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
  * The output length is always exactly 32 bytes.
  */
 
-int encode_string(char *dst, size_t dst_len, Argon2_Context *ctx) {
+int encode_string(char *dst, size_t dst_len, argon2_context *ctx) {
 #define SS(str)                                                                \
     do {                                                                       \
         size_t pp_len = strlen(str);                                           \
