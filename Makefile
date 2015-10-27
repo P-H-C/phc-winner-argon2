@@ -81,7 +81,7 @@ dist:
 		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
 
 test:
-		sh test.sh
+		sh kats/test.sh
 
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
