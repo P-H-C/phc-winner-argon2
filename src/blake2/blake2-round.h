@@ -1,3 +1,23 @@
+#ifndef BLAKE2B_ROUND_OPT_H
+#define BLAKE2B_ROUND_OPT_H
+
+#include "blake2-impl.h"
+
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
+#include <immintrin.h>
+#if defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
+#include <x86intrin.h>
+#endif
+
+#if !defined(__XOP__)
+#if defined(__SSSE3__)
+#define r16                                                                    \
+    (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))
+#define r24                                                                    \
+    (_mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10))
 #define _mm_roti_epi64(x, c)                                                   \
     (-(c) == 32)                                                               \
         ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2, 3, 0, 1))                      \
@@ -10,82 +30,98 @@
                                           _mm_add_epi64((x), (x)))             \
                           : _mm_xor_si128(_mm_srli_epi64((x), -(c)),           \
                                           _mm_slli_epi64((x), 64 - (-(c))))
+#else /* defined(__SSE2__) */
+#define _mm_roti_epi64(r, c)                                                   \
+    _mm_xor_si128(_mm_srli_epi64((r), -(c)), _mm_slli_epi64((r), 64 - (-c)))
+#endif
+#else
+#endif
 
-#define G1(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h)             \
-    row1l = _mm_add_epi64(row1l, row2l);                                       \
-    row1h = _mm_add_epi64(row1h, row2h);                                       \
+#define G1(A0, B0, C0, D0, A1, B1, C1, D1)                                     \
+    do {                                                                       \
+        A0 = _mm_add_epi64(A0, B0);                                            \
+        A1 = _mm_add_epi64(A1, B1);                                            \
                                                                                \
-    row4l = _mm_xor_si128(row4l, row1l);                                       \
-    row4h = _mm_xor_si128(row4h, row1h);                                       \
+        D0 = _mm_xor_si128(D0, A0);                                            \
+        D1 = _mm_xor_si128(D1, A1);                                            \
                                                                                \
-    row4l = _mm_roti_epi64(row4l, -32);                                        \
-    row4h = _mm_roti_epi64(row4h, -32);                                        \
+        D0 = _mm_roti_epi64(D0, -32);                                          \
+        D1 = _mm_roti_epi64(D1, -32);                                          \
                                                                                \
-    row3l = _mm_add_epi64(row3l, row4l);                                       \
-    row3h = _mm_add_epi64(row3h, row4h);                                       \
+        C0 = _mm_add_epi64(C0, D0);                                            \
+        C1 = _mm_add_epi64(C1, D1);                                            \
                                                                                \
-    row2l = _mm_xor_si128(row2l, row3l);                                       \
-    row2h = _mm_xor_si128(row2h, row3h);                                       \
+        B0 = _mm_xor_si128(B0, C0);                                            \
+        B1 = _mm_xor_si128(B1, C1);                                            \
                                                                                \
-    row2l = _mm_roti_epi64(row2l, -24);                                        \
-    row2h = _mm_roti_epi64(row2h, -24);
+        B0 = _mm_roti_epi64(B0, -24);                                          \
+        B1 = _mm_roti_epi64(B1, -24);                                          \
+    } while (0)
 
-#define G2(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h)             \
-    row1l = _mm_add_epi64(row1l, row2l);                                       \
-    row1h = _mm_add_epi64(row1h, row2h);                                       \
+#define G2(A0, B0, C0, D0, A1, B1, C1, D1)                                     \
+    do {                                                                       \
+        A0 = _mm_add_epi64(A0, B0);                                            \
+        A1 = _mm_add_epi64(A1, B1);                                            \
                                                                                \
-    row4l = _mm_xor_si128(row4l, row1l);                                       \
-    row4h = _mm_xor_si128(row4h, row1h);                                       \
+        D0 = _mm_xor_si128(D0, A0);                                            \
+        D1 = _mm_xor_si128(D1, A1);                                            \
                                                                                \
-    row4l = _mm_roti_epi64(row4l, -16);                                        \
-    row4h = _mm_roti_epi64(row4h, -16);                                        \
+        D0 = _mm_roti_epi64(D0, -16);                                          \
+        D1 = _mm_roti_epi64(D1, -16);                                          \
                                                                                \
-    row3l = _mm_add_epi64(row3l, row4l);                                       \
-    row3h = _mm_add_epi64(row3h, row4h);                                       \
+        C0 = _mm_add_epi64(C0, D0);                                            \
+        C1 = _mm_add_epi64(C1, D1);                                            \
                                                                                \
-    row2l = _mm_xor_si128(row2l, row3l);                                       \
-    row2h = _mm_xor_si128(row2h, row3h);                                       \
+        B0 = _mm_xor_si128(B0, C0);                                            \
+        B1 = _mm_xor_si128(B1, C1);                                            \
                                                                                \
-    row2l = _mm_roti_epi64(row2l, -63);                                        \
-    row2h = _mm_roti_epi64(row2h, -63);
+        B0 = _mm_roti_epi64(B0, -63);                                          \
+        B1 = _mm_roti_epi64(B1, -63);                                          \
+    } while (0)
 
-#define DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h)    \
-    t0 = _mm_alignr_epi8(row2h, row2l, 8);                                     \
-    t1 = _mm_alignr_epi8(row2l, row2h, 8);                                     \
-    row2l = t0;                                                                \
-    row2h = t1;                                                                \
+#define DIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1)                            \
+    do {                                                                       \
+        __m128i t0 = _mm_alignr_epi8(B1, B0, 8);                               \
+        __m128i t1 = _mm_alignr_epi8(B0, B1, 8);                               \
+        B0 = t0;                                                               \
+        B1 = t1;                                                               \
                                                                                \
-    t0 = row3l;                                                                \
-    row3l = row3h;                                                             \
-    row3h = t0;                                                                \
+        t0 = C0;                                                               \
+        C0 = C1;                                                               \
+        C1 = t0;                                                               \
                                                                                \
-    t0 = _mm_alignr_epi8(row4h, row4l, 8);                                     \
-    t1 = _mm_alignr_epi8(row4l, row4h, 8);                                     \
-    row4l = t1;                                                                \
-    row4h = t0;
+        t0 = _mm_alignr_epi8(D1, D0, 8);                                       \
+        t1 = _mm_alignr_epi8(D0, D1, 8);                                       \
+        D0 = t1;                                                               \
+        D1 = t0;                                                               \
+    } while (0)
 
-#define UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h)  \
-    t0 = _mm_alignr_epi8(row2l, row2h, 8);                                     \
-    t1 = _mm_alignr_epi8(row2h, row2l, 8);                                     \
-    row2l = t0;                                                                \
-    row2h = t1;                                                                \
+#define UNDIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1)                          \
+    do {                                                                       \
+        __m128i t0 = _mm_alignr_epi8(B0, B1, 8);                               \
+        __m128i t1 = _mm_alignr_epi8(B1, B0, 8);                               \
+        B0 = t0;                                                               \
+        B1 = t1;                                                               \
                                                                                \
-    t0 = row3l;                                                                \
-    row3l = row3h;                                                             \
-    row3h = t0;                                                                \
+        t0 = C0;                                                               \
+        C0 = C1;                                                               \
+        C1 = t0;                                                               \
                                                                                \
-    t0 = _mm_alignr_epi8(row4l, row4h, 8);                                     \
-    t1 = _mm_alignr_epi8(row4h, row4l, 8);                                     \
-    row4l = t1;                                                                \
-    row4h = t0;
+        t0 = _mm_alignr_epi8(D0, D1, 8);                                       \
+        t1 = _mm_alignr_epi8(D1, D0, 8);                                       \
+        D0 = t1;                                                               \
+        D1 = t0;                                                               \
+    } while (0)
 
-#define BLAKE2_ROUND(row1l, row1h, row2l, row2h, row3l, row3h, row4l, row4h)   \
-    G1(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);                \
-    G2(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);                \
+#define BLAKE2_ROUND(A0, A1, B0, B1, C0, C1, D0, D1)                           \
+    do {                                                                       \
+        G1(A0, B0, C0, D0, A1, B1, C1, D1);                                    \
+        G2(A0, B0, C0, D0, A1, B1, C1, D1);                                    \
                                                                                \
-    DIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);       \
+        DIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1);                           \
                                                                                \
-    G1(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);                \
-    G2(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);                \
+        G1(A0, B0, C0, D0, A1, B1, C1, D1);                                    \
+        G2(A0, B0, C0, D0, A1, B1, C1, D1);                                    \
                                                                                \
-    UNDIAGONALIZE(row1l, row2l, row3l, row4l, row1h, row2h, row3h, row4h);
+        UNDIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1);                         \
+    } while (0)

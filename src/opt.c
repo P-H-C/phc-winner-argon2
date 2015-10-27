@@ -18,8 +18,7 @@
 #if !defined(_MSC_VER)
 #include <x86intrin.h>
 #else
-#include <emmintrin.h>
-#include <smmintrin.h>
+#include <immintrin.h>
 #include <intrin.h>
 #endif
 
@@ -27,17 +26,10 @@
 #include "core.h"
 #include "opt.h"
 
-#include "blake2/blamka-round-opt.h"
-#include "blake2/blake2-impl.h"
 #include "blake2/blake2.h"
-
-#define r16                                                                    \
-    (_mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9))
-#define r24                                                                    \
-    (_mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10))
+#include "blake2/blamka-round-opt.h"
 
 void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
-    __m128i t0, t1;
     __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
     uint32_t i;
 
@@ -81,7 +73,7 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
                  state[49], state[57]);
 
     BLAKE2_ROUND(state[2], state[10], state[18], state[26], state[34],
-                 state[42], state[50], state[58])
+                 state[42], state[50], state[58]);
 
     BLAKE2_ROUND(state[3], state[11], state[19], state[27], state[35],
                  state[43], state[51], state[59]);
