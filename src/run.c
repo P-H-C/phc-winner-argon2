@@ -23,7 +23,7 @@
 #include "encoding.h"
 
 #define T_COST_DEF 3
-#define LOG_M_COST_DEF 12 /*4 MB*/
+#define LOG_M_COST_DEF 12 /* 2^12 = 4 MiB */
 #define LANES_DEF 4
 #define THREADS_DEF 4
 #define SALTLEN_DEF 16
@@ -31,18 +31,15 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s pwd salt [-y version] [-t t_cost] [-m m_cost] [-l "
-           "#lanes] [-p #threads]\n",
-           cmd);
+    printf("Usage:  %s pwd salt [-y version] [-t iterations] [-m memory] [-p parallelism]\n", cmd);
 
     printf("Options:\n");
-    printf("\tpwd\t\tThe password to hash (required)\n");
-    printf("\tsalt\t\tThe salt to use, at most 16 characters (required)\n");
-    printf("\t-y version\tArgon2 version, either d or i (default)\n");
-    printf("\t-t t_cost\tNumber of rounds to t_cost between 1 and 2^24, "
-           "default %d\n",
+    printf("\tpwd\t\tThe password to hash (REQUIRED)\n");
+    printf("\tsalt\t\tThe salt to use, at most 16 characters (REQUIRED)\n");
+    printf("\t-y version\tArgon2 version, d for Argon2d, i for Argon2i (default)\n");
+    printf("\t-t iterations\tNumber of iterations, default %d\n",
            T_COST_DEF);
-    printf("\t-m m_cost\tMemory usage of 2^t_cost KiB, default %d\n",
+    printf("\t-m memory\tMemory usage of 2^memory KiB, default 2^%d KiB\n",
            LOG_M_COST_DEF);
     printf("\t-p N\t\tParallelism, default %d\n", THREADS_DEF);
 }
