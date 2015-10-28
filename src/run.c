@@ -64,11 +64,8 @@ Base64-encoded hash string
 static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 const char *type) {
-#if 0
-    uint64_t start_cycles, stop_cycles;
     clock_t start_time, stop_time;
-    double run_time, run_cycles;
-#endif
+
     /*Fixed parameters*/
     const unsigned out_length = 32;
     const unsigned salt_length = SALTLEN_DEF;
@@ -76,10 +73,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     argon2_context context;
     char encoded[300];
 
-#if 0
     start_time = clock();
-    start_cycles = rdtsc();
-#endif
 
     if (!pwd) {
         fatal("password missing");
@@ -125,22 +119,14 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         fatal("wrong Argon2 type");
     }
 
-#if 0
-    stop_cycles = rdtsc();
     stop_time = clock();
-#endif
 
     /* show string encoding */
     encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
 
-#if 0
     /* show running time/cycles */
-    run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
-    run_cycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
-    printf("%2.3f seconds ", run_time);
-    printf("(%.3f mebicycles)\n", run_cycles);
-#endif
+    printf("%2.3f seconds\n", ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
 }
 
 int main(int argc, char *argv[]) {
