@@ -235,7 +235,7 @@ uint32_t index_alpha(const argon2_instance_t *instance,
     return absolute_position;
 }
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 static unsigned __stdcall fill_segment_thr(void *thread_data)
 #else
 static void *fill_segment_thr(void *thread_data)

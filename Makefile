@@ -44,6 +44,11 @@ ifeq ($(KERNEL_NAME), Darwin)
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
 	LIB_PATH := -Xlinker -rpath -Xlinker $(BUILD_PATH)
 endif
+ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
+	LIB_EXT := dll
+	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
+	LIB_PATH := -Wl,-rpath=$(BUILD_PATH)
+endif
 
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a

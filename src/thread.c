@@ -1,5 +1,5 @@
 #include "thread.h"
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <Windows.h>
 #endif
 
@@ -8,7 +8,7 @@ int argon2_thread_create(argon2_thread_handle_t *handle,
     if (NULL == handle || func == NULL) {
         return -1;
     }
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     *handle = _beginthreadex(NULL, 0, func, args, 0, NULL);
     return *handle != 0 ? 0 : -1;
 #else
@@ -17,7 +17,7 @@ int argon2_thread_create(argon2_thread_handle_t *handle,
 }
 
 int argon2_thread_join(argon2_thread_handle_t handle) {
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     if (WaitForSingleObject((HANDLE)handle, INFINITE) == WAIT_OBJECT_0) {
         return CloseHandle((HANDLE)handle) != 0 ? 0 : -1;
     }
@@ -28,7 +28,7 @@ int argon2_thread_join(argon2_thread_handle_t handle) {
 }
 
 void argon2_thread_exit(void) {
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     _endthreadex(0);
 #else
     pthread_exit(NULL);

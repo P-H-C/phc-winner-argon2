@@ -10,7 +10,7 @@
    argon2_thread_func_t,
         and the type of the thread handle---argon2_thread_handle_t.
 */
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <process.h>
 typedef unsigned(__stdcall *argon2_thread_func_t)(void *);
 typedef uintptr_t argon2_thread_handle_t;
