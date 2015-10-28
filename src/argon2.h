@@ -21,9 +21,6 @@
 extern "C" {
 #endif
 
-/* The KAT file name */
-const char *ARGON2_KAT_FILENAME;
-
 /*************************Argon2 input parameter
  * restrictions**************************************************/
 
