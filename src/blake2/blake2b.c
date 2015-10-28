@@ -323,7 +323,7 @@ int blake2b_long(void *pout, size_t outlen, const void *in, size_t inlen) {
     }
 
     /* Ensure little-endian byte order! */
-    store32(outlen_bytes, outlen);
+    store32(outlen_bytes, (uint32_t)outlen);
 
 #define TRY(statement)                                                         \
     do {                                                                       \
@@ -348,7 +348,7 @@ int blake2b_long(void *pout, size_t outlen, const void *in, size_t inlen) {
         TRY(blake2b_final(&blake_state, out_buffer, BLAKE2B_OUTBYTES));
         memcpy(out, out_buffer, BLAKE2B_OUTBYTES / 2);
         out += BLAKE2B_OUTBYTES / 2;
-        toproduce = outlen - BLAKE2B_OUTBYTES / 2;
+        toproduce = (uint32_t)outlen - BLAKE2B_OUTBYTES / 2;
 
         while (toproduce > BLAKE2B_OUTBYTES) {
             memcpy(in_buffer, out_buffer, BLAKE2B_OUTBYTES);

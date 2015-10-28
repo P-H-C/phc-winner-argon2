@@ -216,7 +216,7 @@ uint32_t index_alpha(const argon2_instance_t *instance,
 }
 
 #ifdef _MSC_VER
-static DWORD WINAPI fill_segment_thr(void *thread_data)
+static unsigned __stdcall fill_segment_thr(void *thread_data)
 #else
 static void *fill_segment_thr(void *thread_data)
 #endif
@@ -229,16 +229,23 @@ static void *fill_segment_thr(void *thread_data)
 
 void fill_memory_blocks(argon2_instance_t *instance) {
     uint32_t r, s;
+    argon2_thread_handle_t * thread = NULL;
+    argon2_thread_data * thr_data = NULL;
 
     if (instance == NULL || instance->lanes == 0) {
         return;
     }
 
     /* 1. Allocating space for threads */
-    argon2_thread_handle_t *thread =
-        calloc(instance->lanes, sizeof(argon2_thread_handle_t));
-    argon2_thread_data *thr_data =
-        calloc(instance->lanes, sizeof(argon2_thread_data));
+    thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
+    if (thread == NULL) {
+      goto cleanup;
+    }
+
+    thr_data = calloc(instance->lanes, sizeof(argon2_thread_data));
+    if (thr_data == NULL) {
+      goto cleanup;
+    }
 
     for (r = 0; r < instance->passes; ++r) {
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
@@ -263,13 +270,13 @@ void fill_memory_blocks(argon2_instance_t *instance) {
                 /* 2.2 Create thread */
                 position.pass = r;
                 position.lane = l;
-                position.slice = s;
+                position.slice = (uint8_t)s;
                 position.index = 0;
                 thr_data[l].instance_ptr =
                     instance; /* preparing the thread input */
                 memcpy(&(thr_data[l].pos), &position,
                        sizeof(argon2_position_t));
-                rc = argon2_thread_create(&thread[l], fill_segment_thr,
+                rc = argon2_thread_create(&thread[l], &fill_segment_thr,
                                           (void *)&thr_data[l]);
                 if (rc) {
                     printf("ERROR; return code from argon2_thread_create() is "
@@ -299,8 +306,13 @@ void fill_memory_blocks(argon2_instance_t *instance) {
 #endif
     }
 
-    free(thread);
-    free(thr_data);
+cleanup:
+    if (thread != NULL) {
+      free(thread);
+    }
+    if (thr_data != NULL) {
+      free(thr_data);
+    }
 }
 
 int validate_inputs(const argon2_context *context) {
@@ -327,7 +339,7 @@ int validate_inputs(const argon2_context *context) {
             return ARGON2_PWD_PTR_MISMATCH;
         }
     } else {
-        if (ARGON2_MIN_PWD_LENGTH != 0 &&
+        if (ARGON2_MIN_PWD_LENGTH != 0 && /* TODO: Is this condition right? */
             ARGON2_MIN_PWD_LENGTH > context->pwdlen) {
             return ARGON2_PWD_TOO_SHORT;
         }

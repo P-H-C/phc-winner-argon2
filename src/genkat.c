@@ -25,12 +25,12 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
             break;
         }
 
-        printf("Memory: %d KiB, Iterations: %d, Parallelism: %d lanes, Tag "
-               "length: %d bytes\n",
+        printf("Memory: %u KiB, Iterations: %u, Parallelism: %u lanes, Tag "
+               "length: %u bytes\n",
                context->m_cost, context->t_cost, context->lanes,
                context->outlen);
 
-        printf("Password[%d]: ", context->pwdlen);
+        printf("Password[%u]: ", context->pwdlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_PASSWORD) {
             printf("CLEARED\n");
@@ -42,7 +42,7 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
             printf("\n");
         }
 
-        printf("Salt[%d]: ", context->saltlen);
+        printf("Salt[%u]: ", context->saltlen);
 
         for (i = 0; i < context->saltlen; ++i) {
             printf("%2.2x ", ((unsigned char *)context->salt)[i]);
@@ -50,7 +50,7 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
 
         printf("\n");
 
-        printf("Secret[%d]: ", context->secretlen);
+        printf("Secret[%u]: ", context->secretlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_SECRET) {
             printf("CLEARED\n");
@@ -62,7 +62,7 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
             printf("\n");
         }
 
-        printf("Associated data[%d]: ", context->adlen);
+        printf("Associated data[%u]: ", context->adlen);
 
         for (i = 0; i < context->adlen; ++i) {
             printf("%2.2x ", ((unsigned char *)context->ad)[i]);
@@ -97,7 +97,7 @@ void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
 
     if (instance != NULL) {
         uint32_t i, j;
-        printf("\n After pass %d:\n", pass);
+        printf("\n After pass %u:\n", pass);
 
         for (i = 0; i < instance->memory_blocks; ++i) {
             uint32_t how_many_words =
@@ -106,7 +106,7 @@ void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
                     : ARGON2_WORDS_IN_BLOCK;
 
             for (j = 0; j < how_many_words; ++j)
-                printf("Block %.4d [%3d]: %016" PRIx64 "\n", i, j,
+                printf("Block %.4u [%3u]: %016" PRIx64 "\n", i, j,
                        instance->memory[i].v[j]);
         }
     }

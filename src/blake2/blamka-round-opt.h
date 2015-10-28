@@ -32,7 +32,7 @@
                                           _mm_slli_epi64((x), 64 - (-(c))))
 #else /* defined(__SSE2__) */
 #define _mm_roti_epi64(r, c)                                                   \
-    _mm_xor_si128(_mm_srli_epi64((r), -(c)), _mm_slli_epi64((r), 64 - (-c)))
+    _mm_xor_si128(_mm_srli_epi64((r), -(c)), _mm_slli_epi64((r), 64 - (-(c))))
 #endif
 #else
 #endif
@@ -61,7 +61,7 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
                                                                                \
         B0 = _mm_roti_epi64(B0, -24);                                          \
         B1 = _mm_roti_epi64(B1, -24);                                          \
-    } while (0)
+    } while ((void)0,0)
 
 #define G2(A0, B0, C0, D0, A1, B1, C1, D1)                                     \
     do {                                                                       \
@@ -82,7 +82,7 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
                                                                                \
         B0 = _mm_roti_epi64(B0, -63);                                          \
         B1 = _mm_roti_epi64(B1, -63);                                          \
-    } while (0)
+    } while ((void)0,0)
 
 #define DIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1)                            \
     do {                                                                       \
@@ -99,7 +99,7 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
         t1 = _mm_alignr_epi8(D0, D1, 8);                                       \
         D0 = t1;                                                               \
         D1 = t0;                                                               \
-    } while (0)
+    } while ((void)0,0)
 
 #define UNDIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1)                          \
     do {                                                                       \
@@ -116,7 +116,7 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
         t1 = _mm_alignr_epi8(D1, D0, 8);                                       \
         D0 = t1;                                                               \
         D1 = t0;                                                               \
-    } while (0)
+    } while ((void)0,0)
 
 #define BLAKE2_ROUND(A0, A1, B0, B1, C0, C1, D0, D1)                           \
     do {                                                                       \
@@ -129,6 +129,6 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
         G2(A0, B0, C0, D0, A1, B1, C1, D1);                                    \
                                                                                \
         UNDIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1);                         \
-    } while (0)
+    } while ((void)0,0)
 
 #endif

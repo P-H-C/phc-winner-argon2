@@ -99,12 +99,11 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
 void generate_addresses(const argon2_instance_t *instance,
                         const argon2_position_t *position,
                         uint64_t *pseudo_rands) {
-    block zero_block, address_block, input_block;
+    block address_block, input_block;
     uint32_t i;
 
-    init_block_value(&zero_block, 0);
-    copy_block(&address_block, &zero_block);
-    copy_block(&input_block, &zero_block);
+    init_block_value(&address_block, 0);
+    init_block_value(&input_block, 0);
 
     if (instance != NULL && position != NULL) {
         input_block.v[0] = position->pass;
@@ -176,8 +175,7 @@ void fill_segment(const argon2_instance_t *instance,
         prev_offset = curr_offset - 1;
     }
 
-    memcpy(state, (uint8_t *)((instance->memory + prev_offset)->v),
-           ARGON2_BLOCK_SIZE);
+    memcpy(state, ((instance->memory + prev_offset)->v), ARGON2_BLOCK_SIZE);
 
     for (i = starting_index; i < instance->segment_length;
          ++i, ++curr_offset, ++prev_offset) {

@@ -88,7 +88,11 @@ static const char *Argon2_ErrorMessage[] = {
 {ARGON2_INCORRECT_TYPE, */ "There is no such version of Argon2",
     /*},
 
-{ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch" /*}*/
+{ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch", /*},
+
+{ARGON2_THREADS_TOO_FEW, */ "Not enough threads", /*},
+{ARGON2_THREADS_TOO_MANY, */ "Too many threads", /*},
+{ARGON2_MISSING_ARGS, */ "Missing arguments", /*},*/
 };
 
 int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
@@ -96,12 +100,27 @@ int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
                  unsigned int m_cost) {
 
     argon2_context context;
+
+    /* Detect and reject overflowing sizes */
+    /* TODO: This should probably be fixed in the function signature */
+    if (inlen > UINT32_MAX) {
+      return ARGON2_PWD_TOO_LONG;
+    }
+
+    if (outlen > UINT32_MAX) {
+      return ARGON2_OUTPUT_TOO_LONG;
+    }
+
+    if (saltlen > UINT32_MAX) {
+      return ARGON2_SALT_TOO_LONG;
+    }
+
     context.out = (uint8_t *)out;
-    context.outlen = outlen;
+    context.outlen = (uint32_t)outlen;
     context.pwd = (uint8_t *)in;
-    context.pwdlen = inlen;
+    context.pwdlen = (uint32_t)inlen;
     context.salt = (uint8_t *)salt;
-    context.saltlen = saltlen;
+    context.saltlen = (uint32_t)saltlen;
     context.secret = NULL;
     context.secretlen = 0;
     context.ad = NULL;
@@ -120,14 +139,28 @@ int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
 int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
                  const void *salt, size_t saltlen, unsigned int t_cost,
                  unsigned int m_cost) {
-
     argon2_context context;
+
+    /* Detect and reject overflowing sizes */
+    /* TODO: This should probably be fixed in the function signature */
+    if (inlen > UINT32_MAX) {
+      return ARGON2_PWD_TOO_LONG;
+    }
+
+    if (outlen > UINT32_MAX) {
+      return ARGON2_OUTPUT_TOO_LONG;
+    }
+
+    if (saltlen > UINT32_MAX) {
+      return ARGON2_SALT_TOO_LONG;
+    }
+
     context.out = (uint8_t *)out;
-    context.outlen = outlen;
+    context.outlen = (uint32_t)outlen;
     context.pwd = (uint8_t *)in;
-    context.pwdlen = inlen;
+    context.pwdlen = (uint32_t)inlen;
     context.salt = (uint8_t *)salt;
-    context.saltlen = saltlen;
+    context.saltlen = (uint32_t)saltlen;
     context.secret = NULL;
     context.secretlen = 0;
     context.ad = NULL;
@@ -163,6 +196,10 @@ int verify_d(argon2_context *context, const char *hash) {
 }
 
 const char *error_message(int error_code) {
+    enum {
+      /* Make sure---at compile time---that the enum size matches the array size */
+      ERROR_STRING_CHECK = 1 / !!( (sizeof(Argon2_ErrorMessage) / sizeof(Argon2_ErrorMessage[0])) == ARGON2_ERROR_CODES_LENGTH)
+    };
     if (error_code < ARGON2_ERROR_CODES_LENGTH) {
         return Argon2_ErrorMessage[(argon2_error_codes)error_code];
     }
