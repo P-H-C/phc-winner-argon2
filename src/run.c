@@ -33,15 +33,13 @@
 static void usage(const char *cmd) {
     printf("Usage:  %s pwd salt [-y version] [-t iterations] [-m memory] [-p parallelism]\n", cmd);
 
-    printf("Options:\n");
-    printf("\tpwd\t\tThe password to hash (REQUIRED)\n");
-    printf("\tsalt\t\tThe salt to use, at most 16 characters (REQUIRED)\n");
-    printf("\t-y version\tArgon2 version, d for Argon2d, i for Argon2i (default)\n");
-    printf("\t-t iterations\tNumber of iterations, default %d\n",
-           T_COST_DEF);
-    printf("\t-m memory\tMemory usage of 2^memory KiB, default 2^%d KiB\n",
-           LOG_M_COST_DEF);
-    printf("\t-p N\t\tParallelism, default %d\n", THREADS_DEF);
+    printf("Parameters:\n");
+    printf("\tpwd\t\tThe password to hash\n");
+    printf("\tsalt\t\tThe salt to use, at most 16 characters\n");
+    printf("\t-d\t\tUse Argon2d instead of Argon2i (which is the default)\n");
+    printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n", T_COST_DEF);
+    printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n", LOG_M_COST_DEF);
+    printf("\t-p N\t\tSets parallelism to N threads (default %d)\n", THREADS_DEF);
 }
 
 static void fatal(const char *error) {
@@ -200,17 +198,8 @@ int main(int argc, char *argv[]) {
             } else {
                 fatal("missing -p argument");
             }
-        } else if (!strcmp(a, "-y")) {
-            if (i < argc - 1) {
-                i++;
-                if (strcmp(argv[i], "i") != 0 && strcmp(argv[i], "d") != 0) {
-                    fatal("bad input to -y");
-                }
-                type = argv[i];
-                continue;
-            } else {
-                fatal("missing -y argument");
-            }
+        } else if (!strcmp(a, "-d")) {
+            type = "d";
         } else {
             fatal("unknown argument");
         }
