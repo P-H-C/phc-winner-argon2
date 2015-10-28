@@ -1,6 +1,6 @@
 #!/bin/sh
 
-make genkat
+make genkat > /dev/null
 if [ $? -ne 0 ]
 then
   exit $?
@@ -22,7 +22,7 @@ else printf "ERROR"
 fi
 printf "\n"
 
-make genkat OPT=TRUE
+make genkat OPT=TRUE > /dev/null
 if [ $? -ne 0 ]
 then
   exit $?
