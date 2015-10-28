@@ -34,12 +34,12 @@ anyone has already reported it).
 
 `make` builds the executable `argon2`, the static library `libargon2.a`,
 and the shared library `libargon2.so` (or `libargon2.dylib` on OSX).
-Make sure to run `test.sh` to verify that your build produces valid test
-vectors.
+Make sure to run `make test` to verify that your build produces valid
+results.
 
 `argon2` is a command-line utility to test specific Argon2 instances
-on your system and run benchmarks. To show instructions, run `./argon2`
-without arguments.
+on your system and run benchmarks. To show usage instructions, run
+`./argon2` without arguments.
 
 `libargon2` provides an API to both low-level and high-level functions
 for using Argon2.
@@ -48,11 +48,11 @@ The example program below hashes the string "password" with Argon2i
 using the high-level API and then using the low-level API. While the
 high-level API only takes input/output buffers and the two cost
 parameters, the low-level API additionally takes parallelism parameters
-and several others, as defined in [`argon2.h`](src/argon2.h).
+and several others, as defined in [`src/argon2.h`](src/argon2.h).
 
 Here `t_cost` is set to 2 iterations, `m_cost` is set to 2<sup>16</sup>
-kibibytes (that is, 64 mebibytes), and there's no parallelism
-(single-lane, single-thread).
+kibibytes (64 mebibytes), and there's no parallelism (single-lane,
+single-thread).
 
 Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
 below is named `test.c` and placed in the project's root directory.
@@ -107,20 +107,25 @@ To use Argon2d instead of Argon2i call `hash_argon2d` instead of
 `hash_argon2i` using the high-level API, and `argon2d` instead of
 `argon2i` using the low-level API.
 
-*Note: in this example the salt is set to the all-`0x00` string, but in
-your application you should use a random salt.*
+*Note: in this example the salt is set to the all-`0x00` string for the
+sake of simplicity, but in your application you should use a random salt.*
+
 
 ## Intellectual property
 
-Argon2 code is copyright (c) 2015 Daniel Dinu and Dmitry Khovratovich,
-with modifications copyright (c) 2015 Jean-Philippe Aumasson and Samuel
-Neves. The Argon2 code is under [CC0
+Except for the components listed below, the Argon2 code in this
+repository is copyright (c) 2015 Daniel Dinu, Dmitry Khovratovich (main
+authors), Jean-Philippe Aumasson and Samuel Neves, and under
+[CC0 license](https://creativecommons.org/about/cc0).
+
+The BLAKE2 code in [`src/blake2/`](src/blake2) is copyright (c) Samuel
+Neves, 2013-2015, and under [CC0
 license](https://creativecommons.org/about/cc0).
 
-BLAKE2 code is copyright (c) Samuel Neves, 2013-2015, and under [CC0
-license](https://creativecommons.org/about/cc0).
+[`encoding.h`](src/encoding.h) is copyright (c) 2015 Thomas Pornin, and
+under [CC0 license](https://creativecommons.org/about/cc0).
 
-[`blake2/brg-endian.h`](src/blake2/brg-endian.h) is copyright (c) Brian
-Gladman, 1998-2008, and under permissive license defined in the file
-header.
+[`src/blake2/brg-endian.h`](src/blake2/brg-endian.h) is copyright (c)
+1998-2008 Brian Gladman, and under permissive license defined in the
+file header.
 
