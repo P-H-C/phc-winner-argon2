@@ -84,12 +84,13 @@ below is named `test.c` and placed in the project's root directory.
 #include "argon2.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define OUTLEN 32
 #define SALTLEN 16
 #define PWD "password"
 
-int main()
+int main(void)
 {
     uint8_t out1[OUTLEN];
     uint8_t out2[OUTLEN];
@@ -105,15 +106,24 @@ int main()
 
     // high-level API
     hash_argon2i( out1, OUTLEN, in, inlen, salt, SALTLEN, t_cost, m_cost );
+    free(in);
 
     // low-level API
     uint32_t lanes = 1;             // lanes 1 by default
     uint32_t threads = 1;           // threads 1 by default
     in = (uint8_t *)strdup(PWD);    // was erased by previous call
-    Argon2_Context context = {out2, OUTLEN, in, inlen, salt, SALTLEN, \
-        NULL, 0, NULL, 0, t_cost, m_cost, lanes, threads, NULL, NULL, \
-        true, true, true, false };
+    argon2_context context = {
+        out2, OUTLEN, 
+        in, inlen, 
+        salt, SALTLEN,
+        NULL, 0, /* secret data */
+        NULL, 0, /* associated data */
+        t_cost, m_cost, lanes, threads, 
+        NULL, NULL, /* custom memory allocation / deallocation functions */
+        ARGON2_DEFAULT_FLAGS /* by default the password is zeroed on exit */
+    };
     argon2i( &context );
+    free(in);
 
     for( int i=0; i<OUTLEN; ++i ) printf( "%02x", out1[i] ); printf( "\n" );
     if (memcmp(out1, out2, OUTLEN)) {
