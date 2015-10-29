@@ -158,8 +158,4 @@ The BLAKE2 code in [`src/blake2/`](src/blake2) is copyright (c) Samuel
 Neves, 2013-2015, and under [CC0
 license](https://creativecommons.org/about/cc0).
 
-[`src/blake2/brg-endian.h`](src/blake2/brg-endian.h) is copyright (c)
-1998-2010 Brian Gladman, and under [BSD 3-Clause
-license](src/blake2/brg-endian.h#L1-L27).
-
 All licenses are therefore GPL-compatible.
