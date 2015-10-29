@@ -15,20 +15,16 @@ highest resistance against GPU cracking attacks.
 
 Both Argon2i and Argon2d are parametrized by
 
-* A **memory cost** (argument `m_cost`), given in kibibytes, which defines the memory usage of the function
-* A **time cost** (argument `t_cost`), which defines the amount of computation
-  realized and therefore the execution time
-* The degree of parallelism, through the arguments
-    - `lanes`, the number of parallel series of operations (possible
-      parallelism)
-    - `threads`, the number of threads allocated to the parallel
-      execution (actual parallelism)
+* A **memory cost**, which defines the memory usage of the function
+* A **time cost**, which defines the amount of computation realized and
+  therefore the execution time
+* The degree of **parallelism**, which defines the number of parallel
+  threads
 
-You'll find detailed specifications and design rationale in the [Argon2
-document](argon2-specs.pdf).
+The [Argon2 document](argon2-specs.pdf) gives detailed specs and design
+rationale.
 
-Please report bugs as issues on this repository (after searching if
-anyone has already reported it).
+Please report bugs as issues on this repository.
 
 ## Usage
 
@@ -37,9 +33,35 @@ and the shared library `libargon2.so` (or `libargon2.dylib` on OSX).
 Make sure to run `make test` to verify that your build produces valid
 results.
 
+### Command-line utility
+
 `argon2` is a command-line utility to test specific Argon2 instances
 on your system and run benchmarks. To show usage instructions, run
-`./argon2` without arguments.
+`./argon2` without arguments as
+```
+$ ./argon2
+Usage:  ./argon2 pwd salt [-y version] [-t iterations] [-m memory] [-p parallelism]
+Parameters:
+        pwd             The password to hash
+        salt            The salt to use, at most 16 characters
+        -d              Use Argon2d instead of Argon2i (which is the default)
+        -t N            Sets the number of iterations to N (default = 3)
+        -m N            Sets the memory usage of 2^N KiB (default 12)
+        -p N            Sets parallelism to N threads (default 4)
+```
+For example, to hash "password" using "somesalt" as a salt and doing 2
+iterations, consuming 64 MiB, and using four parallel threads:
+```
+$ ./argon2 password somesalt -t 2 -m 16 -p 4
+Type:           Argon2i
+Memory:         65536 KiB
+Iterations:     2
+Parallelism:    4
+$argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
+0.274 seconds
+```
+
+### Library
 
 `libargon2` provides an API to both low-level and high-level functions
 for using Argon2.
@@ -50,9 +72,10 @@ high-level API only takes input/output buffers and the two cost
 parameters, the low-level API additionally takes parallelism parameters
 and several others, as defined in [`src/argon2.h`](src/argon2.h).
 
-Here `t_cost` is set to 2 iterations, `m_cost` is set to 2<sup>16</sup>
-kibibytes (64 mebibytes), and there's no parallelism (single-lane,
-single-thread).
+
+Here the memory cost `m_cost` is set to 2<sup>16</sup>
+kibibytes (64 mebibytes), the time cost `t_cost` is set to 2 iterations, and
+there's no parallelism (single-thread).
 
 Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
 below is named `test.c` and placed in the project's root directory.
@@ -86,7 +109,7 @@ int main()
     // low-level API
     uint32_t lanes = 1;             // lanes 1 by default
     uint32_t threads = 1;           // threads 1 by default
-    in = (uint8_t *)strdup(PWD);    // cos' erased by previous call
+    in = (uint8_t *)strdup(PWD);    // was erased by previous call
     Argon2_Context context = {out2, OUTLEN, in, inlen, salt, SALTLEN, \
         NULL, 0, NULL, 0, t_cost, m_cost, lanes, threads, NULL, NULL, \
         true, true, true, false };
