@@ -26,7 +26,8 @@
 #define LOG_M_COST_DEF 12 /* 2^12 = 4 MiB */
 #define LANES_DEF 4
 #define THREADS_DEF 4
-#define SALTLEN_DEF 16
+#define OUT_LEN 32
+#define SALT_LEN 16
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -63,10 +64,6 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 const char *type) {
     clock_t start_time, stop_time;
-
-    /*Fixed parameters*/
-    const unsigned out_length = 32;
-    const unsigned salt_length = SALTLEN_DEF;
     unsigned pwd_length;
     argon2_context context;
     char encoded[300];
@@ -87,11 +84,11 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     UNUSED_PARAMETER(threads);
 
     context.out = out;
-    context.outlen = out_length;
+    context.outlen = OUT_LEN;
     context.pwd = (uint8_t *)pwd;
     context.pwdlen = pwd_length;
     context.salt = salt;
-    context.saltlen = salt_length;
+    context.saltlen = SALT_LEN;
     context.secret = NULL;
     context.secretlen = 0;
     context.ad = NULL;
@@ -107,11 +104,11 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     if (!strcmp(type, "d")) {
         int result = argon2d(&context);
         if (result != ARGON2_OK)
-            printf("%s\n", error_message(result));
+            fatal(error_message(result));
     } else if (!strcmp(type, "i")) {
         int result = argon2i(&context);
         if (result != ARGON2_OK)
-            printf("%s\n", error_message(result));
+            fatal(error_message(result));
     } else {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("wrong Argon2 type");
@@ -119,22 +116,20 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     stop_time = clock();
 
-    /* show string encoding */
     encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
 
-    /* show running time/cycles */
     printf("%2.3f seconds\n", ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
 }
 
 int main(int argc, char *argv[]) {
-    unsigned char out[32];
+    unsigned char out[OUT_LEN];
     uint32_t m_cost = 1 << LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
-    uint8_t salt[SALTLEN_DEF];
+    uint8_t salt[SALT_LEN];
     const char *type = "i";
     int i;
 
@@ -145,10 +140,10 @@ int main(int argc, char *argv[]) {
 
     /* get password and salt from command line */
     pwd = argv[1];
-    if (strlen(argv[2]) > SALTLEN_DEF) {
+    if (strlen(argv[2]) > SALT_LEN) {
         fatal("salt too long");
     }
-    memset(salt, 0x00, SALTLEN_DEF); /* pad with null bytes */
+    memset(salt, 0x00, SALT_LEN); /* pad with null bytes */
     memcpy(salt, argv[2], strlen(argv[2]));
 
     /* parse options */
