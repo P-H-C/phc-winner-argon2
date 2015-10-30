@@ -35,7 +35,7 @@ results.
 ### Command-line utility
 
 `argon2` is a command-line utility to test specific Argon2 instances
-on your system and run benchmarks. To show usage instructions, run
+on your system. To show usage instructions, run
 `./argon2` without arguments as
 ```
 $ ./argon2
@@ -141,6 +141,38 @@ To use Argon2d instead of Argon2i call `hash_argon2d` instead of
 
 *Note: in this example the salt is set to the all-`0x00` string for the
 sake of simplicity, but in your application you should use a random salt.*
+
+
+### Benchmarks
+
+`make bench` creates the exectuble `bench`, which measures the execution
+time of various Argon2 instances:
+
+```
+$ ./bench
+Argon2d 1 iterations  1 MiB 1 threads:  5.91 cpb 5.91 Mcycles
+Argon2i 1 iterations  1 MiB 1 threads:  4.64 cpb 4.64 Mcycles
+0.0041 seconds
+
+Argon2d 1 iterations  1 MiB 2 threads:  2.76 cpb 2.76 Mcycles
+Argon2i 1 iterations  1 MiB 2 threads:  2.87 cpb 2.87 Mcycles
+0.0038 seconds
+
+Argon2d 1 iterations  1 MiB 4 threads:  3.25 cpb 3.25 Mcycles
+Argon2i 1 iterations  1 MiB 4 threads:  3.57 cpb 3.57 Mcycles
+0.0048 seconds
+
+(...)
+
+Argon2d 1 iterations  4096 MiB 2 threads:  2.15 cpb 8788.08 Mcycles
+Argon2i 1 iterations  4096 MiB 2 threads:  2.15 cpb 8821.59 Mcycles
+13.0112 seconds
+
+Argon2d 1 iterations  4096 MiB 4 threads:  1.79 cpb 7343.72 Mcycles
+Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
+19.3974 seconds
+```
+
 
 
 ## Intellectual property
