@@ -52,9 +52,7 @@
 #endif
 
 /***************Instance and Position constructors**********/
-void init_block_value(block *b, uint8_t in) { 
-    memset(b->v, in, sizeof(b->v)); 
-}
+void init_block_value(block *b, uint8_t in) { memset(b->v, in, sizeof(b->v)); }
 
 void copy_block(block *dst, const block *src) {
     memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_WORDS_IN_BLOCK);
@@ -67,17 +65,17 @@ void xor_block(block *dst, const block *src) {
     }
 }
 
-static void load_block(block * dst, const void * input) {
+static void load_block(block *dst, const void *input) {
     unsigned i;
-    for(i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
         dst->v[i] = load64((const uint8_t *)input + i * sizeof(dst->v[i]));
     }
 }
 
-static void store_block(void * output, const block * src) {
+static void store_block(void *output, const block *src) {
     unsigned i;
-    for(i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
-        store64((uint8_t *)output + i * sizeof(src->v[i]),  src->v[i]);
+    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+        store64((uint8_t *)output + i * sizeof(src->v[i]), src->v[i]);
     }
 }
 
@@ -143,9 +141,12 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
         {
             uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
             store_block(blockhash_bytes, &blockhash);
-            blake2b_long(context->out, context->outlen, blockhash_bytes, ARGON2_BLOCK_SIZE);
-            secure_wipe_memory(blockhash.v, ARGON2_BLOCK_SIZE); /* clear blockhash */
-            secure_wipe_memory(blockhash_bytes, ARGON2_BLOCK_SIZE); /* clear blockhash_bytes */
+            blake2b_long(context->out, context->outlen, blockhash_bytes,
+                         ARGON2_BLOCK_SIZE);
+            secure_wipe_memory(blockhash.v,
+                               ARGON2_BLOCK_SIZE); /* clear blockhash */
+            secure_wipe_memory(blockhash_bytes,
+                               ARGON2_BLOCK_SIZE); /* clear blockhash_bytes */
         }
 
 #ifdef GENKAT
@@ -249,8 +250,8 @@ static void *fill_segment_thr(void *thread_data)
 
 void fill_memory_blocks(argon2_instance_t *instance) {
     uint32_t r, s;
-    argon2_thread_handle_t * thread = NULL;
-    argon2_thread_data * thr_data = NULL;
+    argon2_thread_handle_t *thread = NULL;
+    argon2_thread_data *thr_data = NULL;
 
     if (instance == NULL || instance->lanes == 0) {
         return;
@@ -259,12 +260,12 @@ void fill_memory_blocks(argon2_instance_t *instance) {
     /* 1. Allocating space for threads */
     thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
     if (thread == NULL) {
-      goto cleanup;
+        goto cleanup;
     }
 
     thr_data = calloc(instance->lanes, sizeof(argon2_thread_data));
     if (thr_data == NULL) {
-      goto cleanup;
+        goto cleanup;
     }
 
     for (r = 0; r < instance->passes; ++r) {
@@ -328,10 +329,10 @@ void fill_memory_blocks(argon2_instance_t *instance) {
 
 cleanup:
     if (thread != NULL) {
-      free(thread);
+        free(thread);
     }
     if (thr_data != NULL) {
-      free(thr_data);
+        free(thr_data);
     }
 }
 
@@ -467,15 +468,19 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
        G(H0||i||1) */
     for (l = 0; l < instance->lanes; ++l) {
         uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
-        
+
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
-        blake2b_long(blockhash_bytes, ARGON2_BLOCK_SIZE, blockhash, ARGON2_PREHASH_SEED_LENGTH);
-        load_block(&instance->memory[l * instance->lane_length + 0], blockhash_bytes);
+        blake2b_long(blockhash_bytes, ARGON2_BLOCK_SIZE, blockhash,
+                     ARGON2_PREHASH_SEED_LENGTH);
+        load_block(&instance->memory[l * instance->lane_length + 0],
+                   blockhash_bytes);
 
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 1);
-        blake2b_long(blockhash_bytes, ARGON2_BLOCK_SIZE, blockhash, ARGON2_PREHASH_SEED_LENGTH);
-        load_block(&instance->memory[l * instance->lane_length + 1], blockhash_bytes);
+        blake2b_long(blockhash_bytes, ARGON2_BLOCK_SIZE, blockhash,
+                     ARGON2_PREHASH_SEED_LENGTH);
+        load_block(&instance->memory[l * instance->lane_length + 1],
+                   blockhash_bytes);
     }
 }
 

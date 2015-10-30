@@ -83,7 +83,7 @@ clean:
 
 dist:
 		cd ..; \
-		tar cfvJ $(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.txz $(DIST)/*
+		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
 test:
 		@sh kats/test.sh

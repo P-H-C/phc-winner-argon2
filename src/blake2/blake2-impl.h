@@ -13,15 +13,17 @@
 #endif
 
 /* Argon2 Team - Begin Code */
-/* 
+/*
    Not an exhaustive list, but should cover the majority of modern platforms
    Additionally, the code will always be correct---this is only a performance
    tweak.
 */
-#if (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)) || \
+#if (defined(__BYTE_ORDER__) &&                                                \
+     (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)) ||                           \
     defined(__LITTLE_ENDIAN__) || defined(__ARMEL__) || defined(__MIPSEL__) || \
-    defined(__AARCH64EL__) || defined(__amd64__) || defined(__i386__) || \
-    defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_ARM)
+    defined(__AARCH64EL__) || defined(__amd64__) || defined(__i386__) ||       \
+    defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) ||                \
+    defined(_M_ARM)
 #define NATIVE_LITTLE_ENDIAN
 #endif
 /* Argon2 Team - End Code */

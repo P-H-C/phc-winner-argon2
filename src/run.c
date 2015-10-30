@@ -32,15 +32,20 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s pwd salt [-y version] [-t iterations] [-m memory] [-p parallelism]\n", cmd);
+    printf("Usage:  %s pwd salt [-y version] [-t iterations] [-m memory] [-p "
+           "parallelism]\n",
+           cmd);
 
     printf("Parameters:\n");
     printf("\tpwd\t\tThe password to hash\n");
     printf("\tsalt\t\tThe salt to use, at most 16 characters\n");
     printf("\t-d\t\tUse Argon2d instead of Argon2i (which is the default)\n");
-    printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n", T_COST_DEF);
-    printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n", LOG_M_COST_DEF);
-    printf("\t-p N\t\tSets parallelism to N threads (default %d)\n", THREADS_DEF);
+    printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n",
+           T_COST_DEF);
+    printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
+           LOG_M_COST_DEF);
+    printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
+           THREADS_DEF);
 }
 
 static void fatal(const char *error) {
@@ -119,7 +124,8 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
 
-    printf("%2.3f seconds\n", ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
+    printf("%2.3f seconds\n",
+           ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
 }
 
 int main(int argc, char *argv[]) {

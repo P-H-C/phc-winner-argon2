@@ -6,7 +6,7 @@
 
 /*designed by the Lyra PHC team */
 static BLAKE2_INLINE uint64_t fBlaMka(uint64_t x, uint64_t y) {
-    const uint64_t m  = UINT64_C(0xFFFFFFFF);
+    const uint64_t m = UINT64_C(0xFFFFFFFF);
     const uint64_t xy = (x & m) * (y & m);
     return x + y + 2 * xy;
 }
@@ -21,7 +21,7 @@ static BLAKE2_INLINE uint64_t fBlaMka(uint64_t x, uint64_t y) {
         d = rotr64(d ^ a, 16);                                                 \
         c = fBlaMka(c, d);                                                     \
         b = rotr64(b ^ c, 63);                                                 \
-    } while ((void)0,0)
+    } while ((void)0, 0)
 
 #define BLAKE2_ROUND_NOMSG(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11,   \
                            v12, v13, v14, v15)                                 \
@@ -34,6 +34,6 @@ static BLAKE2_INLINE uint64_t fBlaMka(uint64_t x, uint64_t y) {
         G(v1, v6, v11, v12);                                                   \
         G(v2, v7, v8, v13);                                                    \
         G(v3, v4, v9, v14);                                                    \
-    } while ((void)0,0)
+    } while ((void)0, 0)
 
 #endif
