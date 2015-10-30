@@ -206,8 +206,8 @@ int main(int argc, char *argv[]) {
         }
     }
     printf("Type:\t\tArgon2%c\n", type[0]);
-    printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
     printf("Iterations:\t%" PRIu32 " \n", t_cost);
+    printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
     printf("Parallelism:\t%" PRIu32 " \n", lanes);
     run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
 

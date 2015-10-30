@@ -13,13 +13,12 @@ There are two main versions of Argon2, **Argon2i** and **Argon2d**. Argon2i
 is the safest against side-channel attacks, while Argon2d provides the
 highest resistance against GPU cracking attacks.
 
-Both Argon2i and Argon2d are parametrized by
+Argon2i and Argon2d are parametrized by
 
-* A **memory cost**, which defines the memory usage of the function
-* A **time cost**, which defines the amount of computation realized and
-  therefore the execution time
-* The degree of **parallelism**, which defines the number of parallel
-  threads
+* A **time** cost, which defines the amount of computation realized and
+  therefore the execution time, given in number of iterations
+* A **memory** cost, which defines the memory usage, given in kibibytes 
+* A **parallelism** degree, which defines the number of parallel threads
 
 The [Argon2 document](argon2-specs.pdf) gives detailed specs and design
 rationale.
@@ -54,8 +53,8 @@ iterations, consuming 64 MiB, and using four parallel threads:
 ```
 $ ./argon2 password somesalt -t 2 -m 16 -p 4
 Type:           Argon2i
-Memory:         65536 KiB
 Iterations:     2
+Memory:         65536 KiB
 Parallelism:    4
 $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
 0.274 seconds
@@ -73,9 +72,9 @@ parameters, the low-level API additionally takes parallelism parameters
 and several others, as defined in [`src/argon2.h`](src/argon2.h).
 
 
-Here the memory cost `m_cost` is set to 2<sup>16</sup>
-kibibytes (64 mebibytes), the time cost `t_cost` is set to 2 iterations, and
-there's no parallelism (single-thread).
+Here the time cost `t_cost` is set to 2 iterations, the
+memory cost `m_cost` is set to 2<sup>16</sup> kibibytes (64 mebibytes),
+and parallelism is set to 1 (single-thread).
 
 Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
 below is named `test.c` and placed in the project's root directory.
