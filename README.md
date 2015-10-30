@@ -171,6 +171,8 @@ Argon2i 1 iterations  4096 MiB 2 threads:  2.15 cpb 8821.59 Mcycles
 Argon2d 1 iterations  4096 MiB 4 threads:  1.79 cpb 7343.72 Mcycles
 Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 19.3974 seconds
+
+(...)
 ```
 
 
