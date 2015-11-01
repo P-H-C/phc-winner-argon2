@@ -25,7 +25,7 @@
 #include "blake2/blamka-round-opt.h"
 
 void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
-    __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
+    ALIGN(16) __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
     uint32_t i;
 
     for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
@@ -137,7 +137,7 @@ void fill_segment(const argon2_instance_t *instance,
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
-    __m128i state[64];
+    ALIGN(16) __m128i state[64];
     int data_independent_addressing = (instance->type == Argon2_i);
 
     /* Pseudo-random values that determine the reference block position */
