@@ -24,7 +24,7 @@ CFLAGS = -std=c89 -pthread -O3 -Wall -g
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
-	CFLAGS +=-march=native 
+	CFLAGS += -march=native -mavx
 	SRC += src/opt.c
 else
 	SRC += src/ref.c
