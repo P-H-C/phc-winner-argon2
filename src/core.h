@@ -55,7 +55,7 @@ typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
  * Memory blocks can be copied, XORed. Internal words can be accessed by [] (no
  * bounds checking).
  */
-typedef struct _block { uint64_t v[ARGON2_WORDS_IN_BLOCK]; } ALIGN(16) block;
+typedef struct _block { uint64_t v[ARGON2_WORDS_IN_BLOCK]; } block;
 
 /*****************Functions that work with the block******************/
 

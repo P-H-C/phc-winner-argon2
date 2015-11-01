@@ -24,12 +24,12 @@
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"
 
-void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
-    ALIGN(16) __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
+void fill_block(__m128i * state, const uint8_t *ref_block, uint8_t *next_block) {
+    __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
     uint32_t i;
 
     for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
-        block_XY[i] = _mm_loadu_si128((__m128i *)ref_block);
+        block_XY[i] = _mm_loadu_si128((__m128i const *)ref_block);
         ref_block += 16;
     }
 
@@ -115,13 +115,14 @@ void generate_addresses(const argon2_instance_t *instance,
 
         for (i = 0; i < instance->segment_length; ++i) {
             if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
-                block zero_block, zero2_block;
+                __m128i zero_block[ARGON2_QWORDS_IN_BLOCK];
+                __m128i zero2_block[ARGON2_QWORDS_IN_BLOCK];
+                memset(zero_block, 0, sizeof(zero_block));
+                memset(zero2_block, 0, sizeof(zero2_block));
                 input_block.v[6]++;
-                init_block_value(&zero_block, 0);
-                init_block_value(&zero2_block, 0);
-                fill_block((__m128i *)&zero_block.v, (uint8_t *)&input_block.v,
+                fill_block(zero_block, (uint8_t *)&input_block.v,
                            (uint8_t *)&address_block.v);
-                fill_block((__m128i *)&zero2_block.v,
+                fill_block(zero2_block,
                            (uint8_t *)&address_block.v,
                            (uint8_t *)&address_block.v);
             }
@@ -137,7 +138,7 @@ void fill_segment(const argon2_instance_t *instance,
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
-    ALIGN(16) __m128i state[64];
+    __m128i state[64];
     int data_independent_addressing = (instance->type == Argon2_i);
 
     /* Pseudo-random values that determine the reference block position */
