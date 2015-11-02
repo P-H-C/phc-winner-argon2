@@ -1,5 +1,3 @@
-**WORK IN PROGRESS, DO NOT USE**
-
 # Argon2
 
 This is the reference C implementation of Argon2, the password-hashing
