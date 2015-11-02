@@ -105,7 +105,7 @@ void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
 #elif defined memset_s
     memset_s(v, n);
 #elif defined(__OpenBSD__)
-    explicit_bzero(memory, size);
+    explicit_bzero(v, n);
 #else
     static void *(*const volatile memset_sec)(void *, int, size_t) = &memset;
     memset_sec(v, 0, n);
