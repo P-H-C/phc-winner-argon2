@@ -466,8 +466,9 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
     uint32_t l;
     /* Make the first and second block in each lane as G(H0||i||0) or
        G(H0||i||1) */
+     uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
     for (l = 0; l < instance->lanes; ++l) {
-        uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
+       
 
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
@@ -482,6 +483,7 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
         load_block(&instance->memory[l * instance->lane_length + 1],
                    blockhash_bytes);
     }
+    secure_wipe_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);
 }
 
 void initial_hash(uint8_t *blockhash, argon2_context *context,
