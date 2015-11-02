@@ -121,17 +121,16 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     stop_time = clock();
 
     /* add back when proper decoding */
-    /* 
+    /*
     char encoded[300];
-    encode_string(encoded, sizeof encoded, &context); 
+    encode_string(encoded, sizeof encoded, &context);
     printf("%s\n", encoded);
     */
     printf("Hash:\t\t");
-    for(i=0; i<context.outlen; ++i) {
+    for (i = 0; i < context.outlen; ++i) {
         printf("%02x", context.out[i]);
     }
     printf("\n");
-
 
     printf("%2.3f seconds\n",
            ((double)stop_time - start_time) / (CLOCKS_PER_SEC));

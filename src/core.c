@@ -83,11 +83,13 @@ static void store_block(void *output, const block *src) {
 int allocate_memory(block **memory, uint32_t m_cost) {
     if (memory != NULL) {
         size_t memory_size = sizeof(block) * m_cost;
-        if (m_cost != 0 && memory_size / m_cost != sizeof(block)) {/*1. Check for multiplication overflow*/
+        if (m_cost != 0 &&
+            memory_size / m_cost !=
+                sizeof(block)) { /*1. Check for multiplication overflow*/
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
 
-        *memory = (block *)malloc(memory_size);/*2. Try to allocate*/
+        *memory = (block *)malloc(memory_size); /*2. Try to allocate*/
 
         if (!*memory) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
@@ -265,8 +267,8 @@ void fill_memory_blocks(argon2_instance_t *instance) {
 
     thr_data = calloc(instance->lanes, sizeof(argon2_thread_data));
     if (thr_data == NULL) {
-       free(thread);
-       return;
+        free(thread);
+        return;
     }
 
     for (r = 0; r < instance->passes; ++r) {
@@ -466,9 +468,8 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
     uint32_t l;
     /* Make the first and second block in each lane as G(H0||i||0) or
        G(H0||i||1) */
-     uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
+    uint8_t blockhash_bytes[ARGON2_BLOCK_SIZE];
     for (l = 0; l < instance->lanes; ++l) {
-       
 
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH, 0);
         store32(blockhash + ARGON2_PREHASH_DIGEST_LENGTH + 4, l);
@@ -571,9 +572,8 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
 
     if (NULL != context->allocate_cbk) {
         uint8_t *p;
-        result =
-            context->allocate_cbk(&p,
-                                  instance->memory_blocks * ARGON2_BLOCK_SIZE);
+        result = context->allocate_cbk(&p, instance->memory_blocks *
+                                               ARGON2_BLOCK_SIZE);
         if (ARGON2_OK != result) {
             return result;
         }

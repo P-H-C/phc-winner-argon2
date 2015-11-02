@@ -280,7 +280,6 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
     return olen;
 }
 
-
 /* ==================================================================== */
 /*
  * Code specific to Argon2i.
