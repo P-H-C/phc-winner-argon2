@@ -70,7 +70,6 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     clock_t start_time, stop_time;
     unsigned pwd_length;
     argon2_context context;
-    char encoded[300];
 
     start_time = clock();
 
@@ -120,8 +119,18 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     stop_time = clock();
 
-    encode_string(encoded, sizeof encoded, &context);
+    /* add back when proper decoding */
+    /* 
+    char encoded[300];
+    encode_string(encoded, sizeof encoded, &context); 
     printf("%s\n", encoded);
+    */
+    printf("Hash:\t\t");
+    for(int i=0; i<context.outlen; ++i) {
+        printf("%02x", context.out[i]);
+    }
+    printf("\n");
+
 
     printf("%2.3f seconds\n",
            ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
