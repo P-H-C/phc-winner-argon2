@@ -83,11 +83,11 @@ static void store_block(void *output, const block *src) {
 int allocate_memory(block **memory, uint32_t m_cost) {
     if (memory != NULL) {
         size_t memory_size = sizeof(block) * m_cost;
-        if (m_cost != 0 && memory_size / m_cost != sizeof(block)) {
+        if (m_cost != 0 && memory_size / m_cost != sizeof(block)) {/*1. Check for multiplication overflow*/
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
 
-        *memory = (block *)malloc(memory_size);
+        *memory = (block *)malloc(memory_size);/*2. Try to allocate*/
 
         if (!*memory) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
@@ -260,12 +260,13 @@ void fill_memory_blocks(argon2_instance_t *instance) {
     /* 1. Allocating space for threads */
     thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
     if (thread == NULL) {
-        goto cleanup;
+        return;
     }
 
     thr_data = calloc(instance->lanes, sizeof(argon2_thread_data));
     if (thr_data == NULL) {
-        goto cleanup;
+       free(thread);
+       return;
     }
 
     for (r = 0; r < instance->passes; ++r) {
@@ -327,7 +328,6 @@ void fill_memory_blocks(argon2_instance_t *instance) {
 #endif
     }
 
-cleanup:
     if (thread != NULL) {
         free(thread);
     }
