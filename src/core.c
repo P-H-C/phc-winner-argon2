@@ -570,15 +570,19 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
     /* 1. Memory allocation */
 
     if (NULL != context->allocate_cbk) {
+        uint8_t *p;
         result =
-            context->allocate_cbk((uint8_t **)&(instance->memory),
+            context->allocate_cbk(&p,
                                   instance->memory_blocks * ARGON2_BLOCK_SIZE);
+        if (ARGON2_OK != result) {
+            return result;
+        }
+        memcpy(&(instance->memory), p, sizeof(instance->memory));
     } else {
         result = allocate_memory(&(instance->memory), instance->memory_blocks);
-    }
-
-    if (ARGON2_OK != result) {
-        return result;
+        if (ARGON2_OK != result) {
+            return result;
+        }
     }
 
     /* 2. Initial hashing */
