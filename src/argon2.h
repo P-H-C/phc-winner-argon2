@@ -269,6 +269,28 @@ int verify_d(argon2_context *context, const char *hash);
  */
 const char *error_message(int error_code);
 
+/* ==================================================================== */
+/*
+ * Code specific to Argon2i.
+ *
+ * The code below applies the following format:
+ *
+ *  $argon2i$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
+ *
+ * where <num> is a decimal integer (positive, fits in an 'unsigned long')
+ * and <bin> is Base64-encoded data (no '=' padding characters, no newline
+ * or whitespace). The "keyid" is a binary identifier for a key (up to 8
+ * bytes); "data" is associated data (up to 32 bytes). When the 'keyid'
+ * (resp. the 'data') is empty, then it is ommitted from the output.
+ *
+ * The last two binary chunks (encoded in Base64) are, in that order,
+ * the salt and the output. Both are optional, but you cannot have an
+ * output without a salt. The binary salt length is between 8 and 48 bytes.
+ * The output length is always exactly 32 bytes.
+ */
+
+int encode_string(char *dst, size_t dst_len, argon2_context *ctx);
+
 #if defined(__cplusplus)
 }
 #endif
