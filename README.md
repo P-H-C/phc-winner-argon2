@@ -37,7 +37,7 @@ on your system. To show usage instructions, run
 `./argon2` without arguments as
 ```
 $ ./argon2
-Usage:  ./argon2 pwd salt [-y version] [-t iterations] [-m memory] [-p parallelism]
+Usage:  ./argon2 pwd salt [-d] [-t iterations] [-m memory] [-p parallelism]
 Parameters:
         pwd             The password to hash
         salt            The salt to use, at most 16 characters
