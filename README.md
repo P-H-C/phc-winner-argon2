@@ -182,8 +182,9 @@ repository is copyright (c) 2015 Daniel Dinu, Dmitry Khovratovich (main
 authors), Jean-Philippe Aumasson and Samuel Neves, and under
 [CC0 license](https://creativecommons.org/about/cc0).
 
-[`src/encoding.h`](src/encoding.h) is copyright (c) 2015 Thomas Pornin, and
-under [CC0 license](https://creativecommons.org/about/cc0).
+The string encoding routines in [`src/argon2.c`](src/argon2.c) are
+copyright (c) 2015 Thomas Pornin, and under [CC0
+license](https://creativecommons.org/about/cc0).
 
 The BLAKE2 code in [`src/blake2/`](src/blake2) is copyright (c) Samuel
 Neves, 2013-2015, and under [CC0
