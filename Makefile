@@ -49,7 +49,7 @@ ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 	LIB_PATH := -Wl,-rpath=$(BUILD_PATH)
 endif
-ifeq ($(KERNEL_NAME), OpenBSD)
+ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),OpenBSD FreeBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
 	LIB_PATH := -Wl,-rpath=$(BUILD_PATH)
