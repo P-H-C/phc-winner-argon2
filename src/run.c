@@ -31,7 +31,7 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s pwd salt [-d] [-y version] [-t iterations] [-m memory]"
+    printf("Usage:  %s pwd salt [-d] [-t iterations] [-m memory] "
            "[-p parallelism]\n",
            cmd);
 
