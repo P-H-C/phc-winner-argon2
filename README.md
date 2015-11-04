@@ -54,8 +54,8 @@ Type:           Argon2i
 Iterations:     2
 Memory:         65536 KiB
 Parallelism:    4
-$argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
-0.274 seconds
+Hash:           4162f32384d8f4790bd994cb73c83a4a29f076165ec18af3cfdcf10a8d1b9066
+0.265 seconds
 ```
 
 ### Library
