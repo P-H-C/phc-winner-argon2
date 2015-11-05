@@ -44,7 +44,7 @@ Parameters:
         -d              Use Argon2d instead of Argon2i (which is the default)
         -t N            Sets the number of iterations to N (default = 3)
         -m N            Sets the memory usage of 2^N KiB (default 12)
-        -p N            Sets parallelism to N threads (default 4)
+        -p N            Sets parallelism to N threads (default 1)
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
 iterations, consuming 64 MiB, and using four parallel threads:
