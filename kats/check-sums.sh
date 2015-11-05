@@ -4,7 +4,7 @@ for file in `ls | grep '^[a-z2]*$' | xargs`
 do
     new=`shasum -a 256 $file`
     old=`cat $file.shasum`
-    if [ "$new" == "$old" ]
+    if [ "$new" = "$old" ]
     then
         echo $file "\t" OK
     else
