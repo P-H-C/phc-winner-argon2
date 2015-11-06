@@ -99,19 +99,24 @@ static const char *Argon2_ErrorMessage[] = {
 {ARGON2_MISSING_ARGS, */ "Missing arguments", /*},*/
 };
 
-int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
-                 const void *salt, size_t saltlen, unsigned int t_cost,
-                 unsigned int m_cost) {
+int hash_argon2i( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    void *hash, const size_t hashlen,
+    char *encoded, const size_t encodedlen) {
 
     argon2_context context;
+    int result;
 
     /* Detect and reject overflowing sizes */
     /* TODO: This should probably be fixed in the function signature */
-    if (inlen > UINT32_MAX) {
+    if (pwdlen > UINT32_MAX) {
         return ARGON2_PWD_TOO_LONG;
     }
 
-    if (outlen > UINT32_MAX) {
+    if (hashlen > UINT32_MAX) {
         return ARGON2_OUTPUT_TOO_LONG;
     }
 
@@ -119,10 +124,10 @@ int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
         return ARGON2_SALT_TOO_LONG;
     }
 
-    context.out = (uint8_t *)out;
-    context.outlen = (uint32_t)outlen;
-    context.pwd = (uint8_t *)in;
-    context.pwdlen = (uint32_t)inlen;
+    context.out = (uint8_t *)hash;
+    context.outlen = (uint32_t)hashlen;
+    context.pwd = (uint8_t *)pwd;
+    context.pwdlen = (uint32_t)pwdlen;
     context.salt = (uint8_t *)salt;
     context.saltlen = (uint32_t)saltlen;
     context.secret = NULL;
@@ -131,27 +136,40 @@ int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
     context.adlen = 0;
     context.t_cost = t_cost;
     context.m_cost = m_cost;
-    context.lanes = 1;
-    context.threads = 1;
+    context.lanes = parallelism;
+    context.threads = parallelism;
     context.allocate_cbk = NULL;
     context.free_cbk = NULL;
     context.flags = ARGON2_DEFAULT_FLAGS;
 
-    return argon2_core(&context, Argon2_i);
+    result = argon2_core(&context, Argon2_i);
+
+    if (result != ARGON2_OK) {
+        memset(hash, 0x00, hashlen); 
+        return result;
+    }
+
+    return ARGON2_OK;
 }
 
-int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
-                 const void *salt, size_t saltlen, unsigned int t_cost,
-                 unsigned int m_cost) {
+int hash_argon2d( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    void *hash, const size_t hashlen,
+    char *encoded, const size_t encodedlen) {
+
     argon2_context context;
+    int result;
 
     /* Detect and reject overflowing sizes */
     /* TODO: This should probably be fixed in the function signature */
-    if (inlen > UINT32_MAX) {
+    if (pwdlen > UINT32_MAX) {
         return ARGON2_PWD_TOO_LONG;
     }
 
-    if (outlen > UINT32_MAX) {
+    if (hashlen > UINT32_MAX) {
         return ARGON2_OUTPUT_TOO_LONG;
     }
 
@@ -159,10 +177,10 @@ int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
         return ARGON2_SALT_TOO_LONG;
     }
 
-    context.out = (uint8_t *)out;
-    context.outlen = (uint32_t)outlen;
-    context.pwd = (uint8_t *)in;
-    context.pwdlen = (uint32_t)inlen;
+    context.out = (uint8_t *)hash;
+    context.outlen = (uint32_t)hashlen;
+    context.pwd = (uint8_t *)pwd;
+    context.pwdlen = (uint32_t)pwdlen;
     context.salt = (uint8_t *)salt;
     context.saltlen = (uint32_t)saltlen;
     context.secret = NULL;
@@ -171,13 +189,22 @@ int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
     context.adlen = 0;
     context.t_cost = t_cost;
     context.m_cost = m_cost;
-    context.lanes = 1;
-    context.threads = 1;
+    context.lanes = parallelism;
+    context.threads = parallelism;
     context.allocate_cbk = NULL;
     context.free_cbk = NULL;
     context.flags = ARGON2_DEFAULT_FLAGS;
 
-    return argon2_core(&context, Argon2_d);
+    result = argon2_core(&context, Argon2_d);
+
+    if (result != ARGON2_OK) {
+        memset(hash, 0x00, hashlen); 
+        return result;
+    }
+
+    return ARGON2_OK;
+
+
 }
 
 int argon2d(argon2_context *context) { return argon2_core(context, Argon2_d); }

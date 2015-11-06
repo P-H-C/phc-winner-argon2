@@ -189,26 +189,40 @@ typedef struct Argon2_Context {
 } argon2_context;
 
 /**
- * Function to hash the inputs in the memory-hard fashion (uses Argon2i)
- * @param  out  Pointer to the memory where the hash digest will be written
- * @param  outlen Digest length in bytes
- * @param  in Pointer to the input (password)
- * @param  inlen Input length in bytes
- * @param  salt Pointer to the salt
- * @param  saltlen Salt length in bytes
- * @pre    @a out must have at least @a outlen bytes allocated
- * @pre    @a in must be at least @inlen bytes long
- * @pre    @a salt must be at least @saltlen bytes long
- * @return Zero if successful, 1 otherwise.
+ * Hashes a password with Argon2i
+ * @param t_cost Number of iterations
+ * @param m_cost Sets memory usage to 2^m_cost kibibytes
+ * @param parallelism Number of threads and compute lanes
+ * @param pwd Point to password
+ * @param pwdlen Password size in bytes
+ * @param salt Pointer to salt
+ * @param saltlen Salt size in bytes
+ * @param hash Buffer where to write the raw hash
+ * @param hashlen Desired length of the hash in bytes
+ * @param encoded Buffer where to write the encoded hash (optional)
+ * @param encodedlen Size of the buffer (thus max size of the encoded hash)
+ * @pre   hash and encoded are only written to if the pointers given are
+          non-null; to only get the raw hash set encoded to null; to
+          only get the encoded string set hash to null; if encodedlen is
+          0 and encoded is non-null, no encoded string won't be written;
+ * @pre   Different parallelism levels will give different results
  */
-int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
-                 const void *salt, size_t saltlen, unsigned int t_cost,
-                 unsigned int m_cost);
+int hash_argon2i( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    void *hash, const size_t hashlen,
+    char *encoded, const size_t encodedlen);
+    
+int hash_argon2d( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    void *hash, const size_t hashlen,
+    char *encoded, const size_t encodedlen);
 
-/* same for argon2d */
-int hash_argon2d(void *out, size_t outlen, const void *in, size_t inlen,
-                 const void *salt, size_t saltlen, unsigned int t_cost,
-                 unsigned int m_cost);
 
 /*
  * **************Argon2d: Version of Argon2 that picks memory blocks depending
@@ -268,28 +282,6 @@ int verify_d(argon2_context *context, const char *hash);
  * @return  The error message associated with the given error code
  */
 const char *error_message(int error_code);
-
-/* ==================================================================== */
-/*
- * Code specific to Argon2i.
- *
- * The code below applies the following format:
- *
- *  $argon2i$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
- *
- * where <num> is a decimal integer (positive, fits in an 'unsigned long')
- * and <bin> is Base64-encoded data (no '=' padding characters, no newline
- * or whitespace). The "keyid" is a binary identifier for a key (up to 8
- * bytes); "data" is associated data (up to 32 bytes). When the 'keyid'
- * (resp. the 'data') is empty, then it is ommitted from the output.
- *
- * The last two binary chunks (encoded in Base64) are, in that order,
- * the salt and the output. Both are optional, but you cannot have an
- * output without a salt. The binary salt length is between 8 and 48 bytes.
- * The output length is always exactly 32 bytes.
- */
-
-int encode_string(char *dst, size_t dst_len, argon2_context *ctx);
 
 #if defined(__cplusplus)
 }
