@@ -31,12 +31,11 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s pwd salt [-d] [-t iterations] [-m memory] "
+    printf("Usage:  %s salt [-d] [-t iterations] [-m memory] "
            "[-p parallelism]\n",
            cmd);
-
+    printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
-    printf("\tpwd\t\tThe password to hash\n");
     printf("\tsalt\t\tThe salt to use, at most 16 characters\n");
     printf("\t-d\t\tUse Argon2d instead of Argon2i (which is the default)\n");
     printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n",
@@ -85,6 +84,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     }
 
     pwdlen = strlen(pwd);
+    printf("STRELN %d\n", pwdlen);
 
     UNUSED_PARAMETER(threads);
 
@@ -117,26 +117,32 @@ int main(int argc, char *argv[]) {
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
-    char *pwd = NULL;
     uint8_t salt[SALT_LEN];
     argon2_type type = Argon2_i;
     int i;
+    ssize_t n;
+    char pwd[128];
 
-    if (argc < 3) {
+    if (argc < 2) {
         usage(argv[0]);
         return ARGON2_MISSING_ARGS;
     }
 
-    /* get password and salt from command line */
-    pwd = argv[1];
-    if (strlen(argv[2]) > SALT_LEN) {
+    /* get password from stdin */
+    while ( ( n = fread(pwd, 1, sizeof pwd - 1, stdin) ) > 0 ) {
+        pwd[n] = '\0';
+        if (pwd[n-1] == '\n') pwd[n-1] = '\0';
+    }
+
+    /* get salt from command line */
+    if (strlen(argv[1]) > SALT_LEN) {
         fatal("salt too long");
     }
     memset(salt, 0x00, SALT_LEN); /* pad with null bytes */
-    memcpy(salt, argv[2], strlen(argv[2]));
+    memcpy(salt, argv[1], strlen(argv[1]));
 
     /* parse options */
-    for (i = 3; i < argc; i++) {
+    for (i = 2; i < argc; i++) {
         const char *a = argv[i];
         unsigned long input = 0;
         if (!strcmp(a, "-m")) {
