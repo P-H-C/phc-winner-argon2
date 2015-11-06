@@ -84,7 +84,6 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     }
 
     pwdlen = strlen(pwd);
-    printf("STRELN %d\n", pwdlen);
 
     UNUSED_PARAMETER(threads);
 
