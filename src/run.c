@@ -66,11 +66,12 @@ Base64-encoded hash string
 */
 static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
-                const char *type) {
+                argon2_type type) {
     clock_t start_time, stop_time;
     unsigned pwdlen;
     char encoded[300];
     uint32_t i;
+    int result;
 
     start_time = clock();
 
@@ -87,20 +88,10 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     UNUSED_PARAMETER(threads);
 
-    if (!strcmp(type, "d")) {
-        int result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt,
-        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded, Argon2_d);
-        if (result != ARGON2_OK)
-            fatal(error_message(result));
-    } else if (!strcmp(type, "i")) {
-        int result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt,
-        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded, Argon2_i);
-        if (result != ARGON2_OK)
-            fatal(error_message(result));
-    } else {
-        secure_wipe_memory(pwd, strlen(pwd));
-        fatal("wrong Argon2 type");
-    }
+    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, SALT_LEN,
+                         out, OUT_LEN, encoded, sizeof encoded, type);
+    if (result != ARGON2_OK)
+        fatal(error_message(result));
 
     stop_time = clock();
 
@@ -113,6 +104,11 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     printf("%2.3f seconds\n",
            ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
+
+    result = argon2_verify(encoded, pwd, pwdlen, type);
+    if (result != ARGON2_OK)
+        fatal(error_message(result));
+    printf("Verification ok\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -123,7 +119,7 @@ int main(int argc, char *argv[]) {
     uint32_t threads = THREADS_DEF;
     char *pwd = NULL;
     uint8_t salt[SALT_LEN];
-    const char *type = "i";
+    argon2_type type = Argon2_i;
     int i;
 
     if (argc < 3) {
@@ -187,12 +183,15 @@ int main(int argc, char *argv[]) {
                 fatal("missing -p argument");
             }
         } else if (!strcmp(a, "-d")) {
-            type = "d";
+            type = Argon2_d;
         } else {
             fatal("unknown argument");
         }
     }
-    printf("Type:\t\tArgon2%c\n", type[0]);
+    if (type == Argon2_i)
+        printf("Type:\t\tArgon2i\n");
+    else
+        printf("Type:\t\tArgon2d\n");
     printf("Iterations:\t%" PRIu32 " \n", t_cost);
     printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
     printf("Parallelism:\t%" PRIu32 " \n", lanes);

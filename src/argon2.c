@@ -100,18 +100,16 @@ static const char *Argon2_ErrorMessage[] = {
     /*},
 {ARGON2_MISSING_ARGS, */ "Missing arguments",
     /*},
-{ARGON2_ENCODING_FAIL, */ "Encoding failed", 
+{ARGON2_ENCODING_FAIL, */ "Encoding failed",
     /*},
 {ARGON2_DECODING_FAIL, */ "Decoding failed", /*},*/
 };
 
-int argon2_hash( 
-        const uint32_t t_cost, const uint32_t m_cost, 
-        const uint32_t parallelism,
-        const void *pwd, const size_t pwdlen,
-        const void *salt, const size_t saltlen, 
-        void *hash, const size_t hashlen,
-        char *encoded, const size_t encodedlen, argon2_type type) {
+int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
+                const uint32_t parallelism, const void *pwd,
+                const size_t pwdlen, const void *salt, const size_t saltlen,
+                void *hash, const size_t hashlen, char *encoded,
+                const size_t encodedlen, argon2_type type) {
 
     argon2_context context;
     int result;
@@ -131,7 +129,7 @@ int argon2_hash(
         return ARGON2_SALT_TOO_LONG;
     }
 
-    out = malloc(hashlen); 
+    out = malloc(hashlen);
 
     context.out = (uint8_t *)out;
     context.outlen = (uint32_t)hashlen;
@@ -154,7 +152,7 @@ int argon2_hash(
     result = argon2_core(&context, type);
 
     if (result != ARGON2_OK) {
-        memset(out, 0x00, hashlen); 
+        memset(out, 0x00, hashlen);
         free(out);
         return result;
     }
@@ -179,57 +177,88 @@ int argon2_hash(
     return ARGON2_OK;
 }
 
-int argon2i_hash_encoded( 
-    const uint32_t t_cost, const uint32_t m_cost, 
-    const uint32_t parallelism,
-    const void *pwd, const size_t pwdlen,
-    const void *salt, const size_t saltlen, 
-    const size_t hashlen, char *encoded, const size_t encodedlen) {
-    
+int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
+                         const uint32_t parallelism, const void *pwd,
+                         const size_t pwdlen, const void *salt,
+                         const size_t saltlen, const size_t hashlen,
+                         char *encoded, const size_t encodedlen) {
+
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-    NULL, hashlen, encoded, encodedlen, Argon2_i);
+                       NULL, hashlen, encoded, encodedlen, Argon2_i);
 }
 
-int argon2i_hash_raw( 
-    const uint32_t t_cost, const uint32_t m_cost, 
-    const uint32_t parallelism,
-    const void *pwd, const size_t pwdlen,
-    const void *salt, const size_t saltlen, 
-    void *hash, const size_t hashlen ) {
-    
+int argon2i_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
+                     const uint32_t parallelism, const void *pwd,
+                     const size_t pwdlen, const void *salt,
+                     const size_t saltlen, void *hash, const size_t hashlen) {
+
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-    hash, hashlen, NULL, 0, Argon2_i);
+                       hash, hashlen, NULL, 0, Argon2_i);
 }
 
-int argon2d_hash_encoded( 
-    const uint32_t t_cost, const uint32_t m_cost, 
-    const uint32_t parallelism,
-    const void *pwd, const size_t pwdlen,
-    const void *salt, const size_t saltlen, 
-    const size_t hashlen, char *encoded, const size_t encodedlen) {
-    
+int argon2d_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
+                         const uint32_t parallelism, const void *pwd,
+                         const size_t pwdlen, const void *salt,
+                         const size_t saltlen, const size_t hashlen,
+                         char *encoded, const size_t encodedlen) {
+
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-    NULL, hashlen, encoded, encodedlen, Argon2_d);
+                       NULL, hashlen, encoded, encodedlen, Argon2_d);
 }
 
-int argon2d_hash_raw( 
-    const uint32_t t_cost, const uint32_t m_cost, 
-    const uint32_t parallelism,
-    const void *pwd, const size_t pwdlen,
-    const void *salt, const size_t saltlen, 
-    void *hash, const size_t hashlen ) {
-    
+int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
+                     const uint32_t parallelism, const void *pwd,
+                     const size_t pwdlen, const void *salt,
+                     const size_t saltlen, void *hash, const size_t hashlen) {
+
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-    hash, hashlen, NULL, 0, Argon2_d);
+                       hash, hashlen, NULL, 0, Argon2_d);
 }
 
-/*
-int argon2i_verify(
-    const char *encoded, const void *pwd, const size_t pwdlen) {
+int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
+                  argon2_type type) {
 
+    argon2_context ctx;
+    uint8_t *out;
+
+    /* max values, to be updated in decode_string */
+    ctx.adlen = 512;
+    ctx.saltlen = 512;
+    ctx.outlen = 512;
+
+    ctx.ad = malloc(ctx.adlen);
+    ctx.salt = malloc(ctx.saltlen);
+    ctx.out = malloc(ctx.outlen);
+    out = malloc(ctx.outlen);
+
+    decode_string(&ctx, encoded, type);
+
+    argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
+                ctx.saltlen, out, ctx.outlen, NULL, 0, type);
+
+    free(ctx.ad);
+    free(ctx.salt);
+
+    if (memcmp(out, ctx.out, ctx.outlen)) {
+        free(out);
+        free(ctx.out);
+        return ARGON2_DECODING_FAIL;
+    }
+    free(out);
+    free(ctx.out);
+
+    return ARGON2_OK;
 }
-*/
 
+int argon2i_verify(const char *encoded, const void *pwd, const size_t pwdlen) {
+
+    return argon2_verify(encoded, pwd, pwdlen, Argon2_i);
+}
+
+int argon2d_verify(const char *encoded, const void *pwd, const size_t pwdlen) {
+
+    return argon2_verify(encoded, pwd, pwdlen, Argon2_d);
+}
 
 int argon2d(argon2_context *context) { return argon2_core(context, Argon2_d); }
 
@@ -264,4 +293,3 @@ const char *error_message(int error_code) {
     }
     return "Unknown error code.";
 }
-
