@@ -198,7 +198,7 @@ typedef struct Argon2_Context {
  * @param  saltlen Salt length in bytes
  * @pre    @a out must have at least @a outlen bytes allocated
  * @pre    @a in must be at least @inlen bytes long
- * @pre    @a saltlen must be at least @saltlen bytes long
+ * @pre    @a salt must be at least @saltlen bytes long
  * @return Zero if successful, 1 otherwise.
  */
 int hash_argon2i(void *out, size_t outlen, const void *in, size_t inlen,
