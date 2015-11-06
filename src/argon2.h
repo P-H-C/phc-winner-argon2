@@ -196,7 +196,28 @@ typedef struct Argon2_Context {
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 /**
- * Hashes a password with Argon2i
+ * Hashes a password with Argon2i, producing an encoded hash
+ * @param t_cost Number of iterations
+ * @param m_cost Sets memory usage to 2^m_cost kibibytes
+ * @param parallelism Number of threads and compute lanes
+ * @param pwd Point to password
+ * @param pwdlen Password size in bytes
+ * @param salt Pointer to salt
+ * @param saltlen Salt size in bytes
+ * @param hashlen Desired length of the hash in bytes
+ * @param encoded Buffer where to write the encoded hash
+ * @param encodedlen Size of the buffer (thus max size of the encoded hash)
+ * @pre   Different parallelism levels will give different results
+ */
+int argon2i_hash_encoded( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    const size_t hashlen, char *encoded, const size_t encodedlen);
+
+/**
+ * Hashes a password with Argon2i, producing a raw hash 
  * @param t_cost Number of iterations
  * @param m_cost Sets memory usage to 2^m_cost kibibytes
  * @param parallelism Number of threads and compute lanes
@@ -206,30 +227,37 @@ typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
  * @param saltlen Salt size in bytes
  * @param hash Buffer where to write the raw hash
  * @param hashlen Desired length of the hash in bytes
- * @param encoded Buffer where to write the encoded hash (optional)
- * @param encodedlen Size of the buffer (thus max size of the encoded hash)
- * @pre   hash and encoded are only written to if the pointers given are
-          non-null; to only get the raw hash set encoded to null; to
-          only get the encoded string set hash to null; if encodedlen is
-          0 and encoded is non-null, no encoded string won't be written;
  * @pre   Different parallelism levels will give different results
  */
-int hash_argon2i( 
+int argon2i_hash_raw( 
     const uint32_t t_cost, const uint32_t m_cost, 
     const uint32_t parallelism,
     const void *pwd, const size_t pwdlen,
     const void *salt, const size_t saltlen, 
-    void *hash, const size_t hashlen,
-    char *encoded, const size_t encodedlen);
+    void *hash, const size_t hashlen);
     
-int hash_argon2d( 
+int argon2d_hash_encoded( 
     const uint32_t t_cost, const uint32_t m_cost, 
     const uint32_t parallelism,
     const void *pwd, const size_t pwdlen,
     const void *salt, const size_t saltlen, 
-    void *hash, const size_t hashlen,
-    char *encoded, const size_t encodedlen);
+    const size_t hashlen, char *encoded, const size_t encodedlen);
 
+int argon2d_hash_raw( 
+    const uint32_t t_cost, const uint32_t m_cost, 
+    const uint32_t parallelism,
+    const void *pwd, const size_t pwdlen,
+    const void *salt, const size_t saltlen, 
+    void *hash, const size_t hashlen);
+
+/* generic function underlying the above ones */
+int argon2_hash( 
+        const uint32_t t_cost, const uint32_t m_cost, 
+        const uint32_t parallelism,
+        const void *pwd, const size_t pwdlen,
+        const void *salt, const size_t saltlen, 
+        void *hash, const size_t hashlen,
+        char *encoded, const size_t encodedlen, argon2_type type);
 
 /*
  * **************Argon2d: Version of Argon2 that picks memory blocks depending

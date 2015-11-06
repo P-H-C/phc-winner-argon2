@@ -88,13 +88,13 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     UNUSED_PARAMETER(threads);
 
     if (!strcmp(type, "d")) {
-        int result = hash_argon2d(t_cost, m_cost, threads, pwd, pwdlen, salt,
-        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded);
+        int result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt,
+        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded, Argon2_d);
         if (result != ARGON2_OK)
             fatal(error_message(result));
     } else if (!strcmp(type, "i")) {
-        int result = hash_argon2i(t_cost, m_cost, threads, pwd, pwdlen, salt,
-        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded);
+        int result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt,
+        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded, Argon2_i);
         if (result != ARGON2_OK)
             fatal(error_message(result));
     } else {
