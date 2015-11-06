@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
     uint8_t salt[SALT_LEN];
     argon2_type type = Argon2_i;
     int i;
-    ssize_t n;
+    size_t n;
     char pwd[128];
 
     if (argc < 2) {
