@@ -36,10 +36,9 @@ results.
 on your system. To show usage instructions, run
 `./argon2` without arguments as
 ```
-$ ./argon2
-Usage:  ./argon2 pwd salt [-d] [-t iterations] [-m memory] [-p parallelism]
+Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism]
+        Password is read from stdin
 Parameters:
-        pwd             The password to hash
         salt            The salt to use, at most 16 characters
         -d              Use Argon2d instead of Argon2i (which is the default)
         -t N            Sets the number of iterations to N (default = 3)
@@ -49,13 +48,16 @@ Parameters:
 For example, to hash "password" using "somesalt" as a salt and doing 2
 iterations, consuming 64 MiB, and using four parallel threads:
 ```
-$ ./argon2 password somesalt -t 2 -m 16 -p 4
+$ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4
 Type:           Argon2i
 Iterations:     2
 Memory:         65536 KiB
 Parallelism:    4
+STRELN 8
 Hash:           4162f32384d8f4790bd994cb73c83a4a29f076165ec18af3cfdcf10a8d1b9066
-0.265 seconds
+Encoded:        $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
+0.271 seconds
+Verification ok
 ```
 
 ### Library
@@ -83,48 +85,47 @@ below is named `test.c` and placed in the project's root directory.
 #include <string.h>
 #include <stdlib.h>
 
-#define OUTLEN 32
+#define HASHLEN 32
 #define SALTLEN 16
 #define PWD "password"
 
 int main(void)
 {
-    uint8_t out1[OUTLEN];
-    uint8_t out2[OUTLEN];
+    uint8_t hash1[HASHLEN];
+    uint8_t hash2[HASHLEN];
 
     uint8_t salt[SALTLEN];
     memset( salt, 0x00, SALTLEN );
 
-    uint8_t *in = (uint8_t *)strdup(PWD);
-    uint32_t inlen = strlen((char *)in);
+    uint8_t *pwd = (uint8_t *)strdup(PWD);
+    uint32_t pwdlen = strlen((char *)pwd);
 
     uint32_t t_cost = 2;            // 1-pass computation
     uint32_t m_cost = (1<<16);      // 64 mebibytes memory usage
+    uint32_t parallelism = 1;       // number of threads and lanes
 
     // high-level API
-    hash_argon2i( out1, OUTLEN, in, inlen, salt, SALTLEN, t_cost, m_cost );
-    free(in);
+    argon2i_hash_raw(t_cost, m_cost, parallelism, pwd, pwdlen, salt, SALTLEN, hash1, HASHLEN);
 
     // low-level API
-    uint32_t lanes = 1;             // lanes 1 by default
-    uint32_t threads = 1;           // threads 1 by default
-    in = (uint8_t *)strdup(PWD);    // was erased by previous call
+    uint32_t lanes = parallelism;
+    uint32_t threads = parallelism;
     argon2_context context = {
-        out2, OUTLEN, 
-        in, inlen, 
+        hash2, HASHLEN, 
+        pwd, pwdlen, 
         salt, SALTLEN,
         NULL, 0, /* secret data */
         NULL, 0, /* associated data */
-        t_cost, m_cost, lanes, threads, 
+        t_cost, m_cost, parallelism, parallelism, 
         NULL, NULL, /* custom memory allocation / deallocation functions */
         ARGON2_DEFAULT_FLAGS /* by default the password is zeroed on exit */
     };
     argon2i( &context );
-    free(in);
+    free(pwd);
 
-    for( int i=0; i<OUTLEN; ++i ) printf( "%02x", out1[i] ); printf( "\n" );
-    if (memcmp(out1, out2, OUTLEN)) {
-        for( int i=0; i<OUTLEN; ++i ) printf( "%02x", out2[i] ); printf( "\n" );
+    for( int i=0; i<HASHLEN; ++i ) printf( "%02x", hash1[i] ); printf( "\n" );
+    if (memcmp(hash1, hash2, HASHLEN)) {
+        for( int i=0; i<HASHLEN; ++i ) printf( "%02x", hash2[i] ); printf( "\n" );
         printf("fail\n");
     }
     else printf("ok\n");
@@ -133,9 +134,14 @@ int main(void)
 }
 ```
 
-To use Argon2d instead of Argon2i call `hash_argon2d` instead of
-`hash_argon2i` using the high-level API, and `argon2d` instead of
+To use Argon2d instead of Argon2i call `argon2d_hash` instead of
+`argon2i_hash` using the high-level API, and `argon2d` instead of
 `argon2i` using the low-level API.
+
+To produce the crypt-like encoding rather than the raw hash, call
+`argon2i_hash_encoded` for Argon2i and `argon2d_hash_encoded` for Argon2d.
+
+See [`src/argon2.h`](src/argon2.h) for API detais.
 
 *Note: in this example the salt is set to the all-`0x00` string for the
 sake of simplicity, but in your application you should use a random salt.*
@@ -143,7 +149,7 @@ sake of simplicity, but in your application you should use a random salt.*
 
 ### Benchmarks
 
-`make bench` creates the exectuble `bench`, which measures the execution
+`make bench` creates the executable `bench`, which measures the execution
 time of various Argon2 instances:
 
 ```
@@ -182,7 +188,7 @@ repository is copyright (c) 2015 Daniel Dinu, Dmitry Khovratovich (main
 authors), Jean-Philippe Aumasson and Samuel Neves, and under
 [CC0 license](https://creativecommons.org/about/cc0).
 
-The string encoding routines in [`src/argon2.c`](src/argon2.c) are
+The string encoding routines in [`src/encoding.c`](src/encoding.c) are
 copyright (c) 2015 Thomas Pornin, and under [CC0
 license](https://creativecommons.org/about/cc0).
 
