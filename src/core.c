@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "argon2.h"
 #include "core.h"
 #include "thread.h"
 #include "blake2/blake2.h"

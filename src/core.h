@@ -14,6 +14,8 @@
 #ifndef ARGON2_CORE_H
 #define ARGON2_CORE_H
 
+#include "argon2.h"
+
 #if defined(_MSC_VER)
 #define ALIGN(n) __declspec(align(16))
 #elif defined(__GNUC__) || defined(__clang)
@@ -43,9 +45,6 @@ enum argon2_core_constants {
     ARGON2_PREHASH_DIGEST_LENGTH = 64,
     ARGON2_PREHASH_SEED_LENGTH = 72
 };
-
-/* Argon2 primitive type */
-typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 /*************************Argon2 internal data
  * types**************************************************/

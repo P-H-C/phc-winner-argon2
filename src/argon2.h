@@ -126,6 +126,10 @@ typedef enum Argon2_ErrorCodes {
 
     ARGON2_MISSING_ARGS = 30,
 
+    ARGON2_ENCODING_FAIL = 31,
+
+    ARGON2_DECODING_FAIL = 32,
+
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
                                  error code */
@@ -187,6 +191,9 @@ typedef struct Argon2_Context {
 
     uint32_t flags; /* array of bool options */
 } argon2_context;
+
+/* Argon2 primitive type */
+typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 /**
  * Hashes a password with Argon2i

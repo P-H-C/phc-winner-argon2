@@ -68,8 +68,8 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 const char *type) {
     clock_t start_time, stop_time;
-    unsigned pwd_length;
-    argon2_context context;
+    unsigned pwdlen;
+    char encoded[300];
     uint32_t i;
 
     start_time = clock();
@@ -83,34 +83,18 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
         fatal("salt missing");
     }
 
-    pwd_length = strlen(pwd);
+    pwdlen = strlen(pwd);
 
     UNUSED_PARAMETER(threads);
 
-    context.out = out;
-    context.outlen = OUT_LEN;
-    context.pwd = (uint8_t *)pwd;
-    context.pwdlen = pwd_length;
-    context.salt = salt;
-    context.saltlen = SALT_LEN;
-    context.secret = NULL;
-    context.secretlen = 0;
-    context.ad = NULL;
-    context.adlen = 0;
-    context.t_cost = t_cost;
-    context.m_cost = m_cost;
-    context.lanes = lanes;
-    context.threads = lanes;
-    context.allocate_cbk = NULL;
-    context.free_cbk = NULL;
-    context.flags = ARGON2_FLAG_CLEAR_PASSWORD;
-
     if (!strcmp(type, "d")) {
-        int result = argon2d(&context);
+        int result = hash_argon2d(t_cost, m_cost, threads, pwd, pwdlen, salt,
+        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded);
         if (result != ARGON2_OK)
             fatal(error_message(result));
     } else if (!strcmp(type, "i")) {
-        int result = argon2i(&context);
+        int result = hash_argon2i(t_cost, m_cost, threads, pwd, pwdlen, salt,
+        SALT_LEN, out, OUT_LEN, encoded, sizeof encoded);
         if (result != ARGON2_OK)
             fatal(error_message(result));
     } else {
@@ -120,17 +104,12 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     stop_time = clock();
 
-    /* add back when proper decoding */
-    /*
-    char encoded[300];
-    encode_string(encoded, sizeof encoded, &context);
-    printf("%s\n", encoded);
-    */
     printf("Hash:\t\t");
-    for (i = 0; i < context.outlen; ++i) {
-        printf("%02x", context.out[i]);
+    for (i = 0; i < OUT_LEN; ++i) {
+        printf("%02x", out[i]);
     }
     printf("\n");
+    printf("Encoded:\t%s\n", encoded);
 
     printf("%2.3f seconds\n",
            ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
