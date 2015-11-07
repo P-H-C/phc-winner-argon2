@@ -215,7 +215,7 @@ int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
                        hash, hashlen, NULL, 0, Argon2_d);
 }
 
-int argon2_compare(const char *b1_, const char *b2_, size_t len) {
+int argon2_compare(const char *b1, const char *b2, size_t len) {
     size_t               i;
     unsigned char        d = (unsigned char) 0U;
 
