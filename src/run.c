@@ -85,7 +85,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     pwdlen = strlen(pwd);
 
-    UNUSED_PARAMETER(threads);
+    UNUSED_PARAMETER(lanes);
 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, SALT_LEN,
                          out, OUT_LEN, encoded, sizeof encoded, type);
@@ -128,9 +128,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* get password from stdin */
-    while ( ( n = fread(pwd, 1, sizeof pwd - 1, stdin) ) > 0 ) {
+    while ((n = fread(pwd, 1, sizeof pwd - 1, stdin)) > 0) {
         pwd[n] = '\0';
-        if (pwd[n-1] == '\n') pwd[n-1] = '\0';
+        if (pwd[n - 1] == '\n')
+            pwd[n - 1] = '\0';
     }
 
     /* get salt from command line */
@@ -193,10 +194,11 @@ int main(int argc, char *argv[]) {
             fatal("unknown argument");
         }
     }
-    if (type == Argon2_i)
+    if (type == Argon2_i) {
         printf("Type:\t\tArgon2i\n");
-    else
+    } else {
         printf("Type:\t\tArgon2d\n");
+    }
     printf("Iterations:\t%" PRIu32 " \n", t_cost);
     printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
     printf("Parallelism:\t%" PRIu32 " \n", lanes);

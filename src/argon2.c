@@ -216,13 +216,13 @@ int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
 }
 
 int argon2_compare(const uint8_t *b1, const uint8_t *b2, size_t len) {
-    size_t         i;
-    uint8_t        d = 0U;
+    size_t i;
+    uint8_t d = 0U;
 
     for (i = 0U; i < len; i++) {
         d |= b1[i] ^ b2[i];
     }
-    return (int) ((1 & ((d - 1) >> 8)) - 1);
+    return (int)((1 & ((d - 1) >> 8)) - 1);
 }
 
 int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
