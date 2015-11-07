@@ -243,10 +243,16 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     ctx.salt = malloc(ctx.saltlen);
     ctx.out = malloc(ctx.outlen);
     if (!ctx.out || !ctx.salt || !ctx.ad) {
+        free(ctx.ad);
+        free(ctx.salt);
+        free(ctx.out);
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
     out = malloc(ctx.outlen);
     if (!out) {
+        free(ctx.ad);
+        free(ctx.salt);
+        free(ctx.out);
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
 
