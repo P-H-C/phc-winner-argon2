@@ -130,6 +130,9 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     }
 
     out = malloc(hashlen);
+    if (!out) {
+        return ARGON2_MEMORY_ALLOCATION_ERROR;
+    }
 
     context.out = (uint8_t *)out;
     context.outlen = (uint32_t)hashlen;
@@ -239,7 +242,13 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
     ctx.out = malloc(ctx.outlen);
+    if (!ctx.out || !ctx.salt || !ctx.ad) {
+        return ARGON2_MEMORY_ALLOCATION_ERROR;
+    }
     out = malloc(ctx.outlen);
+    if (!out) {
+        return ARGON2_MEMORY_ALLOCATION_ERROR;
+    }
 
     decode_string(&ctx, encoded, type);
 
