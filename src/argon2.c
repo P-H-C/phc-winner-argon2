@@ -215,6 +215,19 @@ int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
                        hash, hashlen, NULL, 0, Argon2_d);
 }
 
+int argon2_compare(const char *b1_, const char *b2_, size_t len) {
+    unsigned char gt = 0U;
+    unsigned char eq = 1U;
+    size_t        i;
+    i = len;
+    while (i != 0U) {
+        i--;
+        gt |= ((b2[i] - b1[i]) >> 8) & eq;
+        eq &= ((b2[i] ^ b1[i]) - 1) >> 8;
+    }
+    return (int) (gt + gt + eq) - 1;
+}
+
 int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
                   argon2_type type) {
 
@@ -239,7 +252,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     free(ctx.ad);
     free(ctx.salt);
 
-    if (memcmp(out, ctx.out, ctx.outlen)) {
+    if (argon2_compare(out, ctx.out, ctx.outlen)) {
         free(out);
         free(ctx.out);
         return ARGON2_DECODING_FAIL;
