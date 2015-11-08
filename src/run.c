@@ -37,6 +37,10 @@
  * + NULL byte
  * 9 + 12 + 14 + 25 + 45 + 1 = 106
  * Rounded to 4 byte boundary: 108
+ *
+ * WARNING: 108 is only for the parameters supported by this
+   command-line utility. You'll need a longer ENCODED_LEN to support
+   longer salts and ouputs, as supported by the argon2 library
  */
 #define ENCODED_LEN 108
 
