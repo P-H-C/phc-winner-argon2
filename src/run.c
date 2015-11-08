@@ -27,6 +27,18 @@
 #define THREADS_DEF 1
 #define OUT_LEN 32
 #define SALT_LEN 16
+/* Sample encode: $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
+ * Maximumum lengths are defined as:
+ * strlen $argon2i$ = 9
+ * m=65536 with strlen (uint32_t)-1 = 10, so this total is 12
+ * ,t=2,p=4 If we consider each number to potentially reach four digits in future, this = 14
+ * $c29tZXNhbHQAAAAAAAAAAA Formula for this is 1 + (floor(SALT_LEN/3) + 1) * 4 = 25
+ * $QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY per above formula, = 45
+ * + NULL byte
+ * 9 + 12 + 14 + 25 + 45 + 1 = 106
+ * Rounded to 4 byte boundary: 108
+ */
+#define ENCODED_LEN 108
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -68,7 +80,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 argon2_type type) {
     clock_t start_time, stop_time;
     unsigned pwdlen;
-    char encoded[300];
+    char encoded[ENCODED_LEN];
     uint32_t i;
     int result;
 
