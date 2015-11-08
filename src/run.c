@@ -32,13 +32,13 @@
  * strlen $argon2i$ = 9
  * m=65536 with strlen (uint32_t)-1 = 10, so this total is 12
  * ,t=2,p=4 If we consider each number to potentially reach four digits in future, this = 14
- * $c29tZXNhbHQAAAAAAAAAAA Formula for this is 1 + (floor(SALT_LEN/3) + 1) * 4 = 25
- * $QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY per above formula, = 45
+ * $c29tZXNhbHQAAAAAAAAAAA Formula for this is (SALT_LEN * 4 + 3) / 3 + 1 = 23
+ * $QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY per above formula, = 44
  * + NULL byte
- * 9 + 12 + 14 + 25 + 45 + 1 = 106
- * Rounded to 4 byte boundary: 108
+ * 9 + 12 + 14 + 23 + 44 + 1 = 103
+ * Rounded to 4 byte boundary: 104
  *
- * WARNING: 108 is only for the parameters supported by this
+ * WARNING: 104 is only for the parameters supported by this
    command-line utility. You'll need a longer ENCODED_LEN to support
    longer salts and ouputs, as supported by the argon2 library
  */
