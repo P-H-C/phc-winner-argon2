@@ -233,6 +233,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
 
     argon2_context ctx;
     uint8_t *out;
+    int ret;
 
     /* max values, to be updated in decode_string */
     ctx.adlen = 512;
@@ -256,15 +257,21 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
 
-    decode_string(&ctx, encoded, type);
+    if(decode_string(&ctx, encoded, type) != 1) {
+        free(ctx.ad);
+        free(ctx.salt);
+        free(ctx.out);
+        free(out);
+        return ARGON2_DECODING_FAIL;
+    }
 
-    argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
+    ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
                 ctx.saltlen, out, ctx.outlen, NULL, 0, type);
 
     free(ctx.ad);
     free(ctx.salt);
 
-    if (argon2_compare(out, ctx.out, ctx.outlen)) {
+    if (ret != ARGON2_OK || argon2_compare(out, ctx.out, ctx.outlen)) {
         free(out);
         free(ctx.out);
         return ARGON2_DECODING_FAIL;
