@@ -387,7 +387,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         char tmp[30];                                                          \
         sprintf(tmp, "%lu", (unsigned long)(x));                               \
         SS(tmp);                                                               \
-    } while (0);
+    } while (0)
 
 #define SB(buf, len)                                                           \
     do {                                                                       \
@@ -397,7 +397,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         }                                                                      \
         dst += sb_len;                                                         \
         dst_len -= sb_len;                                                     \
-    } while (0);
+    } while (0)
 
     if (type == Argon2_i)
         SS("$argon2i$m=");
