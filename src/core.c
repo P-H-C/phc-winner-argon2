@@ -361,8 +361,7 @@ int validate_inputs(const argon2_context *context) {
             return ARGON2_PWD_PTR_MISMATCH;
         }
     } else {
-        if (ARGON2_MIN_PWD_LENGTH != 0 && /* TODO: Is this condition right? */
-            ARGON2_MIN_PWD_LENGTH > context->pwdlen) {
+        if (ARGON2_MIN_PWD_LENGTH > context->pwdlen) {
             return ARGON2_PWD_TOO_SHORT;
         }
 
