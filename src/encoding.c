@@ -197,7 +197,6 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
     const char *orig;
     unsigned long acc;
 
-    orig = str;
     acc = 0;
     for (orig = str;; str++) {
         int c;
