@@ -83,7 +83,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type) {
     clock_t start_time, stop_time;
-    unsigned pwdlen;
+    size_t pwdlen;
     char encoded[ENCODED_LEN];
     uint32_t i;
     int result;
