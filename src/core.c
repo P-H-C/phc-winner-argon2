@@ -462,7 +462,7 @@ int validate_inputs(const argon2_context *context) {
     return ARGON2_OK;
 }
 
-static void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
+void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
     uint32_t l;
     /* Make the first and second block in each lane as G(H0||i||0) or
        G(H0||i||1) */

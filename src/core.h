@@ -171,7 +171,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
  * @param blockhash Pointer to the pre-hashing digest
  * @pre blockhash must point to @a PREHASH_SEED_LENGTH allocated values
  */
-void fill_firsts_blocks(uint8_t *blockhash, const argon2_instance_t *instance);
+void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance);
 
 /*
  * Function allocates memory, hashes the inputs with Blake,  and creates first
