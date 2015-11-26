@@ -5,4 +5,5 @@ libargon2.dylib
 .DS_Store
 src/*.o
 src/blake2/*.o
+genkat
 test.c
