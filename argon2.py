@@ -62,5 +62,5 @@ int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost, const uint32_t
                 const void *pwd, const size_t pwdlen,
                 const void *salt, const size_t saltlen,
                 void *hash, const size_t hashlen,
-                argon2_type type)
+                uint32_t type)
 """
