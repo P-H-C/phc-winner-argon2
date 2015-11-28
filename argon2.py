@@ -6,7 +6,7 @@ import sys
 IS_PY2 = sys.version_info < (3, 0, 0, 'final', 0)
 _argon2 = cdll.LoadLibrary("./libargon2.so")
 
-_crypto_argon2 = _argon2.argon2_hash
+_crypto_argon2 = _argon2.argon2_hash_2py
 _crypto_argon2.argtypes = [
                            c_uint32,  # uint32_t       N
                            c_uint32,  # uint32_t       r
@@ -20,9 +20,6 @@ _crypto_argon2.argtypes = [
 
                            c_char_p,  # uint8_t       *buf
                            c_size_t,  # size_t         buflen
-
-                           c_char_p,  # uint8_t       *encoded
-                           c_size_t,  # size_t         encodedlen
 
                            c_uint32,  # uint32_t       Argon_type
                            ]
@@ -43,10 +40,10 @@ def _ensure_bytes(data):
     return data
 
 
-def hash(password, salt, t=16 , r=8, p=1, buflen=128, encodedlen=108):
+def hash(password, salt, t=16 , r=8, p=1, buflen=128):
     outbuf = create_string_buffer(buflen)
-    encoded = create_string_buffer(encodedlen)
-
+    # argon2_d = 0
+    argon2_i = 1
     password = _ensure_bytes(password)
     salt = _ensure_bytes(salt)
 
@@ -54,8 +51,7 @@ def hash(password, salt, t=16 , r=8, p=1, buflen=128, encodedlen=108):
                             password, len(password),
                             salt, len(salt),
                             outbuf, buflen,
-                            encoded, encodedlen,
-                            1)
+                            argon2_i)
     print result
     if result:
         raise Argon2Exception('could not compute hash')
@@ -63,10 +59,9 @@ def hash(password, salt, t=16 , r=8, p=1, buflen=128, encodedlen=108):
     print len(outbuf.raw)
     return outbuf.raw
 """
-int argon2_hash(const uint32_t t_cost, const uint32_t m_cost, const uint32_t parallelism,
+int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost, const uint32_t parallelism,
                 const void *pwd, const size_t pwdlen,
                 const void *salt, const size_t saltlen,
                 void *hash, const size_t hashlen,
-                char *encoded, const size_t encodedlen,
                 argon2_type type)
 """

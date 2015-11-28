@@ -114,23 +114,9 @@ int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost,
     int result;
     uint8_t *out;
 
-    /* Detect and reject overflowing sizes */
-    /* TODO: This should probably be fixed in the function signature */
-    if (pwdlen > UINT32_MAX) {
-        return ARGON2_PWD_TOO_LONG;
-    }
-
-    if (hashlen > UINT32_MAX) {
-        return ARGON2_OUTPUT_TOO_LONG;
-    }
-
-    if (saltlen > UINT32_MAX) {
-        return ARGON2_SALT_TOO_LONG;
-    }
-
     out = malloc(hashlen);
     if (!out) {
-        return ARGON2_MEMORY_ALLOCATION_ERROR;
+        return ARGON2_ETERNAL_ERROR;
     }
 
     context.out = (uint8_t *)out;
@@ -159,10 +145,7 @@ int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost,
         return result;
     }
 
-    /* if raw hash requested, write it */
-    if (hash) {
-        memcpy(hash, out, hashlen);
-    }
+    memcpy(hash, out, hashlen);
 
     free(out);
 
@@ -173,7 +156,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
                 const uint32_t parallelism, const void *pwd,
                 const size_t pwdlen, const void *salt, const size_t saltlen,
                 void *hash, const size_t hashlen, char *encoded,
-                const size_t encodedlen, uint32_t type) {
+                const size_t encodedlen, argon2_type type) {
 
     argon2_context context;
     int result;
