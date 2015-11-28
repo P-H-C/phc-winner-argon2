@@ -105,11 +105,10 @@ static const char *Argon2_ErrorMessage[] = {
 {ARGON2_DECODING_FAIL, */ "Decoding failed", /*},*/
 };
 
-int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
-                const uint32_t parallelism, const void *pwd,
-                const size_t pwdlen, const void *salt, const size_t saltlen,
-                void *hash, const size_t hashlen, char *encoded,
-                const size_t encodedlen, argon2_type type) {
+int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost,
+                    const uint32_t parallelism, const void *pwd,
+                    const size_t pwdlen, const void *salt, const size_t saltlen,
+                    void *hash, const size_t hashlen, uint32_t type) {
 
     argon2_context context;
     int result;
@@ -152,7 +151,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     context.free_cbk = NULL;
     context.flags = ARGON2_DEFAULT_FLAGS;
 
-    result = argon2_core(&context, type);
+    result = argon2_core(&context, 1);
 
     if (result != ARGON2_OK) {
         memset(out, 0x00, hashlen);
@@ -165,14 +164,69 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
         memcpy(hash, out, hashlen);
     }
 
-    /* if encoding requested, write it */
-    if (encoded && encodedlen) {
-        if (!encode_string(encoded, encodedlen, &context, type)) {
-            memset(out, 0x00, hashlen);
-            memset(encoded, 0x00, encodedlen);
-            free(out);
-            return ARGON2_ENCODING_FAIL;
-        }
+    free(out);
+
+    return ARGON2_OK;
+}
+
+int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
+                const uint32_t parallelism, const void *pwd,
+                const size_t pwdlen, const void *salt, const size_t saltlen,
+                void *hash, const size_t hashlen, char *encoded,
+                const size_t encodedlen, uint32_t type) {
+
+    argon2_context context;
+    int result;
+    uint8_t *out;
+
+    /* Detect and reject overflowing sizes */
+    /* TODO: This should probably be fixed in the function signature */
+    if (pwdlen > UINT32_MAX) {
+        return ARGON2_PWD_TOO_LONG;
+    }
+
+    if (hashlen > UINT32_MAX) {
+        return ARGON2_OUTPUT_TOO_LONG;
+    }
+
+    if (saltlen > UINT32_MAX) {
+        return ARGON2_SALT_TOO_LONG;
+    }
+
+    out = malloc(hashlen);
+    if (!out) {
+        return ARGON2_MEMORY_ALLOCATION_ERROR;
+    }
+
+    context.out = (uint8_t *)out;
+    context.outlen = (uint32_t)hashlen;
+    context.pwd = (uint8_t *)pwd;
+    context.pwdlen = (uint32_t)pwdlen;
+    context.salt = (uint8_t *)salt;
+    context.saltlen = (uint32_t)saltlen;
+    context.secret = NULL;
+    context.secretlen = 0;
+    context.ad = NULL;
+    context.adlen = 0;
+    context.t_cost = t_cost;
+    context.m_cost = m_cost;
+    context.lanes = parallelism;
+    context.threads = parallelism;
+    context.allocate_cbk = NULL;
+    context.free_cbk = NULL;
+    context.flags = ARGON2_DEFAULT_FLAGS;
+
+    result = argon2_core(&context, 1);
+
+    if (result != ARGON2_OK) {
+        memset(out, 0x00, hashlen);
+        free(out);
+        return result;
+    }
+
+    /* if raw hash requested, write it */
+    if (hash) {
+        memcpy(hash, out, hashlen);
     }
 
     free(out);
