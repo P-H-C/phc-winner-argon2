@@ -52,7 +52,6 @@ def hash(password, salt, t=16 , r=8, p=1, buflen=128):
                             salt, len(salt),
                             outbuf, buflen,
                             argon2_i)
-    print result
     if result:
         raise Argon2Exception('could not compute hash')
 
