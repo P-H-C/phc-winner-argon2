@@ -13,6 +13,21 @@
 
 #include <stdint.h>
 #include <string.h>
+/*
+ * Argon2 source code package
+ *
+ * Written by Daniel Dinu and Dmitry Khovratovich, 2015
+ *
+ * This work is licensed under a Creative Commons CC0 1.0 License/Waiver.
+ *
+ * You should have received a copy of the CC0 Public Domain Dedication along
+ * with
+ * this software. If not, see
+ * <http://creativecommons.org/publicdomain/zero/1.0/>.
+ */
+
+#include <stdint.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
@@ -23,10 +38,10 @@
 
 /* Error messages */
 static const char *Argon2_ErrorMessage[] = {
-        /*{ARGON2_OK, */ "OK",
+/*{ARGON2_OK, */ "OK",
         /*},
 
-        {ARGON2_OUTPUT_PTR_NULL, */ "Output pointer is NULL",
+    {ARGON2_OUTPUT_PTR_NULL, */ "Output pointer is NULL",
         /*},
 
     {ARGON2_OUTPUT_TOO_SHORT, */ "Output is too short",
@@ -325,6 +340,7 @@ const char *error_message(int error_code) {
     }
     return "Unknown error code.";
 }
+
 
 int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost,
                     const uint32_t parallelism, const void *pwd,
