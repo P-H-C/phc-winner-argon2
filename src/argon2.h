@@ -75,7 +75,6 @@ extern "C" {
 #define ARGON2_FLAG_CLEAR_MEMORY (UINT32_C(1) << 2)
 #define ARGON2_DEFAULT_FLAGS (ARGON2_FLAG_CLEAR_MEMORY)
 
-#define ARGON2_ETERNAL_ERROR 666
 /* Error codes */
 typedef enum Argon2_ErrorCodes {
     ARGON2_OK = 0,

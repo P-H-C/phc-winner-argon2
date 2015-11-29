@@ -13,21 +13,6 @@
 
 #include <stdint.h>
 #include <string.h>
-/*
- * Argon2 source code package
- *
- * Written by Daniel Dinu and Dmitry Khovratovich, 2015
- *
- * This work is licensed under a Creative Commons CC0 1.0 License/Waiver.
- *
- * You should have received a copy of the CC0 Public Domain Dedication along
- * with
- * this software. If not, see
- * <http://creativecommons.org/publicdomain/zero/1.0/>.
- */
-
-#include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
@@ -38,86 +23,86 @@
 
 /* Error messages */
 static const char *Argon2_ErrorMessage[] = {
-/*{ARGON2_OK, */ "OK",
-        /*},
+    /*{ARGON2_OK, */ "OK",
+    /*},
 
     {ARGON2_OUTPUT_PTR_NULL, */ "Output pointer is NULL",
-        /*},
+    /*},
 
-    {ARGON2_OUTPUT_TOO_SHORT, */ "Output is too short",
-        /*},
-    {ARGON2_OUTPUT_TOO_LONG, */ "Output is too long",
-        /*},
+{ARGON2_OUTPUT_TOO_SHORT, */ "Output is too short",
+    /*},
+{ARGON2_OUTPUT_TOO_LONG, */ "Output is too long",
+    /*},
 
-    {ARGON2_PWD_TOO_SHORT, */ "Password is too short",
-        /*},
-    {ARGON2_PWD_TOO_LONG, */ "Password is too long",
-        /*},
+{ARGON2_PWD_TOO_SHORT, */ "Password is too short",
+    /*},
+{ARGON2_PWD_TOO_LONG, */ "Password is too long",
+    /*},
 
-    {ARGON2_SALT_TOO_SHORT, */ "Salt is too short",
-        /*},
-    {ARGON2_SALT_TOO_LONG, */ "Salt is too long",
-        /*},
+{ARGON2_SALT_TOO_SHORT, */ "Salt is too short",
+    /*},
+{ARGON2_SALT_TOO_LONG, */ "Salt is too long",
+    /*},
 
-    {ARGON2_AD_TOO_SHORT, */ "Associated data is too short",
-        /*},
-    {ARGON2_AD_TOO_LONG, */ "Associated date is too long",
-        /*},
+{ARGON2_AD_TOO_SHORT, */ "Associated data is too short",
+    /*},
+{ARGON2_AD_TOO_LONG, */ "Associated date is too long",
+    /*},
 
-    {ARGON2_SECRET_TOO_SHORT, */ "Secret is too short",
-        /*},
-    {ARGON2_SECRET_TOO_LONG, */ "Secret is too long",
-        /*},
+{ARGON2_SECRET_TOO_SHORT, */ "Secret is too short",
+    /*},
+{ARGON2_SECRET_TOO_LONG, */ "Secret is too long",
+    /*},
 
-    {ARGON2_TIME_TOO_SMALL, */ "Time cost is too small",
-        /*},
-    {ARGON2_TIME_TOO_LARGE, */ "Time cost is too large",
-        /*},
+{ARGON2_TIME_TOO_SMALL, */ "Time cost is too small",
+    /*},
+{ARGON2_TIME_TOO_LARGE, */ "Time cost is too large",
+    /*},
 
-    {ARGON2_MEMORY_TOO_LITTLE, */ "Memory cost is too small",
-        /*},
-    {ARGON2_MEMORY_TOO_MUCH, */ "Memory cost is too large",
-        /*},
+{ARGON2_MEMORY_TOO_LITTLE, */ "Memory cost is too small",
+    /*},
+{ARGON2_MEMORY_TOO_MUCH, */ "Memory cost is too large",
+    /*},
 
-    {ARGON2_LANES_TOO_FEW, */ "Too few lanes",
-        /*},
-    {ARGON2_LANES_TOO_MANY, */ "Too many lanes",
-        /*},
+{ARGON2_LANES_TOO_FEW, */ "Too few lanes",
+    /*},
+{ARGON2_LANES_TOO_MANY, */ "Too many lanes",
+    /*},
 
-    {ARGON2_PWD_PTR_MISMATCH, */ "Password pointer is NULL, but password length is not 0",
-        /*},
-    {ARGON2_SALT_PTR_MISMATCH, */ "Salt pointer is NULL, but salt length is not 0",
-        /*},
-    {ARGON2_SECRET_PTR_MISMATCH, */ "Secret pointer is NULL, but secret length is not 0",
-        /*},
-    {ARGON2_AD_PTR_MISMATCH, */ "Associated data pointer is NULL, but ad length is not 0",
-        /*},
+{ARGON2_PWD_PTR_MISMATCH, */ "Password pointer is NULL, but password length is not 0",
+    /*},
+{ARGON2_SALT_PTR_MISMATCH, */ "Salt pointer is NULL, but salt length is not 0",
+    /*},
+{ARGON2_SECRET_PTR_MISMATCH, */ "Secret pointer is NULL, but secret length is not 0",
+    /*},
+{ARGON2_AD_PTR_MISMATCH, */ "Associated data pointer is NULL, but ad length is not 0",
+    /*},
 
-    {ARGON2_MEMORY_ALLOCATION_ERROR, */ "Memory allocation error",
-        /*},
+{ARGON2_MEMORY_ALLOCATION_ERROR, */ "Memory allocation error",
+    /*},
 
-    {ARGON2_FREE_MEMORY_CBK_NULL, */ "The free memory callback is NULL",
-        /*},
-    {ARGON2_ALLOCATE_MEMORY_CBK_NULL, */ "The allocate memory callback is NULL",
-        /*},
+{ARGON2_FREE_MEMORY_CBK_NULL, */ "The free memory callback is NULL",
+    /*},
+{ARGON2_ALLOCATE_MEMORY_CBK_NULL, */ "The allocate memory callback is NULL",
+    /*},
 
-    {ARGON2_INCORRECT_PARAMETER, */ "Argon2_Context context is NULL",
-        /*},
-    {ARGON2_INCORRECT_TYPE, */ "There is no such version of Argon2",
-        /*},
+{ARGON2_INCORRECT_PARAMETER, */ "Argon2_Context context is NULL",
+    /*},
+{ARGON2_INCORRECT_TYPE, */ "There is no such version of Argon2",
+    /*},
 
-    {ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch",
-        /*},
+{ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch",
+    /*},
 
-    {ARGON2_THREADS_TOO_FEW, */ "Not enough threads",
-        /*},
-    {ARGON2_THREADS_TOO_MANY, */ "Too many threads",
-        /*},
-    {ARGON2_MISSING_ARGS, */ "Missing arguments",
-        /*},
-    {ARGON2_ENCODING_FAIL, */ "Encoding failed",
-        /*},
-    {ARGON2_DECODING_FAIL, */ "Decoding failed", /*},*/
+{ARGON2_THREADS_TOO_FEW, */ "Not enough threads",
+    /*},
+{ARGON2_THREADS_TOO_MANY, */ "Too many threads",
+    /*},
+{ARGON2_MISSING_ARGS, */ "Missing arguments",
+    /*},
+{ARGON2_ENCODING_FAIL, */ "Encoding failed",
+    /*},
+{ARGON2_DECODING_FAIL, */ "Decoding failed", /*},*/
 };
 
 int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
@@ -281,7 +266,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     }
 
     ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
-                      ctx.saltlen, out, ctx.outlen, NULL, 0, type);
+                ctx.saltlen, out, ctx.outlen, NULL, 0, type);
 
     free(ctx.ad);
     free(ctx.salt);
@@ -330,61 +315,13 @@ const char *error_message(int error_code) {
     enum {
         /* Make sure---at compile time---that the enum size matches the array
            size */
-                ERROR_STRING_CHECK =
-                1 /
-                !!((sizeof(Argon2_ErrorMessage) / sizeof(Argon2_ErrorMessage[0])) ==
-                   ARGON2_ERROR_CODES_LENGTH)
+        ERROR_STRING_CHECK =
+            1 /
+            !!((sizeof(Argon2_ErrorMessage) / sizeof(Argon2_ErrorMessage[0])) ==
+               ARGON2_ERROR_CODES_LENGTH)
     };
     if (error_code < ARGON2_ERROR_CODES_LENGTH) {
         return Argon2_ErrorMessage[(argon2_error_codes)error_code];
     }
     return "Unknown error code.";
-}
-
-
-int argon2_hash_2py(const uint32_t t_cost, const uint32_t m_cost,
-                    const uint32_t parallelism, const void *pwd,
-                    const size_t pwdlen, const void *salt, const size_t saltlen,
-                    void *hash, const size_t hashlen, uint32_t type) {
-
-    argon2_context context;
-    int result;
-    uint8_t *out;
-
-    out = malloc(hashlen);
-    if (!out) {
-        return ARGON2_ETERNAL_ERROR;
-    }
-
-    context.out = (uint8_t *)out;
-    context.outlen = (uint32_t)hashlen;
-    context.pwd = (uint8_t *)pwd;
-    context.pwdlen = (uint32_t)pwdlen;
-    context.salt = (uint8_t *)salt;
-    context.saltlen = (uint32_t)saltlen;
-    context.secret = NULL;
-    context.secretlen = 0;
-    context.ad = NULL;
-    context.adlen = 0;
-    context.t_cost = t_cost;
-    context.m_cost = m_cost;
-    context.lanes = parallelism;
-    context.threads = parallelism;
-    context.allocate_cbk = NULL;
-    context.free_cbk = NULL;
-    context.flags = ARGON2_DEFAULT_FLAGS;
-
-    result = argon2_core(&context, 1);
-
-    if (result != ARGON2_OK) {
-        memset(out, 0x00, hashlen);
-        free(out);
-        return result;
-    }
-
-    memcpy(hash, out, hashlen);
-
-    free(out);
-
-    return ARGON2_OK;
 }
