@@ -1,10 +1,30 @@
 from ctypes import *
 import sys
+import platform
+import os
 
 
+system_type = platform.system()
 IS_PY2 = sys.version_info < (3, 0, 0, 'final', 0)
-_argon2 = cdll.LoadLibrary("../../libargon2.so")
+LOCAL_LIB_PATH = "../../"
 
+if system_type == "Linux":
+    LIB_NAME = "libargon2.so"
+elif system_type == "Windows":
+    LIB_NAME = "libargon2.dll"
+elif system_type == "Darwin":
+    LIB_NAME = "libargon2.dylib"
+else:
+    raise OSError("Your operating systems is not fully supported, you may try to modify code manually")
+
+try:
+    GLOBAL_LIB_PATH = os.environ['LD_LIBRARY_PATH']
+    _argon2 = cdll.LoadLibrary(GLOBAL_LIB_PATH + LIB_NAME)
+except (OSError, KeyError), e:
+    try:
+        _argon2 = cdll.LoadLibrary(LOCAL_LIB_PATH + LIB_NAME)
+    except OSError, e:
+        raise type(e), type(e)(e.message + "You haven't installed Argon2 lib")
 
 _crypto_argon2 = _argon2.argon2_hash
 _crypto_argon2.argtypes = [
@@ -58,7 +78,7 @@ def _ensure_bytes(data):
     return data
 
 
-def hash(password, salt, t=16 , m=8, p=1, buflen=128, argon_type=Argon2Type.Argon2_i):
+def argon2_hash(password, salt, t=16, m=8, p=1, buflen=128, argon_type=Argon2Type.Argon2_i):
     outbuf = create_string_buffer(buflen)
     password = _ensure_bytes(password)
     salt = _ensure_bytes(salt)
@@ -74,3 +94,7 @@ def hash(password, salt, t=16 , m=8, p=1, buflen=128, argon_type=Argon2Type.Argo
         raise Argon2Exception(Argon2Exception.errors[result])
 
     return outbuf.raw
+
+
+if __name__ == "__main__":
+    print(argon2_hash("password", "some salt"))
