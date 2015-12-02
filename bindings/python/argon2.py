@@ -4,8 +4,8 @@ import platform
 import os
 
 
+system_type = platform.system()
 IS_PY2 = sys.version_info < (3, 0, 0, 'final', 0)
-print(sys.version_info)
 LOCAL_LIB_PATH = "../../"
 
 if system_type == "Linux":
