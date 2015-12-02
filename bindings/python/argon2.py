@@ -6,6 +6,7 @@ import os
 
 system_type = platform.system()
 IS_PY2 = sys.version_info < (3, 0, 0, 'final', 0)
+print(sys.version_info)
 LOCAL_LIB_PATH = "../../"
 
 if system_type == "Linux":
@@ -20,11 +21,11 @@ else:
 try:
     GLOBAL_LIB_PATH = os.environ['LD_LIBRARY_PATH']
     _argon2 = cdll.LoadLibrary(GLOBAL_LIB_PATH + LIB_NAME)
-except (OSError, KeyError), e:
+except (OSError, KeyError) as e:
     try:
         _argon2 = cdll.LoadLibrary(LOCAL_LIB_PATH + LIB_NAME)
-    except OSError, e:
-        raise type(e), type(e)(e.message + "You haven't installed Argon2 lib")
+    except OSError as e:
+        raise OSError("You haven't installed Argon2 lib")
 
 _crypto_argon2 = _argon2.argon2_hash
 _crypto_argon2.argtypes = [
