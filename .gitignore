@@ -7,3 +7,5 @@ src/*.o
 src/blake2/*.o
 genkat
 test.c
+.idea
+*.pyc
