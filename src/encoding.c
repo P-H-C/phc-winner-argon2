@@ -279,10 +279,10 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     do {                                                                       \
         size_t bin_len = (max_len);                                            \
         str = from_base64(buf, &bin_len, str);                                 \
-        if (str == NULL) {                                                     \
+        if (str == NULL || bin_len > UINT32_MAX) {                             \
             return 0;                                                          \
         }                                                                      \
-        (len) = bin_len;                                                       \
+        (len) = (uint32_t)bin_len;                                             \
     } while (0)
 
     size_t maxadlen = ctx->adlen;
