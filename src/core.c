@@ -54,26 +54,26 @@
 void init_block_value(block *b, uint8_t in) { memset(b->v, in, sizeof(b->v)); }
 
 void copy_block(block *dst, const block *src) {
-    memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_WORDS_IN_BLOCK);
+    memcpy(dst->v, src->v, sizeof(uint64_t) * ARGON2_QWORDS_IN_BLOCK);
 }
 
 void xor_block(block *dst, const block *src) {
     int i;
-    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i) {
         dst->v[i] ^= src->v[i];
     }
 }
 
 static void load_block(block *dst, const void *input) {
     unsigned i;
-    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i) {
         dst->v[i] = load64((const uint8_t *)input + i * sizeof(dst->v[i]));
     }
 }
 
 static void store_block(void *output, const block *src) {
     unsigned i;
-    for (i = 0; i < ARGON2_WORDS_IN_BLOCK; ++i) {
+    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; ++i) {
         store64((uint8_t *)output + i * sizeof(src->v[i]), src->v[i]);
     }
 }

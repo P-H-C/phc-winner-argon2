@@ -25,10 +25,10 @@
 #include "blake2/blamka-round-opt.h"
 
 void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
-    __m128i block_XY[ARGON2_QWORDS_IN_BLOCK];
+    __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     uint32_t i;
 
-    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
         block_XY[i] = state[i] = _mm_xor_si128(
             state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
     }
@@ -45,7 +45,7 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
                      state[8 * 6 + i], state[8 * 7 + i]);
     }
 
-    for (i = 0; i < ARGON2_QWORDS_IN_BLOCK; i++) {
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
         state[i] = _mm_xor_si128(state[i], block_XY[i]);
         _mm_storeu_si128((__m128i *)(&next_block[16 * i]), state[i]);
     }
@@ -70,8 +70,8 @@ void generate_addresses(const argon2_instance_t *instance,
 
         for (i = 0; i < instance->segment_length; ++i) {
             if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
-                __m128i zero_block[ARGON2_QWORDS_IN_BLOCK];
-                __m128i zero2_block[ARGON2_QWORDS_IN_BLOCK];
+                __m128i zero_block[ARGON2_OWORDS_IN_BLOCK];
+                __m128i zero2_block[ARGON2_OWORDS_IN_BLOCK];
                 memset(zero_block, 0, sizeof(zero_block));
                 memset(zero2_block, 0, sizeof(zero2_block));
                 input_block.v[6]++;

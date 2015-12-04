@@ -114,9 +114,9 @@ void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
 
         for (i = 0; i < instance->memory_blocks; ++i) {
             uint32_t how_many_words =
-                (instance->memory_blocks > ARGON2_WORDS_IN_BLOCK)
+                (instance->memory_blocks > ARGON2_QWORDS_IN_BLOCK)
                     ? 1
-                    : ARGON2_WORDS_IN_BLOCK;
+                    : ARGON2_QWORDS_IN_BLOCK;
 
             for (j = 0; j < how_many_words; ++j)
                 printf("Block %.4u [%3u]: %016" PRIx64 "\n", i, j,
