@@ -1,21 +1,23 @@
-from ctypes import *
-import sys
-import platform
+#!/usr/bin/env python
+
+from ctypes import cdll, c_uint32, c_char_p, c_size_t, c_int, create_string_buffer
 import os
+import platform
+import sys
 
 
-system_type = platform.system()
+SYSTEM_TYPE = platform.system()
 IS_PY2 = sys.version_info < (3, 0, 0, 'final', 0)
 LOCAL_LIB_PATH = "../../"
 
-if system_type == "Linux":
+if SYSTEM_TYPE == "Linux":
     LIB_NAME = "libargon2.so"
-elif system_type == "Windows":
+elif SYSTEM_TYPE == "Windows":
     LIB_NAME = "libargon2.dll"
-elif system_type == "Darwin":
+elif SYSTEM_TYPE == "Darwin":
     LIB_NAME = "libargon2.dylib"
 else:
-    raise OSError("Your operating systems is not fully supported, you may try to modify code manually")
+    raise OSError("Your OS is not fully supported, you may try to modify code manually")
 
 try:
     GLOBAL_LIB_PATH = os.environ['LD_LIBRARY_PATH']
@@ -28,24 +30,24 @@ except (OSError, KeyError) as e:
 
 _crypto_argon2 = _argon2.argon2_hash
 _crypto_argon2.argtypes = [
-                           c_uint32,  # uint32_t       N
-                           c_uint32,  # uint32_t       r
-                           c_uint32,  # uint32_t       p
+    c_uint32,  # uint32_t       N
+    c_uint32,  # uint32_t       r
+    c_uint32,  # uint32_t       p
 
-                           c_char_p,  # const uint8_t *passwd
-                           c_size_t,  # size_t         passwdlen
+    c_char_p,  # const uint8_t *passwd
+    c_size_t,  # size_t         passwdlen
 
-                           c_char_p,  # const uint8_t *salt
-                           c_size_t,  # size_t         saltlen
+    c_char_p,  # const uint8_t *salt
+    c_size_t,  # size_t         saltlen
 
-                           c_char_p,  # uint8_t       *buf
-                           c_size_t,  # size_t         buflen
+    c_char_p,  # uint8_t       *buf
+    c_size_t,  # size_t         buflen
 
-                           c_char_p,  # uint8_t       *encoded
-                           c_size_t,  # size_t         encodedlen
+    c_char_p,  # uint8_t       *encoded
+    c_size_t,  # size_t         encodedlen
 
-                           c_uint32,  # uint32_t       Argon_type
-                           ]
+    c_uint32,  # uint32_t       Argon_type
+]
 _crypto_argon2.restype = c_int
 
 
