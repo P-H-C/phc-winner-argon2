@@ -134,11 +134,12 @@ static BLAKE2_INLINE __m128i fBlaMka(__m128i x, __m128i y) {
 
 #define UNDIAGONALIZE(A0, B0, C0, D0, A1, B1, C1, D1)                          \
     do {                                                                       \
-        __m128i t0 = C0;                                                       \
+        __m128i t0, t1;                                                        \
+        t0 = C0;                                                               \
         C0 = C1;                                                               \
         C1 = t0;                                                               \
         t0 = B0;                                                               \
-        __m128i t1 = D0;                                                       \
+        t1 = D0;                                                               \
         B0 = _mm_unpackhi_epi64(B1, _mm_unpacklo_epi64(B0, B0));               \
         B1 = _mm_unpackhi_epi64(t0, _mm_unpacklo_epi64(B1, B1));               \
         D0 = _mm_unpackhi_epi64(D0, _mm_unpacklo_epi64(D1, D1));               \
