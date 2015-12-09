@@ -424,6 +424,10 @@ int validate_inputs(const argon2_context *context) {
         return ARGON2_MEMORY_TOO_MUCH;
     }
 
+    if (context->m_cost < 8*context->lanes) {
+        return ARGON2_MEMORY_TOO_LITTLE;
+    }
+
     /* Validate time cost */
     if (ARGON2_MIN_TIME > context->t_cost) {
         return ARGON2_TIME_TOO_SMALL;
