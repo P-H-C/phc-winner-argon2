@@ -147,7 +147,7 @@ static void generate_testvectors(const char *type) {
     const deallocate_fptr myown_deallocator = NULL;
 
     unsigned t_cost = 3;
-    unsigned m_cost = 16;
+    unsigned m_cost = 32;
     unsigned lanes = 4;
 
     memset(pwd, 1, TEST_OUTLEN);
