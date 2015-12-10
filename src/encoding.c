@@ -254,7 +254,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
             return 0;                                                          \
         }                                                                      \
         str += cc_len;                                                         \
-    } while (0)
+    } while ((void)0, 0)
 
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
@@ -263,7 +263,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
             str += cc_len;                                                     \
             { code; }                                                          \
         }                                                                      \
-    } while (0)
+    } while ((void)0, 0)
 
 #define DECIMAL(x)                                                             \
     do {                                                                       \
@@ -273,7 +273,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
             return 0;                                                          \
         }                                                                      \
         (x) = dec_x;                                                           \
-    } while (0)
+    } while ((void)0, 0)
 
 #define BIN(buf, max_len, len)                                                 \
     do {                                                                       \
@@ -283,7 +283,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
             return 0;                                                          \
         }                                                                      \
         (len) = (uint32_t)bin_len;                                             \
-    } while (0)
+    } while ((void)0, 0)
 
     size_t maxadlen = ctx->adlen;
     size_t maxsaltlen = ctx->saltlen;
@@ -379,14 +379,14 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         memcpy(dst, str, pp_len + 1);                                          \
         dst += pp_len;                                                         \
         dst_len -= pp_len;                                                     \
-    } while (0)
+    } while ((void)0, 0)
 
 #define SX(x)                                                                  \
     do {                                                                       \
         char tmp[30];                                                          \
         sprintf(tmp, "%lu", (unsigned long)(x));                               \
         SS(tmp);                                                               \
-    } while (0)
+    } while ((void)0, 0)
 
 #define SB(buf, len)                                                           \
     do {                                                                       \
@@ -396,7 +396,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         }                                                                      \
         dst += sb_len;                                                         \
         dst_len -= sb_len;                                                     \
-    } while (0)
+    } while ((void)0, 0)
 
     if (type == Argon2_i)
         SS("$argon2i$m=");
