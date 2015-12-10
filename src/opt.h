@@ -14,6 +14,11 @@
 #ifndef ARGON2_OPT_H
 #define ARGON2_OPT_H
 
+#include <stdint.h>
+#include <emmintrin.h>
+#include "argon2.h"
+#include "core.h"
+
 /*
  * Function fills a new memory block. Differs from the
  * @param state Pointer to the just produced block. Content will be updated(!)

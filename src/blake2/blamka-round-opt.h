@@ -3,11 +3,11 @@
 
 #include "blake2-impl.h"
 
-#if defined(_MSC_VER)
-#include <intrin.h>
+#include <emmintrin.h>
+#if defined(__SSSE3__)
+#include <tmmintrin.h> /* for _mm_shuffle_epi8 and _mm_alignr_epi8 */
 #endif
 
-#include <immintrin.h>
 #if defined(__XOP__) && (defined(__GNUC__) || defined(__clang__))
 #include <x86intrin.h>
 #endif

@@ -15,8 +15,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <immintrin.h>
-
 #include "argon2.h"
 #include "core.h"
 #include "opt.h"
