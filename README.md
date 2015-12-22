@@ -178,6 +178,14 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 (...)
 ```
 
+## Bindings
+
+Bindings are available for the following languages (make sure to read
+their documentation):
+
+* [https://github.com/ranisalt/node-argon2](JavaScript), by @ranisalt
+* [https://pypi.python.org/pypi/argon2](Python), by @flamewow
+* [https://github.com/technion/ruby-argon2](Ruby) by @technion
 
 
 ## Intellectual property
