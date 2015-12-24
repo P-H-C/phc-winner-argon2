@@ -319,6 +319,13 @@ int argon2id(argon2_context *context);
  */
 int verify_d(argon2_context *context, const char *hash);
 
+/*
+ * Verify if a given password is correct for Argon2i hashing
+ * @param  context  Pointer to current Argon2 context
+ * @param  hash  The password hash to verify. The length of the hash is
+ * specified by the context outlen member
+ * @return  Zero if successful, a non zero error code otherwise
+ */
 int verify_i(argon2_context *context, const char *hash);
 
 /*
