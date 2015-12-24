@@ -311,6 +311,22 @@ int verify_d(argon2_context *context, const char *hash) {
     return 0 == memcmp(hash, context->out, context->outlen);
 }
 
+int verify_i(argon2_context *context, const char *hash) {
+    int result;
+    if (0 == context->outlen || NULL == hash) {
+        return ARGON2_OUT_PTR_MISMATCH;
+    }
+
+    result = argon2_core(context, Argon2_i);
+
+    if (ARGON2_OK != result) {
+        return result;
+    }
+
+    return 0 == memcmp(hash, context->out, context->outlen);
+}
+
+
 const char *error_message(int error_code) {
     enum {
         /* Make sure---at compile time---that the enum size matches the array

@@ -319,6 +319,8 @@ int argon2id(argon2_context *context);
  */
 int verify_d(argon2_context *context, const char *hash);
 
+int verify_i(argon2_context *context, const char *hash);
+
 /*
  * Get the associated error message for given error code
  * @return  The error message associated with the given error code
