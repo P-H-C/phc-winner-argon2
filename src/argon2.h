@@ -194,6 +194,14 @@ typedef struct Argon2_Context {
 /* Argon2 primitive type */
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
+
+/*
+ * Function that performs memory-hard hashing with certain degree of parallelism
+ * @param  context  Pointer to the Argon2 internal structure
+ * @return Error code if smth is wrong, ARGON2_OK otherwise
+ */
+int argon2_core(argon2_context *context, argon2_type type);
+
 /**
  * Hashes a password with Argon2i, producing an encoded hash
  * @param t_cost Number of iterations

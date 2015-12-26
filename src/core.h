@@ -215,11 +215,4 @@ void fill_segment(const argon2_instance_t *instance,
  */
 void fill_memory_blocks(argon2_instance_t *instance);
 
-/*
- * Function that performs memory-hard hashing with certain degree of parallelism
- * @param  context  Pointer to the Argon2 internal structure
- * @return Error code if smth is wrong, ARGON2_OK otherwise
- */
-int argon2_core(argon2_context *context, argon2_type type);
-
 #endif
