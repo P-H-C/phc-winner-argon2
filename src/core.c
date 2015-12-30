@@ -308,7 +308,7 @@ void fill_memory_blocks(argon2_instance_t *instance) {
                     exit(-1);
                 }
 
-                /* FillSegment(instance, position); */
+                /* fill_segment(instance, position); */
                 /*Non-thread equivalent of the lines above */
             }
 
