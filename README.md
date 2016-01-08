@@ -185,6 +185,7 @@ their documentation):
 
 * [Javascript](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
 * [Python](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
+* [Python](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 
 
