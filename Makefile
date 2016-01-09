@@ -36,6 +36,7 @@ LIB_NAME=argon2
 ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
+	SO_LDFLAGS := -Wl,-soname,libargon2.so.0
 endif
 ifeq ($(KERNEL_NAME), NetBSD)
 	LIB_EXT := so
@@ -72,7 +73,7 @@ $(GENKAT):      $(SRC) $(SRC_GENKAT)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
-		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $^ -Isrc -o $@
+		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -Isrc -o $@
 
 $(LIB_ST): 	$(OBJ)
 		ar rcs $@ $^
