@@ -183,6 +183,7 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
+* [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
 * [Javascript](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
 * [Python](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
 * [Python](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
