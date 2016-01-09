@@ -19,7 +19,7 @@ SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS = -std=c89 -pthread -O3 -Wall -g
+CFLAGS += -std=c89 -pthread -O3 -Wall -g
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
@@ -63,7 +63,7 @@ all: clean $(RUN) libs
 libs: $(LIB_SH) $(LIB_ST)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
-		$(CC) $(CFLAGS) $^ -Isrc  -o $@
+		$(CC) $(CFLAGS) $(LDFLAGS) $^ -Isrc  -o $@
 
 $(BENCH):       $(SRC) $(SRC_BENCH)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@
@@ -72,7 +72,7 @@ $(GENKAT):      $(SRC) $(SRC_GENKAT)
 		$(CC) $(CFLAGS) $^ -Isrc  -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
-		$(CC) $(CFLAGS) $(LIB_CFLAGS) $^ -Isrc -o $@
+		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $^ -Isrc -o $@
 
 $(LIB_ST): 	$(OBJ)
 		ar rcs $@ $^
