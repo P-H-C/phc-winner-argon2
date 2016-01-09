@@ -188,6 +188,7 @@ their documentation):
 * [Python](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
 * [Python](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
+* [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 
 
 ## Intellectual property
