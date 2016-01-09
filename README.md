@@ -2,7 +2,7 @@
 
 This is the reference C implementation of Argon2, the password-hashing
 function that won the [Password Hashing Competition
-(PHC)](https://password-hashing.net). 
+(PHC)](https://password-hashing.net).
 
 You should use Argon2 whenever you need to hash passwords for credential
 storage, key derivation, or other applications.
@@ -15,7 +15,7 @@ Argon2i and Argon2d are parametrized by
 
 * A **time** cost, which defines the amount of computation realized and
   therefore the execution time, given in number of iterations
-* A **memory** cost, which defines the memory usage, given in kibibytes 
+* A **memory** cost, which defines the memory usage, given in kibibytes
 * A **parallelism** degree, which defines the number of parallel threads
 
 The [Argon2 document](argon2-specs.pdf) gives detailed specs and design
@@ -110,12 +110,12 @@ int main(void)
     uint32_t lanes = parallelism;
     uint32_t threads = parallelism;
     argon2_context context = {
-        hash2, HASHLEN, 
-        pwd, pwdlen, 
+        hash2, HASHLEN,
+        pwd, pwdlen,
         salt, SALTLEN,
         NULL, 0, /* secret data */
         NULL, 0, /* associated data */
-        t_cost, m_cost, parallelism, parallelism, 
+        t_cost, m_cost, parallelism, parallelism,
         NULL, NULL, /* custom memory allocation / deallocation functions */
         ARGON2_DEFAULT_FLAGS /* by default the password is zeroed on exit */
     };
@@ -189,7 +189,7 @@ their documentation):
 * [Python](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
-
+* [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
 
 ## Intellectual property
 
