@@ -190,6 +190,7 @@ their documentation):
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
+* [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
 
 ## Intellectual property
 
