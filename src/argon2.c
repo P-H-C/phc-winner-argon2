@@ -391,7 +391,7 @@ const char *error_message(int error_code) {
             !!((sizeof(Argon2_ErrorMessage) / sizeof(Argon2_ErrorMessage[0])) ==
                ARGON2_ERROR_CODES_LENGTH)
     };
-    if (error_code < ARGON2_ERROR_CODES_LENGTH) {
+    if (error_code >= 0 && error_code < ARGON2_ERROR_CODES_LENGTH) {
         return Argon2_ErrorMessage[(argon2_error_codes)error_code];
     }
     return "Unknown error code.";
