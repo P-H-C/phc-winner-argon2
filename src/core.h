@@ -24,6 +24,8 @@
 #define ALIGN(x)
 #endif
 
+#define CONST_CAST(x) (x)(uintptr_t)
+
 /*************************Argon2 internal
  * constants**************************************************/
 

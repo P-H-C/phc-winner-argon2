@@ -14,6 +14,8 @@
 #ifndef ARGON2_REF_H
 #define ARGON2_REF_H
 
+#include "core.h"
+
 /*
  * Function fills a new memory block
  * @param prev_block Pointer to the previous block
@@ -35,15 +37,5 @@ void fill_block(const block *prev_block, const block *ref_block,
 void generate_addresses(const argon2_instance_t *instance,
                         const argon2_position_t *position,
                         uint64_t *pseudo_rands);
-
-/*
- * Function that fills the segment using previous segments also from other
- * threads
- * @param instance Pointer to the current instance
- * @param position Current position
- * @pre all block pointers must be valid
- */
-void fill_segment(const argon2_instance_t *instance,
-                  argon2_position_t position);
 
 #endif /* ARGON2_REF_H */
