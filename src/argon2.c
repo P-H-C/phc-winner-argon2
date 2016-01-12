@@ -11,11 +11,9 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 
 #include "argon2.h"
 #include "encoding.h"
@@ -273,7 +271,7 @@ int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
                        hash, hashlen, NULL, 0, Argon2_d);
 }
 
-int argon2_compare(const uint8_t *b1, const uint8_t *b2, size_t len) {
+static int argon2_compare(const uint8_t *b1, const uint8_t *b2, size_t len) {
     size_t i;
     uint8_t d = 0U;
 

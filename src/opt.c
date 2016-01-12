@@ -16,7 +16,6 @@
 #include <stdlib.h>
 
 #include "argon2.h"
-#include "core.h"
 #include "opt.h"
 
 #include "blake2/blake2.h"
