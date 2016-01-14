@@ -140,7 +140,7 @@ To use Argon2d instead of Argon2i call `argon2d_hash` instead of
 To produce the crypt-like encoding rather than the raw hash, call
 `argon2i_hash_encoded` for Argon2i and `argon2d_hash_encoded` for Argon2d.
 
-See [`src/argon2.h`](src/argon2.h) for API detais.
+See [`src/argon2.h`](src/argon2.h) for API details.
 
 *Note: in this example the salt is set to the all-`0x00` string for the
 sake of simplicity, but in your application you should use a random salt.*
