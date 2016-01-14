@@ -191,6 +191,7 @@ their documentation):
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
+* [Lua](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 
 ## Intellectual property
 
