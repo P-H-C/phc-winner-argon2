@@ -183,15 +183,15 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
+* [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
 * [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
 * [Javascript](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
+* [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
+* [Lua](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 * [Python](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
 * [Python](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
-* [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
-* [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
-* [Lua](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 
 ## Intellectual property
 
