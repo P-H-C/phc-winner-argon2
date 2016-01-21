@@ -292,11 +292,15 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     argon2_context ctx;
     uint8_t *out;
     int ret;
+    size_t encoded_len;
 
-    /* max values, to be updated in decode_string */
-    ctx.adlen = 512;
-    ctx.saltlen = 512;
-    ctx.outlen = 512;
+    encoded_len = strlen(encoded);
+    /* This is larger than the largest possible size, and thus, safe for 
+     * initialising values. They will be updated in decode_string
+     */
+    ctx.adlen = encoded_len;
+    ctx.saltlen = encoded_len;
+    ctx.outlen = encoded_len;
 
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
