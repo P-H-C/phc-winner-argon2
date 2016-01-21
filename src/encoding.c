@@ -5,7 +5,7 @@
 #include "encoding.h"
 
 #/*
- * Example code for a decoder and encoder of "hash strings", with Argon2i
+ * Example code for a decoder and encoder of "hash strings", with Argon2
  * parameters.
  *
  * This code comprises three sections:
@@ -17,7 +17,7 @@
  *   the relevant functions are made public (non-static) and be given
  *   reasonable names to avoid collisions with other functions.
  *
- *   -- The second section is specific to Argon2i. It encodes and decodes
+ *   -- The second section is specific to Argon2. It encodes and decodes
  *   the parameters, salts and outputs. It does not compute the hash
  *   itself.
  *
@@ -224,13 +224,13 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
 
 /* ==================================================================== */
 /*
- * Code specific to Argon2i.
+ * Code specific to Argon2.
  *
  * The code below applies the following format:
  *
- *  $argon2i$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
+ *  $argon2<T>$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
  *
- * where <num> is a decimal integer (positive, fits in an 'unsigned long')
+ * where <T> is either 'd' or 'i', <num> is a decimal integer (positive, fits in an 'unsigned long'),
  * and <bin> is Base64-encoded data (no '=' padding characters, no newline
  * or whitespace). The "keyid" is a binary identifier for a key (up to 8
  * bytes); "data" is associated data (up to 32 bytes). When the 'keyid'
@@ -242,11 +242,9 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  * The output length is always exactly 32 bytes.
  */
 
-/*
- * Decode an Argon2i hash string into the provided structure 'ctx'.
- * Returned value is 1 on success, 0 on error.
- */
 int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
+
+	//check for prefix
 #define CC(prefix)                                                             \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -256,6 +254,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         str += cc_len;                                                         \
     } while ((void)0, 0)
 
+	//prefix checking with supplied code
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -265,6 +264,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         }                                                                      \
     } while ((void)0, 0)
 
+	//Decoding  prefix into decimal
 #define DECIMAL(x)                                                             \
     do {                                                                       \
         unsigned long dec_x;                                                   \
@@ -297,7 +297,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     else if (type == Argon2_d)
         CC("$argon2d");
     else
-        return 0;
+        return ARGON2_INCORRECT_TYPE;
     CC("$m=");
     DECIMAL(ctx->m_cost);
     CC(",t=");
@@ -313,22 +313,22 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
      * on machines where 'unsigned long' is a 32-bit type.
      */
     if (ctx->m_cost < 1 || (ctx->m_cost >> 30) > 3) {
-        return 0;
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
     if (ctx->t_cost < 1 || (ctx->t_cost >> 30) > 3) {
-        return 0;
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
 
     /*
-     * The parallelism p must be between 1 and 255. The memory cost
+     * The parallelism p must be between 1 and ARGON2_MAX_DECODED_LANES. The memory cost
      * parameter, expressed in kilobytes, must be at least 8 times
      * the value of p.
      */
-    if (ctx->lanes < 1 || ctx->lanes > 255) {
-        return 0;
+    if (ctx->lanes < 1 || ctx->lanes > ARGON2_MAX_DECODED_LANES) {
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
     if (ctx->m_cost < (ctx->lanes << 3)) {
-        return 0;
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
 
     CC_opt(",data=", BIN(ctx->ad, maxadlen, ctx->adlen));
@@ -337,16 +337,16 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     }
     CC("$");
     BIN(ctx->salt, maxsaltlen, ctx->saltlen);
-    if (ctx->saltlen < 8) {
-        return 0;
+    if (ctx->saltlen < ARGON2_MIN_DECODED_SALT_LEN) {
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
     if (*str == 0) {
         return 1;
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-    if (ctx->outlen < 12) {
-        return 0;
+    if (ctx->outlen < ARGON2_MIN_DECODED_OUT_LEN) {
+        return ARGON2_DECODING_LENGTH_FAIL;
     }
     return *str == 0;
 
@@ -356,18 +356,6 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 #undef BIN
 }
 
-/*
- * encode an argon2i hash string into the provided buffer. 'dst_len'
- * contains the size, in characters, of the 'dst' buffer; if 'dst_len'
- * is less than the number of required characters (including the
- * terminating 0), then this function returns 0.
- *
- * if pp->output_len is 0, then the hash string will be a salt string
- * (no output). if pp->salt_len is also 0, then the string will be a
- * parameter-only string (no salt and no output).
- *
- * on success, 1 is returned.
- */
 int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
                   argon2_type type) {
 #define SS(str)                                                                \

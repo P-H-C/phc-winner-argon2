@@ -102,7 +102,9 @@ static const char *Argon2_ErrorMessage[] = {
     /*},
 {ARGON2_DECODING_FAIL, */ "Decoding failed",
     /*},
-{ARGON2_THREAD_FAIL */ "Threading failure", /*},*/
+{ARGON2_THREAD_FAIL */ "Threading failure", 
+/*,
+{ARGON2_DECODING_LENGTH_FAIL */ "Some of encoded parameters are too long or too short" /*},*/
 };
 
 
@@ -213,7 +215,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     result = argon2_core(&context, type);
 
     if (result != ARGON2_OK) {
-        memset(out, 0x00, hashlen);
+		secure_wipe_memory(out, hashlen);
         free(out);
         return result;
     }
@@ -226,13 +228,13 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
         if (!encode_string(encoded, encodedlen, &context, type)) {
-            memset(out, 0x00, hashlen);
-            memset(encoded, 0x00, encodedlen);
+			secure_wipe_memory(out, hashlen);//wipe buffers if error
+			secure_wipe_memory(encoded, encodedlen);
             free(out);
             return ARGON2_ENCODING_FAIL;
         }
     }
-
+	secure_wipe_memory(out, hashlen);
     free(out);
 
     return ARGON2_OK;
@@ -294,9 +296,9 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     int ret;
 
     /* max values, to be updated in decode_string */
-    ctx.adlen = 512;
-    ctx.saltlen = 512;
-    ctx.outlen = 512;
+    ctx.adlen = ARGON2_MAX_DECODED_AD_LEN;
+    ctx.saltlen = ARGON2_MAX_DECODED_SALT_LEN;
+    ctx.outlen = ARGON2_MAX_DECODED_OUT_LEN;
 
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
@@ -314,13 +316,13 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         free(ctx.out);
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
-
-    if(decode_string(&ctx, encoded, type) != 1) {
+	int decode_result = decode_string(&ctx, encoded, type);
+    if(decode_result != 1) {
         free(ctx.ad);
         free(ctx.salt);
         free(ctx.out);
         free(out);
-        return ARGON2_DECODING_FAIL;
+        return decode_result;
     }
 
     ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
