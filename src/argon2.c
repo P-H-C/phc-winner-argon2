@@ -297,6 +297,8 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     ctx.adlen = 512;
     ctx.saltlen = 512;
     ctx.outlen = 512;
+    ctx.allocate_cbk = NULL;
+    ctx.free_cbk = NULL;
 
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
