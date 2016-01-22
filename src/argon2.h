@@ -199,10 +199,7 @@ typedef struct Argon2_Context {
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 
-/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to be decoded******/
-#define ARGON2_MAX_DECODED_SALT_LEN UINT32_C(512)
-#define ARGON2_MAX_DECODED_OUT_LEN UINT32_C(512)
-#define ARGON2_MAX_DECODED_AD_LEN UINT32_C(512)
+/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to be decoded* NOT ENFORCED NOW*****/
 
 
 /*
@@ -272,11 +269,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
 
 /**
  * Verifies a password against an encoded string
- * Encoded string has the following restrictions:
- * Salt between ARGON2_MIN_DECODED_SALT_LEN and ARGON2_MAX_DECODED_SALT_LEN
- * Parallelism between 1 and ARGON2_MAX_DECODED_LANES
- * Associated data no longer than ARGON2_MAX_DECODED_AD_LEN
- * Output between ARGON2_MIN_DECODED_OUT_LEN and ARGON2_MAX_DECODED_OUT_LEN
+ * Encoded string is restricted as in validate_inputs()
  * @param encoded String encoding parameters, salt, hash
  * @param pwd Pointer to password
  * @pre   Returns ARGON2_OK if successful
