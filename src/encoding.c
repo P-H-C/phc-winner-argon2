@@ -5,13 +5,8 @@
 #include "encoding.h"
 #include "core.h"
 
-<<<<<<< HEAD
 /*
- * Example code for a decoder and encoder of "hash strings", with Argon2i
-=======
-#/*
  * Example code for a decoder and encoder of "hash strings", with Argon2
->>>>>>> refs/remotes/origin/master
  * parameters.
  *
  * This code comprises three sections:
@@ -314,58 +309,19 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     DECIMAL(ctx->lanes);
     ctx->threads = ctx->lanes;
 
-<<<<<<< HEAD
-=======
-    /*
-     * Both m and t must be no more than 2^32-1. The tests below
-     * use a shift by 30 bits to avoid a direct comparison with
-     * 0xFFFFFFFF, which may trigger a spurious compiler warning
-     * on machines where 'unsigned long' is a 32-bit type.
-     */
-    if (ctx->m_cost < 1 || (ctx->m_cost >> 30) > 3) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-    if (ctx->t_cost < 1 || (ctx->t_cost >> 30) > 3) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-
-    /*
-     * The parallelism p must be between 1 and ARGON2_MAX_DECODED_LANES. The memory cost
-     * parameter, expressed in kilobytes, must be at least 8 times
-     * the value of p.
-     */
-    if (ctx->lanes < 1 || ctx->lanes > ARGON2_MAX_DECODED_LANES) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-    if (ctx->m_cost < (ctx->lanes << 3)) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-
->>>>>>> refs/remotes/origin/master
     CC_opt(",data=", BIN(ctx->ad, maxadlen, ctx->adlen));
     if (*str == 0) {
         return 1;
     }
     CC("$");
     BIN(ctx->salt, maxsaltlen, ctx->saltlen);
-<<<<<<< HEAD
-=======
-    if (ctx->saltlen < ARGON2_MIN_DECODED_SALT_LEN) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
->>>>>>> refs/remotes/origin/master
     if (*str == 0) {
         return 1;
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-<<<<<<< HEAD
     if (validate_inputs(ctx) != ARGON2_OK) {
         return 0;
-=======
-    if (ctx->outlen < ARGON2_MIN_DECODED_OUT_LEN) {
-        return ARGON2_DECODING_LENGTH_FAIL;
->>>>>>> refs/remotes/origin/master
     }
     return *str == 0;
 
