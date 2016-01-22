@@ -3,8 +3,9 @@
 #include <string.h>
 #include <limits.h>
 #include "encoding.h"
+#include "core.h"
 
-#/*
+/*
  * Example code for a decoder and encoder of "hash strings", with Argon2
  * parameters.
  *
@@ -292,6 +293,8 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     ctx->adlen = 0;
     ctx->saltlen = 0;
     ctx->outlen = 0;
+    ctx->pwdlen = 0;
+
     if (type == Argon2_i)
         CC("$argon2i");
     else if (type == Argon2_d)
@@ -306,47 +309,19 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     DECIMAL(ctx->lanes);
     ctx->threads = ctx->lanes;
 
-    /*
-     * Both m and t must be no more than 2^32-1. The tests below
-     * use a shift by 30 bits to avoid a direct comparison with
-     * 0xFFFFFFFF, which may trigger a spurious compiler warning
-     * on machines where 'unsigned long' is a 32-bit type.
-     */
-    if (ctx->m_cost < 1 || (ctx->m_cost >> 30) > 3) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-    if (ctx->t_cost < 1 || (ctx->t_cost >> 30) > 3) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-
-    /*
-     * The parallelism p must be between 1 and ARGON2_MAX_DECODED_LANES. The memory cost
-     * parameter, expressed in kilobytes, must be at least 8 times
-     * the value of p.
-     */
-    if (ctx->lanes < 1 || ctx->lanes > ARGON2_MAX_DECODED_LANES) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-    if (ctx->m_cost < (ctx->lanes << 3)) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
-
     CC_opt(",data=", BIN(ctx->ad, maxadlen, ctx->adlen));
     if (*str == 0) {
         return 1;
     }
     CC("$");
     BIN(ctx->salt, maxsaltlen, ctx->saltlen);
-    if (ctx->saltlen < ARGON2_MIN_DECODED_SALT_LEN) {
-        return ARGON2_DECODING_LENGTH_FAIL;
-    }
     if (*str == 0) {
         return 1;
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-    if (ctx->outlen < ARGON2_MIN_DECODED_OUT_LEN) {
-        return ARGON2_DECODING_LENGTH_FAIL;
+    if (validate_inputs(ctx) != ARGON2_OK) {
+        return 0;
     }
     return *str == 0;
 
@@ -392,6 +367,10 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         SS("$argon2d$m=");
     else
         return 0;
+
+    if (validate_inputs(ctx) != ARGON2_OK) {
+        return 0;
+    }
     SX(ctx->m_cost);
     SS(",t=");
     SX(ctx->t_cost);

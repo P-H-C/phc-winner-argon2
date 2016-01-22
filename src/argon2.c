@@ -296,10 +296,12 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     int ret;
 
     /* max values, to be updated in decode_string */
-    ctx.adlen = ARGON2_MAX_DECODED_AD_LEN;
-    ctx.saltlen = ARGON2_MAX_DECODED_SALT_LEN;
-    ctx.outlen = ARGON2_MAX_DECODED_OUT_LEN;
-
+	uint32_t encoded_len = strlen(encoded);
+    ctx.adlen = encoded_len;
+    ctx.saltlen = encoded_len;
+    ctx.outlen = encoded_len;
+    ctx.allocate_cbk = NULL;
+    ctx.free_cbk = NULL;
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
     ctx.out = malloc(ctx.outlen);
