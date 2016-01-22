@@ -131,6 +131,8 @@ typedef enum Argon2_ErrorCodes {
 
     ARGON2_THREAD_FAIL = 33,
 
+	ARGON2_DECODING_LENGTH_FAIL=34,
+
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
                                  error code */
@@ -197,6 +199,12 @@ typedef struct Argon2_Context {
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 
+/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to be decoded******/
+#define ARGON2_MAX_DECODED_SALT_LEN UINT32_C(512)
+#define ARGON2_MAX_DECODED_OUT_LEN UINT32_C(512)
+#define ARGON2_MAX_DECODED_AD_LEN UINT32_C(512)
+
+
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
  * @param  context  Pointer to the Argon2 internal structure
@@ -226,7 +234,7 @@ int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
                          char *encoded, const size_t encodedlen);
 
 /**
- * Hashes a password with Argon2i, producing a raw hash
+ * Hashes a password with Argon2i, producing a raw hash by allocating memory at @hash
  * @param t_cost Number of iterations
  * @param m_cost Sets memory usage to m_cost kibibytes
  * @param parallelism Number of threads and compute lanes
@@ -234,7 +242,7 @@ int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
  * @param pwdlen Password size in bytes
  * @param salt Pointer to salt
  * @param saltlen Salt size in bytes
- * @param hash Buffer where to write the raw hash
+ * @param hash Buffer where to write the raw hash - updated by the function
  * @param hashlen Desired length of the hash in bytes
  * @pre   Different parallelism levels will give different results
  * @pre   Returns ARGON2_OK if successful
@@ -264,6 +272,11 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
 
 /**
  * Verifies a password against an encoded string
+ * Encoded string has the following restrictions:
+ * Salt between ARGON2_MIN_DECODED_SALT_LEN and ARGON2_MAX_DECODED_SALT_LEN
+ * Parallelism between 1 and ARGON2_MAX_DECODED_LANES
+ * Associated data no longer than ARGON2_MAX_DECODED_AD_LEN
+ * Output between ARGON2_MIN_DECODED_OUT_LEN and ARGON2_MAX_DECODED_OUT_LEN
  * @param encoded String encoding parameters, salt, hash
  * @param pwd Pointer to password
  * @pre   Returns ARGON2_OK if successful
