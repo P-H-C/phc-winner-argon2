@@ -244,7 +244,7 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
 
 int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
-	//check for prefix
+	/* check for prefix */
 #define CC(prefix)                                                             \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -254,7 +254,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         str += cc_len;                                                         \
     } while ((void)0, 0)
 
-	//prefix checking with supplied code
+	/* prefix checking with supplied code */
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -264,7 +264,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         }                                                                      \
     } while ((void)0, 0)
 
-	//Decoding  prefix into decimal
+	/* Decoding  prefix into decimal */
 #define DECIMAL(x)                                                             \
     do {                                                                       \
         unsigned long dec_x;                                                   \
