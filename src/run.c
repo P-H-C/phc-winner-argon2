@@ -108,7 +108,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, SALT_LEN,
                          out, OUT_LEN, encoded, sizeof encoded, type);
     if (result != ARGON2_OK)
-        fatal(error_message(result));
+        fatal(argon2_error_message(result));
 
     stop_time = clock();
 
@@ -124,7 +124,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
 
     result = argon2_verify(encoded, pwd, pwdlen, type);
     if (result != ARGON2_OK)
-        fatal(error_message(result));
+        fatal(argon2_error_message(result));
     printf("Verification ok\n");
 }
 

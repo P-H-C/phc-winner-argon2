@@ -386,7 +386,7 @@ int argon2i_verify_ctx(argon2_context *context, const char *hash) {
 	return argon2_verify_ctx(context, hash, Argon2_i);
 }
 
-const char *error_message(int error_code) {
+const char *argon2_error_message(int error_code) {
     enum {
         /* Make sure---at compile time---that the enum size matches the array
            size */

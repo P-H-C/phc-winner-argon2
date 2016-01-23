@@ -352,7 +352,7 @@ int argon2_verify_ctx(argon2_context *context, const char *hash,
  * Get the associated error message for given error code
  * @return  The error message associated with the given error code
  */
-const char *error_message(int error_code);
+const char *argon2_error_message(int error_code);
 
 #if defined(__cplusplus)
 }
