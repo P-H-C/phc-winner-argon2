@@ -108,7 +108,7 @@ static const char *Argon2_ErrorMessage[] = {
 };
 
 
-int argon2_core(argon2_context *context, argon2_type type) {
+int argon2_ctx(argon2_context *context, argon2_type type) {
     /* 1. Validate all inputs */
     int result = validate_inputs(context);
     uint32_t memory_blocks, segment_length;
@@ -212,7 +212,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     context.free_cbk = NULL;
     context.flags = ARGON2_DEFAULT_FLAGS;
 
-    result = argon2_core(&context, type);
+    result = argon2_ctx(&context, type);
 
     if (result != ARGON2_OK) {
 		secure_wipe_memory(out, hashlen);
@@ -354,17 +354,22 @@ int argon2d_verify(const char *encoded, const void *pwd, const size_t pwdlen) {
     return argon2_verify(encoded, pwd, pwdlen, Argon2_d);
 }
 
-int argon2d(argon2_context *context) { return argon2_core(context, Argon2_d); }
+int argon2d_ctx(argon2_context *context) {
+	return argon2_ctx(context, Argon2_d);
+}
 
-int argon2i(argon2_context *context) { return argon2_core(context, Argon2_i); }
+int argon2i_ctx(argon2_context *context) {
+	return argon2_ctx(context, Argon2_i);
+}
 
-int verify_d(argon2_context *context, const char *hash) {
+int argon2_verify_ctx(argon2_context *context, const char *hash, 
+						argon2_type type) {
     int result;
     if (0 == context->outlen || NULL == hash) {
         return ARGON2_OUT_PTR_MISMATCH;
     }
 
-    result = argon2_core(context, Argon2_d);
+    result = argon2_ctx(context, type);
 
     if (ARGON2_OK != result) {
         return result;
@@ -373,21 +378,13 @@ int verify_d(argon2_context *context, const char *hash) {
     return 0 == memcmp(hash, context->out, context->outlen);
 }
 
-int verify_i(argon2_context *context, const char *hash) {
-    int result;
-    if (0 == context->outlen || NULL == hash) {
-        return ARGON2_OUT_PTR_MISMATCH;
-    }
-
-    result = argon2_core(context, Argon2_i);
-
-    if (ARGON2_OK != result) {
-        return result;
-    }
-
-    return 0 == memcmp(hash, context->out, context->outlen);
+int argon2d_verify_ctx(argon2_context *context, const char *hash) {
+    return argon2_verify_ctx(context, hash, Argon2_d);
 }
 
+int argon2i_verify_ctx(argon2_context *context, const char *hash) {
+	return argon2_verify_ctx(context, hash, Argon2_i);
+}
 
 const char *error_message(int error_code) {
     enum {

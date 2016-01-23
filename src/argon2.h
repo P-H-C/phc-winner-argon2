@@ -207,7 +207,7 @@ typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
  * @param  context  Pointer to the Argon2 internal structure
  * @return Error code if smth is wrong, ARGON2_OK otherwise
  */
-int argon2_core(argon2_context *context, argon2_type type);
+int argon2_ctx(argon2_context *context, argon2_type type);
 
 /**
  * Hashes a password with Argon2i, producing an encoded hash
@@ -289,7 +289,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2d(argon2_context *context);
+int argon2d_ctx(argon2_context *context);
 
 /*
  *  * **************Argon2i: Version of Argon2 that picks memory blocks
@@ -299,14 +299,14 @@ int argon2d(argon2_context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2i(argon2_context *context);
+int argon2i_ctx(argon2_context *context);
 
 /*
  *   * **************Argon2di: Reserved name***************
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2di(argon2_context *context);
+int argon2di_ctx(argon2_context *context);
 
 /*
  *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20%
@@ -314,7 +314,7 @@ int argon2di(argon2_context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2ds(argon2_context *context);
+int argon2ds_ctx(argon2_context *context);
 
 /*
  *   * **************Argon2id: First half-pass over memory is
@@ -324,7 +324,7 @@ int argon2ds(argon2_context *context);
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
-int argon2id(argon2_context *context);
+int argon2id_ctx(argon2_context *context);
 
 /*
  * Verify if a given password is correct for Argon2d hashing
@@ -333,7 +333,7 @@ int argon2id(argon2_context *context);
  * specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-int verify_d(argon2_context *context, const char *hash);
+int argon2d_verify_ctx(argon2_context *context, const char *hash);
 
 /*
  * Verify if a given password is correct for Argon2i hashing
@@ -342,7 +342,11 @@ int verify_d(argon2_context *context, const char *hash);
  * specified by the context outlen member
  * @return  Zero if successful, a non zero error code otherwise
  */
-int verify_i(argon2_context *context, const char *hash);
+int argon2i_verify_ctx(argon2_context *context, const char *hash);
+
+/* generic function underlying the above ones */
+int argon2_verify_ctx(argon2_context *context, const char *hash, 
+                        argon2_type type);
 
 /*
  * Get the associated error message for given error code

@@ -11,6 +11,8 @@
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -141,9 +143,9 @@ int main(void)
 	uint8_t *pwd = (uint8_t *)strdup(PWD);
 	uint32_t pwdlen = strlen((char *)pwd);
 
-	uint32_t t_cost = 2;            // 1-pass computation
-	uint32_t m_cost = (1 << 16);      // 64 mebibytes memory usage
-	uint32_t parallelism = 1;       // number of threads and lanes
+	uint32_t t_cost = 2;            /* 1-pass computation */
+	uint32_t m_cost = (1 << 16);    /* 64 mebibytes memory usage */
+	uint32_t parallelism = 1;       /* number of threads and lanes */
 
 	argon2i_hash_encoded(
 		t_cost, m_cost,
