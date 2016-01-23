@@ -250,7 +250,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
         if (strncmp(str, prefix, cc_len) != 0) {                               \
-            return 0;                                                          \
+            return ARGON2_DECODING_FAIL;                                                          \
         }                                                                      \
         str += cc_len;                                                         \
     } while ((void)0, 0)
@@ -272,6 +272,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         str = decode_decimal(str, &dec_x);                                     \
         if (str == NULL) {                                                     \
             return 0;                                                          \
+            return ARGON2_DECODING_FAIL;                                                          \
         }                                                                      \
         (x) = dec_x;                                                           \
     } while ((void)0, 0)
@@ -281,7 +282,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         size_t bin_len = (max_len);                                            \
         str = from_base64(buf, &bin_len, str);                                 \
         if (str == NULL || bin_len > UINT32_MAX) {                             \
-            return 0;                                                          \
+            return ARGON2_DECODING_FAIL;                                                          \
         }                                                                      \
         (len) = (uint32_t)bin_len;                                             \
     } while ((void)0, 0)
@@ -311,20 +312,25 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
     CC_opt(",data=", BIN(ctx->ad, maxadlen, ctx->adlen));
     if (*str == 0) {
-        return 1;
+        return ARGON2_OK;
     }
     CC("$");
     BIN(ctx->salt, maxsaltlen, ctx->saltlen);
     if (*str == 0) {
-        return 1;
+        return ARGON2_OK;
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-    if (validate_inputs(ctx) != ARGON2_OK) {
-        return 0;
+	int validation_result = validate_inputs(ctx);
+    if (validation_result != ARGON2_OK) {
+        return validation_result;
     }
-    return *str == 0;
-
+	if (*str == 0) {
+		return ARGON2_OK;
+	}
+	else {
+		return ARGON2_DECODING_FAIL;
+	}
 #undef CC
 #undef CC_opt
 #undef DECIMAL
@@ -337,7 +343,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     do {                                                                       \
         size_t pp_len = strlen(str);                                           \
         if (pp_len >= dst_len) {                                               \
-            return 0;                                                          \
+            return ARGON2_ENCODING_FAIL;                                                          \
         }                                                                      \
         memcpy(dst, str, pp_len + 1);                                          \
         dst += pp_len;                                                         \
@@ -355,7 +361,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     do {                                                                       \
         size_t sb_len = to_base64(dst, dst_len, buf, len);                     \
         if (sb_len == (size_t)-1) {                                            \
-            return 0;                                                          \
+            return ARGON2_ENCODING_FAIL;                                                          \
         }                                                                      \
         dst += sb_len;                                                         \
         dst_len -= sb_len;                                                     \
@@ -366,10 +372,10 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     else if (type == Argon2_d)
         SS("$argon2d$m=");
     else
-        return 0;
+        return ARGON2_ENCODING_FAIL;
 
     if (validate_inputs(ctx) != ARGON2_OK) {
-        return 0;
+        return validate_inputs(ctx);
     }
     SX(ctx->m_cost);
     SS(",t=");
@@ -383,17 +389,17 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     }
 
     if (ctx->saltlen == 0)
-        return 1;
+        return ARGON2_OK;
 
     SS("$");
     SB(ctx->salt, ctx->saltlen);
 
     if (ctx->outlen == 0)
-        return 1;
+        return ARGON2_OK;
 
     SS("$");
     SB(ctx->out, ctx->outlen);
-    return 1;
+    return ARGON2_OK;
 
 #undef SS
 #undef SX

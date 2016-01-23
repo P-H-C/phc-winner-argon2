@@ -227,7 +227,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
 
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
-        if (!encode_string(encoded, encodedlen, &context, type)) {
+        if (encode_string(encoded, encodedlen, &context, type)!=ARGON2_OK) {
 			secure_wipe_memory(out, hashlen); /* wipe buffers if error */
 			secure_wipe_memory(encoded, encodedlen);
             free(out);
@@ -319,7 +319,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
 	int decode_result = decode_string(&ctx, encoded, type);
-    if(decode_result != 1) {
+    if(decode_result != ARGON2_OK) {
         free(ctx.ad);
         free(ctx.salt);
         free(ctx.out);

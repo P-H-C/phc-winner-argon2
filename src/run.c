@@ -126,7 +126,63 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     printf("Verification ok\n");
 }
 
-int main(int argc, char *argv[]) {
+#define HASHLEN 32
+#define SALTLEN 16
+#define PWD "password"
+
+int main(void)
+{
+	char hash_i[HASHLEN * 100];
+	char hash_d[HASHLEN * 100];
+
+	uint8_t salt[SALTLEN];
+	memset(salt, 0x00, SALTLEN);
+
+	uint8_t *pwd = (uint8_t *)strdup(PWD);
+	uint32_t pwdlen = strlen((char *)pwd);
+
+	uint32_t t_cost = 2;            // 1-pass computation
+	uint32_t m_cost = (1 << 16);      // 64 mebibytes memory usage
+	uint32_t parallelism = 1;       // number of threads and lanes
+
+	argon2i_hash_encoded(
+		t_cost, m_cost,
+		parallelism,
+		pwd, pwdlen,
+		salt, SALTLEN,
+		HASHLEN,
+		hash_i, HASHLEN * 100
+		);
+	argon2d_hash_encoded(
+		t_cost, m_cost,
+		parallelism,
+		pwd, pwdlen,
+		salt, SALTLEN,
+		HASHLEN,
+		hash_d, HASHLEN * 100
+		);
+
+	printf("hash_i: %s\n", hash_i);
+	printf("hash_d: %s\n\n", hash_d);
+
+	int rv;
+
+	rv = argon2i_verify(hash_i, "hello", 5);
+	printf("wrong pwd, correct type (both i): %d\n", rv);
+	rv = argon2d_verify(hash_d, "hello", 5);
+	printf("wrong pwd, correct type (both d): %d\n", rv);
+	rv = argon2i_verify(hash_d, "hello", 5);
+	printf("wrong pwd, wrong type (i/d): %d\n", rv);
+	rv = argon2d_verify(hash_i, "hello", 5);
+	printf("wrong pwd, wrong type (d/i): %d\n", rv);
+	if (rv == 0) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int main2(int argc, char *argv[]) {
     unsigned char out[OUT_LEN];
     uint32_t m_cost = 1 << LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
