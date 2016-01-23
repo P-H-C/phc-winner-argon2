@@ -80,9 +80,9 @@ static void benchmark() {
             context.free_cbk = NULL;
             context.flags = 0;
 
-            argon2d(&context);
+            argon2d_ctx(&context);
             stop_cycles = rdtsc();
-            argon2i(&context);
+            argon2i_ctx(&context);
             stop_cycles_i = rdtsc();
             stop_time = clock();
 

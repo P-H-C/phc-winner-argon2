@@ -180,9 +180,9 @@ static void generate_testvectors(const char *type) {
 #undef TEST_ADLEN
 
     if (!strcmp(type, "d")) {
-        argon2d(&context);
+        argon2d_ctx(&context);
     } else if (!strcmp(type, "i")) {
-        argon2i(&context);
+        argon2i_ctx(&context);
     } else
         fatal("wrong Argon2 type");
 }
