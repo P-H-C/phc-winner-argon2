@@ -245,7 +245,7 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
 
 int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
-	/* check for prefix */
+    /* check for prefix */
 #define CC(prefix)                                                             \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -255,7 +255,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         str += cc_len;                                                         \
     } while ((void)0, 0)
 
-	/* prefix checking with supplied code */
+    /* prefix checking with supplied code */
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -265,7 +265,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         }                                                                      \
     } while ((void)0, 0)
 
-	/* Decoding  prefix into decimal */
+    /* Decoding  prefix into decimal */
 #define DECIMAL(x)                                                             \
     do {                                                                       \
         unsigned long dec_x;                                                   \
@@ -321,16 +321,16 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-	int validation_result = validate_inputs(ctx);
+    int validation_result = validate_inputs(ctx);
     if (validation_result != ARGON2_OK) {
         return validation_result;
     }
-	if (*str == 0) {
-		return ARGON2_OK;
-	}
-	else {
-		return ARGON2_DECODING_FAIL;
-	}
+    if (*str == 0) {
+        return ARGON2_OK;
+    }
+    else {
+        return ARGON2_DECODING_FAIL;
+    }
 #undef CC
 #undef CC_opt
 #undef DECIMAL

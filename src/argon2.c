@@ -215,7 +215,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     result = argon2_ctx(&context, type);
 
     if (result != ARGON2_OK) {
-		secure_wipe_memory(out, hashlen);
+        secure_wipe_memory(out, hashlen);
         free(out);
         return result;
     }
@@ -228,13 +228,13 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
         if (encode_string(encoded, encodedlen, &context, type)!=ARGON2_OK) {
-			secure_wipe_memory(out, hashlen); /* wipe buffers if error */
-			secure_wipe_memory(encoded, encodedlen);
+            secure_wipe_memory(out, hashlen); /* wipe buffers if error */
+            secure_wipe_memory(encoded, encodedlen);
             free(out);
             return ARGON2_ENCODING_FAIL;
         }
     }
-	secure_wipe_memory(out, hashlen);
+    secure_wipe_memory(out, hashlen);
     free(out);
 
     return ARGON2_OK;
@@ -296,7 +296,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     int ret;
 
     /* max values, to be updated in decode_string */
-	uint32_t encoded_len = strlen(encoded);
+    uint32_t encoded_len = strlen(encoded);
     ctx.adlen = encoded_len;
     ctx.saltlen = encoded_len;
     ctx.outlen = encoded_len;
@@ -318,7 +318,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         free(ctx.out);
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
-	int decode_result = decode_string(&ctx, encoded, type);
+    int decode_result = decode_string(&ctx, encoded, type);
     if(decode_result != ARGON2_OK) {
         free(ctx.ad);
         free(ctx.salt);
@@ -327,8 +327,8 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         return decode_result;
     }
 
-    ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen, ctx.salt,
-                ctx.saltlen, out, ctx.outlen, NULL, 0, type);
+    ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen,
+            ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type);
 
     free(ctx.ad);
     free(ctx.salt);
