@@ -131,7 +131,7 @@ typedef enum Argon2_ErrorCodes {
 
     ARGON2_THREAD_FAIL = 33,
 
-	ARGON2_DECODING_LENGTH_FAIL=34,
+    ARGON2_DECODING_LENGTH_FAIL = 34,
 
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
@@ -198,9 +198,8 @@ typedef struct Argon2_Context {
 /* Argon2 primitive type */
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
-
-/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to be decoded* NOT ENFORCED NOW*****/
-
+/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to
+ * be decoded* NOT ENFORCED NOW*****/
 
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
@@ -231,7 +230,8 @@ int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
                          char *encoded, const size_t encodedlen);
 
 /**
- * Hashes a password with Argon2i, producing a raw hash by allocating memory at @hash
+ * Hashes a password with Argon2i, producing a raw hash by allocating memory at
+ * @hash
  * @param t_cost Number of iterations
  * @param m_cost Sets memory usage to m_cost kibibytes
  * @param parallelism Number of threads and compute lanes
@@ -345,8 +345,8 @@ int argon2d_verify_ctx(argon2_context *context, const char *hash);
 int argon2i_verify_ctx(argon2_context *context, const char *hash);
 
 /* generic function underlying the above ones */
-int argon2_verify_ctx(argon2_context *context, const char *hash, 
-                        argon2_type type);
+int argon2_verify_ctx(argon2_context *context, const char *hash,
+                      argon2_type type);
 
 /*
  * Get the associated error message for given error code

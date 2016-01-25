@@ -102,11 +102,10 @@ static const char *Argon2_ErrorMessage[] = {
     /*},
 {ARGON2_DECODING_FAIL, */ "Decoding failed",
     /*},
-{ARGON2_THREAD_FAIL */ "Threading failure", 
-/*,
+{ARGON2_THREAD_FAIL */ "Threading failure",
+    /*,
 {ARGON2_DECODING_LENGTH_FAIL */ "Some of encoded parameters are too long or too short" /*},*/
 };
-
 
 int argon2_ctx(argon2_context *context, argon2_type type) {
     /* 1. Validate all inputs */
@@ -163,7 +162,6 @@ int argon2_ctx(argon2_context *context, argon2_type type) {
 
     return ARGON2_OK;
 }
-
 
 int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
                 const uint32_t parallelism, const void *pwd,
@@ -227,7 +225,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
 
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
-        if (encode_string(encoded, encodedlen, &context, type)!=ARGON2_OK) {
+        if (encode_string(encoded, encodedlen, &context, type) != ARGON2_OK) {
             secure_wipe_memory(out, hashlen); /* wipe buffers if error */
             secure_wipe_memory(encoded, encodedlen);
             free(out);
@@ -320,7 +318,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
     decode_result = decode_string(&ctx, encoded, type);
-    if(decode_result != ARGON2_OK) {
+    if (decode_result != ARGON2_OK) {
         free(ctx.ad);
         free(ctx.salt);
         free(ctx.out);
@@ -329,7 +327,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     }
 
     ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen,
-            ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type);
+                      ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type);
 
     free(ctx.ad);
     free(ctx.salt);
@@ -356,15 +354,15 @@ int argon2d_verify(const char *encoded, const void *pwd, const size_t pwdlen) {
 }
 
 int argon2d_ctx(argon2_context *context) {
-	return argon2_ctx(context, Argon2_d);
+    return argon2_ctx(context, Argon2_d);
 }
 
 int argon2i_ctx(argon2_context *context) {
-	return argon2_ctx(context, Argon2_i);
+    return argon2_ctx(context, Argon2_i);
 }
 
-int argon2_verify_ctx(argon2_context *context, const char *hash, 
-						argon2_type type) {
+int argon2_verify_ctx(argon2_context *context, const char *hash,
+                      argon2_type type) {
     int result;
     if (0 == context->outlen || NULL == hash) {
         return ARGON2_OUT_PTR_MISMATCH;
@@ -384,7 +382,7 @@ int argon2d_verify_ctx(argon2_context *context, const char *hash) {
 }
 
 int argon2i_verify_ctx(argon2_context *context, const char *hash) {
-	return argon2_verify_ctx(context, hash, Argon2_i);
+    return argon2_verify_ctx(context, hash, Argon2_i);
 }
 
 const char *argon2_error_message(int error_code) {

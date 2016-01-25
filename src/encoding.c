@@ -59,7 +59,7 @@
  * Some macros for constant-time comparisons. These work over values in
  * the 0..255 range. Returned value is 0x00 on "false", 0xFF on "true".
  */
-#define EQ(x, y) ((((0U-((unsigned)(x) ^ (unsigned)(y))) >> 8) & 0xFF) ^ 0xFF)
+#define EQ(x, y) ((((0U - ((unsigned)(x) ^ (unsigned)(y))) >> 8) & 0xFF) ^ 0xFF)
 #define GT(x, y) ((((unsigned)(y) - (unsigned)(x)) >> 8) & 0xFF)
 #define GE(x, y) (GT(y, x) ^ 0xFF)
 #define LT(x, y) GT(y, x)
@@ -123,11 +123,11 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
         acc_len += 8;
         while (acc_len >= 6) {
             acc_len -= 6;
-            *dst++ = (char) b64_byte_to_char((acc >> acc_len) & 0x3F);
+            *dst++ = (char)b64_byte_to_char((acc >> acc_len) & 0x3F);
         }
     }
     if (acc_len > 0) {
-        *dst++ = (char) b64_byte_to_char((acc << (6 - acc_len)) & 0x3F);
+        *dst++ = (char)b64_byte_to_char((acc << (6 - acc_len)) & 0x3F);
     }
     *dst++ = 0;
     return olen;
@@ -231,10 +231,11 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  *
  *  $argon2<T>$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
  *
- * where <T> is either 'd' or 'i', <num> is a decimal integer (positive, fits in an 'unsigned long'),
- * and <bin> is Base64-encoded data (no '=' padding characters, no newline
- * or whitespace). The "keyid" is a binary identifier for a key (up to 8
- * bytes); "data" is associated data (up to 32 bytes). When the 'keyid'
+ * where <T> is either 'd' or 'i', <num> is a decimal integer (positive, fits in
+ * an 'unsigned long'), and <bin> is Base64-encoded data (no '=' padding
+ * characters, no newline or whitespace).
+ * The "keyid" is a binary identifier for a key (up to 8 bytes);
+ * "data" is associated data (up to 32 bytes). When the 'keyid'
  * (resp. the 'data') is empty, then it is ommitted from the output.
  *
  * The last two binary chunks (encoded in Base64) are, in that order,
@@ -245,17 +246,17 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
 
 int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
-    /* check for prefix */
+/* check for prefix */
 #define CC(prefix)                                                             \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
         if (strncmp(str, prefix, cc_len) != 0) {                               \
-            return ARGON2_DECODING_FAIL;                                                          \
+            return ARGON2_DECODING_FAIL;                                       \
         }                                                                      \
         str += cc_len;                                                         \
     } while ((void)0, 0)
 
-    /* prefix checking with supplied code */
+/* prefix checking with supplied code */
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -265,14 +266,14 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         }                                                                      \
     } while ((void)0, 0)
 
-    /* Decoding  prefix into decimal */
+/* Decoding  prefix into decimal */
 #define DECIMAL(x)                                                             \
     do {                                                                       \
         unsigned long dec_x;                                                   \
         str = decode_decimal(str, &dec_x);                                     \
         if (str == NULL) {                                                     \
             return 0;                                                          \
-            return ARGON2_DECODING_FAIL;                                                          \
+            return ARGON2_DECODING_FAIL;                                       \
         }                                                                      \
         (x) = dec_x;                                                           \
     } while ((void)0, 0)
@@ -282,7 +283,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         size_t bin_len = (max_len);                                            \
         str = from_base64(buf, &bin_len, str);                                 \
         if (str == NULL || bin_len > UINT32_MAX) {                             \
-            return ARGON2_DECODING_FAIL;                                                          \
+            return ARGON2_DECODING_FAIL;                                       \
         }                                                                      \
         (len) = (uint32_t)bin_len;                                             \
     } while ((void)0, 0)
@@ -327,8 +328,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     }
     if (*str == 0) {
         return ARGON2_OK;
-    }
-    else {
+    } else {
         return ARGON2_DECODING_FAIL;
     }
 #undef CC
@@ -343,7 +343,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     do {                                                                       \
         size_t pp_len = strlen(str);                                           \
         if (pp_len >= dst_len) {                                               \
-            return ARGON2_ENCODING_FAIL;                                                          \
+            return ARGON2_ENCODING_FAIL;                                       \
         }                                                                      \
         memcpy(dst, str, pp_len + 1);                                          \
         dst += pp_len;                                                         \
@@ -361,7 +361,7 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     do {                                                                       \
         size_t sb_len = to_base64(dst, dst_len, buf, len);                     \
         if (sb_len == (size_t)-1) {                                            \
-            return ARGON2_ENCODING_FAIL;                                                          \
+            return ARGON2_ENCODING_FAIL;                                       \
         }                                                                      \
         dst += sb_len;                                                         \
         dst_len -= sb_len;                                                     \
