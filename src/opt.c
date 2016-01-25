@@ -93,8 +93,10 @@ void generate_addresses(const argon2_instance_t *instance,
             if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
                 input_block.v[6]++;
 
-                fill_block_lhs_zero((__m128i*) &address_block.v, (const uint8_t *) &input_block.v);
-                fill_block_lhs_zero((__m128i*) &address_block.v, (const uint8_t *) &address_block.v);
+                fill_block_lhs_zero((__m128i*) &address_block.v,
+                                    (const uint8_t *) &input_block.v);
+                fill_block_lhs_zero((__m128i*) &address_block.v,
+                                    (const uint8_t *) &address_block.v);
             }
 
             pseudo_rands[i] = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
