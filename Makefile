@@ -35,7 +35,7 @@ KERNEL_NAME := $(shell uname -s)
 LIB_NAME=argon2
 ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := so
-	LIB_CFLAGS := -shared -fPIC
+	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
 	SO_LDFLAGS := -Wl,-soname,libargon2.so.0
 endif
 ifeq ($(KERNEL_NAME), NetBSD)
