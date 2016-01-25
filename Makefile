@@ -90,8 +90,11 @@ dist:
 		cd ..; \
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
-test:
+test:   $(SRC) src/test.c
+		$(CC) $(CFLAGS) -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
 		@sh kats/test.sh
+		./testcase
+
 
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
