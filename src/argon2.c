@@ -294,6 +294,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     argon2_context ctx;
     uint8_t *out;
     int ret;
+    int decode_result;
 
     /* max values, to be updated in decode_string */
     uint32_t encoded_len = strlen(encoded);
@@ -318,7 +319,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
         free(ctx.out);
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
-    int decode_result = decode_string(&ctx, encoded, type);
+    decode_result = decode_string(&ctx, encoded, type);
     if(decode_result != ARGON2_OK) {
         free(ctx.ad);
         free(ctx.salt);
