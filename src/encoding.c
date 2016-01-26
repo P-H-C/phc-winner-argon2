@@ -290,6 +290,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     size_t maxadlen = ctx->adlen;
     size_t maxsaltlen = ctx->saltlen;
     size_t maxoutlen = ctx->outlen;
+    int validation_result;
 
     ctx->adlen = 0;
     ctx->saltlen = 0;
@@ -321,7 +322,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
-    int validation_result = validate_inputs(ctx);
+    validation_result = validate_inputs(ctx);
     if (validation_result != ARGON2_OK) {
         return validation_result;
     }

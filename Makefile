@@ -93,5 +93,7 @@ dist:
 test:
 		@sh kats/test.sh
 
+.PHONY: test
+
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
