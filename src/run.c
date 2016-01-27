@@ -29,11 +29,12 @@
 #define THREADS_DEF 1
 #define OUT_LEN 32
 #define SALT_LEN 16
-/* Sample encode: $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
+/* Sample encode:
+ $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
  * Maximumum lengths are defined as:
  * strlen $argon2i$ = 9
  * m=65536 with strlen (uint32_t)-1 = 10, so this total is 12
- * ,t=2,p=4 If we consider each number to potentially reach four digits in future, this = 14
+ * ,t=2,p=4 where each number could reach four digits in future, this = 14
  * $c29tZXNhbHQAAAAAAAAAAA Formula for this is (SALT_LEN * 4 + 3) / 3 + 1 = 23
  * $QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY per above formula, = 44
  * + NULL byte

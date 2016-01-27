@@ -19,7 +19,7 @@ SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -std=c89 -pthread -O3 -Wall -g
+CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
@@ -35,7 +35,7 @@ KERNEL_NAME := $(shell uname -s)
 LIB_NAME=argon2
 ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := so
-	LIB_CFLAGS := -shared -fPIC
+	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
 	SO_LDFLAGS := -Wl,-soname,libargon2.so.0
 endif
 ifeq ($(KERNEL_NAME), NetBSD)
@@ -64,16 +64,16 @@ all: clean $(RUN) libs
 libs: $(LIB_SH) $(LIB_ST)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
-		$(CC) $(CFLAGS) $(LDFLAGS) $^ -Isrc  -o $@
+		$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 $(BENCH):       $(SRC) $(SRC_BENCH)
-		$(CC) $(CFLAGS) $^ -Isrc  -o $@
+		$(CC) $(CFLAGS) $^ -o $@
 
 $(GENKAT):      $(SRC) $(SRC_GENKAT)
-		$(CC) $(CFLAGS) $^ -Isrc  -o $@ -DGENKAT
+		$(CC) $(CFLAGS) $^ -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
-		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -Isrc -o $@
+		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -o $@
 
 $(LIB_ST): 	$(OBJ)
 		ar rcs $@ $^
@@ -96,4 +96,4 @@ test:
 .PHONY: test
 
 format:
-		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i src/*.c src/*.h src/blake2/*.c src/blake2/*.h
+		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i include/*.h src/*.c src/*.h src/blake2/*.c src/blake2/*.h

@@ -68,7 +68,7 @@ The example program below hashes the string "password" with Argon2i
 using the high-level API and then using the low-level API. While the
 high-level API only takes input/output buffers and the two cost
 parameters, the low-level API additionally takes parallelism parameters
-and several others, as defined in [`src/argon2.h`](src/argon2.h).
+and several others, as defined in [`include/argon2.h`](include/argon2.h).
 
 
 Here the time cost `t_cost` is set to 2 iterations, the
@@ -140,7 +140,7 @@ To use Argon2d instead of Argon2i call `argon2d_hash` instead of
 To produce the crypt-like encoding rather than the raw hash, call
 `argon2i_hash_encoded` for Argon2i and `argon2d_hash_encoded` for Argon2d.
 
-See [`src/argon2.h`](src/argon2.h) for API details.
+See [`include/argon2.h`](include/argon2.h) for API details.
 
 *Note: in this example the salt is set to the all-`0x00` string for the
 sake of simplicity, but in your application you should use a random salt.*
