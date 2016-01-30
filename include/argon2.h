@@ -318,31 +318,6 @@ ARGON2_PUBLIC int argon2d_ctx(argon2_context *context);
 ARGON2_PUBLIC int argon2i_ctx(argon2_context *context);
 
 /*
- *   * **************Argon2di: Reserved name***************
- * @param  context  Pointer to current Argon2 context
- * @return  Zero if successful, a non zero error code otherwise
- */
-ARGON2_PUBLIC int argon2di_ctx(argon2_context *context);
-
-/*
- *   * **************Argon2ds: Argon2d hardened against GPU attacks, 20%
- * slower***************
- * @param  context  Pointer to current Argon2 context
- * @return  Zero if successful, a non zero error code otherwise
- */
-ARGON2_PUBLIC int argon2ds_ctx(argon2_context *context);
-
-/*
- *   * **************Argon2id: First half-pass over memory is
- *password-independent, the rest are password-dependent
- ********************OK against side channels: they reduce to 1/2-pass
- *Argon2i***************
- * @param  context  Pointer to current Argon2 context
- * @return  Zero if successful, a non zero error code otherwise
- */
-ARGON2_PUBLIC int argon2id_ctx(argon2_context *context);
-
-/*
  * Verify if a given password is correct for Argon2d hashing
  * @param  context  Pointer to current Argon2 context
  * @param  hash  The password hash to verify. The length of the hash is
