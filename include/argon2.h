@@ -5,11 +5,11 @@
  *
  * This work is licensed under a Creative Commons CC0 1.0 License/Waiver.
  *
- * You should have received a copy of the CC0 Public Domain Dedication along
- * with
- * this software. If not, see
+ * You should have received a copy of the CC0 Public Domain Dedication
+ * along with this software. If not, see
  * <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
+
 #ifndef ARGON2_H
 #define ARGON2_H
 
@@ -28,8 +28,9 @@ extern "C" {
 #define ARGON2_PUBLIC
 #endif
 
-/*************************Argon2 input parameter
- * restrictions**************************************************/
+/*
+ * Argon2 input parameter restrictions
+ */
 
 /* Minimum and maximum number of lanes (degree of parallelism) */
 #define ARGON2_MIN_LANES UINT32_C(1)
@@ -50,8 +51,7 @@ extern "C" {
 #define ARGON2_MIN_MEMORY (2 * ARGON2_SYNC_POINTS) /* 2 blocks per slice */
 
 #define ARGON2_MIN(a, b) ((a) < (b) ? (a) : (b))
-/* Max memory size is half the addressing space, topping at 2^32 blocks (4 TB)
- */
+/* Max memory size is addressing-space/2, topping at 2^32 blocks (4 TB) */
 #define ARGON2_MAX_MEMORY_BITS                                                 \
     ARGON2_MIN(UINT32_C(32), (sizeof(void *) * CHAR_BIT - 10 - 1))
 #define ARGON2_MAX_MEMORY                                                      \
@@ -152,28 +152,29 @@ typedef void (*deallocate_fptr)(uint8_t *memory, size_t bytes_to_allocate);
 /* Argon2 external data structures */
 
 /*
- *****Context: structure to hold Argon2 inputs:
- * output array and its length,
- * password and its length,
- * salt and its length,
- * secret and its length,
- * associated data and its length,
- * number of passes, amount of used memory (in KBytes, can be rounded up a bit)
- * number of parallel threads that will be run.
+ *****
+ * Context: structure to hold Argon2 inputs:
+ *  output array and its length,
+ *  password and its length,
+ *  salt and its length,
+ *  secret and its length,
+ *  associated data and its length,
+ *  number of passes, amount of used memory (in KBytes, can be rounded up a bit)
+ *  number of parallel threads that will be run.
  * All the parameters above affect the output hash value.
  * Additionally, two function pointers can be provided to allocate and
- deallocate the memory (if NULL, memory will be allocated internally).
+ * deallocate the memory (if NULL, memory will be allocated internally).
  * Also, three flags indicate whether to erase password, secret as soon as they
- are pre-hashed (and thus not needed anymore), and the entire memory
- ****************************
- Simplest situation: you have output array out[8], password is stored in
- pwd[32], salt is stored in salt[16], you do not have keys nor associated data.
- You need to spend 1 GB of RAM and you run 5 passes of Argon2d with 4 parallel
- lanes.
- You want to erase the password, but you're OK with last pass not being erased.
- You want to use the default memory allocator.
- Then you initialize
- Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,4,NULL,NULL,true,false,false,false).
+ * are pre-hashed (and thus not needed anymore), and the entire memory
+ *****
+ * Simplest situation: you have output array out[8], password is stored in
+ * pwd[32], salt is stored in salt[16], you do not have keys nor associated
+ * data. You need to spend 1 GB of RAM and you run 5 passes of Argon2d with
+ * 4 parallel lanes.
+ * You want to erase the password, but you're OK with last pass not being
+ * erased. You want to use the default memory allocator.
+ * Then you initialize:
+ Argon2_Context(out,8,pwd,32,salt,16,NULL,0,NULL,0,5,1<<20,4,4,NULL,NULL,true,false,false,false)
  */
 typedef struct Argon2_Context {
     uint8_t *out;    /* output array */
@@ -204,9 +205,6 @@ typedef struct Argon2_Context {
 
 /* Argon2 primitive type */
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
-
-/*****Decoding restrictions (maximal salt/ad/out lengths allowed in a string to
- * be decoded* NOT ENFORCED NOW*****/
 
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
@@ -298,26 +296,27 @@ ARGON2_PUBLIC int argon2d_verify(const char *encoded, const void *pwd,
 ARGON2_PUBLIC int argon2_verify(const char *encoded, const void *pwd,
                                 const size_t pwdlen, argon2_type type);
 
-/*
- * **************Argon2d: Version of Argon2 that picks memory blocks depending
+/**
+ * Argon2d: Version of Argon2 that picks memory blocks depending
  * on the password and salt. Only for side-channel-free
- * environment!!***************
+ * environment!!
+ *****
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
 ARGON2_PUBLIC int argon2d_ctx(argon2_context *context);
 
-/*
- *  * **************Argon2i: Version of Argon2 that picks memory blocks
- *independent on the password and salt. Good for side-channels,
- ******************* but worse w.r.t. tradeoff attacks if
- *******************only one pass is used***************
+/**
+ * Argon2i: Version of Argon2 that picks memory blocks
+ * independent on the password and salt. Good for side-channels,
+ * but worse w.r.t. tradeoff attacks if only one pass is used.
+ *****
  * @param  context  Pointer to current Argon2 context
  * @return  Zero if successful, a non zero error code otherwise
  */
 ARGON2_PUBLIC int argon2i_ctx(argon2_context *context);
 
-/*
+/**
  * Verify if a given password is correct for Argon2d hashing
  * @param  context  Pointer to current Argon2 context
  * @param  hash  The password hash to verify. The length of the hash is
@@ -326,7 +325,7 @@ ARGON2_PUBLIC int argon2i_ctx(argon2_context *context);
  */
 ARGON2_PUBLIC int argon2d_verify_ctx(argon2_context *context, const char *hash);
 
-/*
+/**
  * Verify if a given password is correct for Argon2i hashing
  * @param  context  Pointer to current Argon2 context
  * @param  hash  The password hash to verify. The length of the hash is
@@ -339,7 +338,7 @@ ARGON2_PUBLIC int argon2i_verify_ctx(argon2_context *context, const char *hash);
 ARGON2_PUBLIC int argon2_verify_ctx(argon2_context *context, const char *hash,
                                     argon2_type type);
 
-/*
+/**
  * Get the associated error message for given error code
  * @return  The error message associated with the given error code
  */
