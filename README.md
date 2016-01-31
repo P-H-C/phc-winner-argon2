@@ -4,14 +4,24 @@ This is the reference C implementation of Argon2, the password-hashing
 function that won the [Password Hashing Competition
 (PHC)](https://password-hashing.net).
 
-You should use Argon2 whenever you need to hash passwords for credential
-storage, key derivation, or other applications.
+Argon2 is a password-hashing function that summarizes the state of the
+art in the design of memory-hard functions and can be used to hash
+passwords for credential storage, key derivation, or other applications.
 
-There are two main versions of Argon2, **Argon2i** and **Argon2d**. Argon2i
-is the safest against side-channel attacks, while Argon2d provides the
-highest resistance against GPU cracking attacks.
+It has a simple design aimed at the highest memory filling rate and
+effective use of multiple computing units, while still providing defense
+against tradeoff attacks (by exploiting the cache and memory organization
+of the recent processors).
 
-Argon2i and Argon2d are parametrized by
+Argon2 has two variants: Argon2d and Argon2i. Argon2d is faster and
+uses data-depending memory access, which makes it highly resistant
+against GPU cracking attacks and suitable for applications with no threats
+from side-channel timing attacks (eg. cryptocurrencies). Argon2i instead
+uses data-independent memory access, which is preferred for password
+hashing and password-based key derivation, but it is slower as it makes
+more passes over the memory to protect from tradeoff attacks.
+
+Argon2i and Argon2d are parametrized by:
 
 * A **time** cost, which defines the amount of computation realized and
   therefore the execution time, given in number of iterations
