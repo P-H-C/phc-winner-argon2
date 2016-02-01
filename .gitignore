@@ -6,6 +6,6 @@ libargon2.dylib
 src/*.o
 src/blake2/*.o
 genkat
-test.c
 .idea
 *.pyc
+testcase

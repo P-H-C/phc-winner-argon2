@@ -204,6 +204,14 @@ their documentation):
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 
+## Test Suite
+
+There are two sets of test suites. One is a low level test for the hash
+function, the other tests the higher level API. Both of these are built and
+executed by running:
+
+`make test`
+
 ## Intellectual property
 
 Except for the components listed below, the Argon2 code in this
