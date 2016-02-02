@@ -81,6 +81,7 @@ $(LIB_ST): 	$(OBJ)
 clean:
 		rm -f $(RUN) $(BENCH) $(GENKAT)
 		rm -f $(LIB_SH) $(LIB_ST) kat-argon2* 
+		rm -f testcase
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
@@ -91,7 +92,7 @@ dist:
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
 test:   $(SRC) src/test.c
-		$(CC) $(CFLAGS) -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
+		$(CC) $(CFLAGS) -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
