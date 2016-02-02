@@ -92,7 +92,7 @@ dist:
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
 test:   $(SRC) src/test.c
-		$(CC) $(CFLAGS) -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
+		$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
