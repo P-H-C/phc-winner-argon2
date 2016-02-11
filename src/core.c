@@ -93,7 +93,7 @@ int allocate_memory(block **memory, uint32_t m_cost) {
         if (!*memory) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
-
+        memset(memory,0, memory_size);
         return ARGON2_OK;
     } else {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
