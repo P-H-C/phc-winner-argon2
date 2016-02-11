@@ -283,6 +283,8 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                 if (l >= instance->threads) {
                     rc = argon2_thread_join(thread[l - instance->threads]);
                     if (rc) {
+                        free(thr_data);
+                        free(thread);
                         return ARGON2_THREAD_FAIL;
                     }
                 }
@@ -299,6 +301,8 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                 rc = argon2_thread_create(&thread[l], &fill_segment_thr,
                                           (void *)&thr_data[l]);
                 if (rc) {
+                    free(thr_data);
+                    free(thread);
                     return ARGON2_THREAD_FAIL;
                 }
 
