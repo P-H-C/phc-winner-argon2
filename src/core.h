@@ -31,7 +31,7 @@
 
 enum argon2_core_constants {
     /* Version of the algorithm */
-    ARGON2_VERSION_NUMBER = 0x10,
+    ARGON2_VERSION_NUMBER = 0x13,
 
     /* Memory block size in bytes */
     ARGON2_BLOCK_SIZE = 1024,

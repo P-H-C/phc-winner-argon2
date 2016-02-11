@@ -25,9 +25,11 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     uint32_t i;
 
-    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
-        block_XY[i] = state[i] = _mm_xor_si128(
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) { 
+       state[i] = _mm_xor_si128(
             state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
+        block_XY[i] =  _mm_xor_si128(
+            state[i], _mm_loadu_si128((__m128i const *)(&next_block[16 * i])));
     }
 
     for (i = 0; i < 8; ++i) {
