@@ -10,9 +10,5 @@ os:
 
 script: make && make testci
 
-#before_install:
-#  - pip install --user codecov
-
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-#  - codecov
