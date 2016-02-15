@@ -18,13 +18,14 @@
 #include <emmintrin.h>
 
 /*
- * Function fills a new memory block. Differs from the
+ * Function fills a new memory block by XORing the new block over the old one. Memory must be initialized. 
+ * After finishing, @state is identical to @next_block
  * @param state Pointer to the just produced block. Content will be updated(!)
  * @param ref_block Pointer to the reference block
- * @param next_block Pointer to the block to be constructed
+ * @param next_block Pointer to the block to be XORed over. May coincide with @ref_block
  * @pre all block pointers must be valid
  */
-void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block);
+void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next_block);
 
 /*
  * Generate pseudo-random values to reference blocks in the segment and puts

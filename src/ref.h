@@ -17,13 +17,13 @@
 #include "core.h"
 
 /*
- * Function fills a new memory block
+ * Function fills a new memory block by XORing over @next_block. @next_block must be initialized
  * @param prev_block Pointer to the previous block
  * @param ref_block Pointer to the reference block
  * @param next_block Pointer to the block to be constructed
  * @pre all block pointers must be valid
  */
-void fill_block(const block *prev_block, const block *ref_block,
+void fill_block_with_xor(const block *prev_block, const block *ref_block,
                 block *next_block);
 
 /*

@@ -1,4 +1,4 @@
-#include <stdio.h>
+git ech#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +22,7 @@ static uint64_t rdtsc(void) {
     __asm__ __volatile__("rdtsc" : "=A"(rax) : :);
     return rax;
 #else
-#error "Not implemented!"
+#error "Not implemented!"git branch
 #endif
 #endif
 }
@@ -42,16 +42,16 @@ static void benchmark() {
 #undef BENCH_INLEN
 #undef BENCH_OUTLEN
 
-    uint32_t t_cost = 1;
-    uint32_t m_cost;
-    uint32_t thread_test[6] = {1, 2, 4, 6, 8, 16};
+    uint32_t t_cost = 3;
+    uint32_t m_cost;git
+    uint32_t thread_test[4] = {1, 2, 4,  8};
 
     memset(pwd_array, 0, inlen);
     memset(salt_array, 1, inlen);
 
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
         unsigned i;
-        for (i = 0; i < 6; ++i) {
+        for (i = 0; i < 4; ++i) {
             argon2_context context;
             uint32_t thread_n = thread_test[i];
             uint64_t stop_cycles, stop_cycles_i;
