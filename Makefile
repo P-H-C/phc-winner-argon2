@@ -20,7 +20,8 @@ SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
-CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined
+CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
+				-Wextra -Wno-type-limits -Werror
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
@@ -54,6 +55,12 @@ endif
 ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),OpenBSD FreeBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
+endif
+
+ifeq ($(KERNEL_NAME), Linux)
+ifeq ($(CC), clang)
+	CI_FLAGS += -fsanitize=address -fsanitize=undefined
+endif
 endif
 
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
@@ -105,4 +112,5 @@ testci:   $(SRC) src/test.c
 .PHONY: test
 
 format:
-		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" -i include/*.h src/*.c src/*.h src/blake2/*.c src/blake2/*.h
+		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" \
+			-i include/*.h src/*.c src/*.h src/blake2/*.c src/blake2/*.h
