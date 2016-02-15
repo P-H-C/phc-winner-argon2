@@ -9,3 +9,6 @@ genkat
 .idea
 *.pyc
 testcase
+*.gcda
+*.gcno
+*.gcov

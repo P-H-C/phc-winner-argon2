@@ -1,9 +1,17 @@
 language: c
+
 compiler:
   - clang
   - gcc
+
 os:
   - linux
   - osx
+
 script: make && make testci
 
+before_install:
+  - pip install --user codecov
+
+after_success:
+  - codecov
