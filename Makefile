@@ -97,7 +97,8 @@ test:   $(SRC) src/test.c
 		./testcase
 
 testci:   $(SRC) src/test.c
-		$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
+		@#$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
+		$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
