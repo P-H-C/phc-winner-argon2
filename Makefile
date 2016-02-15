@@ -20,6 +20,7 @@ SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
+CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined
 
 #OPT=TRUE
 ifeq ($(OPT), TRUE)
@@ -97,8 +98,7 @@ test:   $(SRC) src/test.c
 		./testcase
 
 testci:   $(SRC) src/test.c
-		@#$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror -fsanitize=address -fsanitize=undefined $^ -o testcase
-		$(CC) $(CFLAGS)  -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 -Wextra -Wno-type-limits -Werror $^ -o testcase
+		$(CC) $(CI_CFLAGS) $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
