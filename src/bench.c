@@ -1,4 +1,4 @@
-git ech#include <stdio.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +22,7 @@ static uint64_t rdtsc(void) {
     __asm__ __volatile__("rdtsc" : "=A"(rax) : :);
     return rax;
 #else
-#error "Not implemented!"git branch
+#error "Not implemented!"
 #endif
 #endif
 }
@@ -43,7 +43,7 @@ static void benchmark() {
 #undef BENCH_OUTLEN
 
     uint32_t t_cost = 3;
-    uint32_t m_cost;git
+    uint32_t m_cost;
     uint32_t thread_test[4] = {1, 2, 4,  8};
 
     memset(pwd_array, 0, inlen);
