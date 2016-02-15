@@ -1,5 +1,7 @@
 # Argon2
 
+[![Build Status](https://travis-ci.org/P-H-C/phc-winner-argon2.svg?branch=master)](https://travis-ci.org/P-H-C/phc-winner-argon2)
+
 This is the reference C implementation of Argon2, the password-hashing
 function that won the [Password Hashing Competition
 (PHC)](https://password-hashing.net).
