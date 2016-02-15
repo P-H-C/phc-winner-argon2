@@ -59,7 +59,7 @@ endif
 
 ifeq ($(KERNEL_NAME), Linux)
 ifeq ($(CC), clang)
-	CI_FLAGS += -fsanitize=address -fsanitize=undefined
+	CI_CFLAGS += -fsanitize=address -fsanitize=undefined
 endif
 endif
 
