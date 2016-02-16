@@ -12,3 +12,4 @@ testcase
 *.gcda
 *.gcno
 *.gcov
+bench
