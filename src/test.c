@@ -47,6 +47,7 @@ void hashtest(uint32_t t, uint32_t m, uint32_t p, char *pwd, char *hexref,
 int main() {
     int ret;
     unsigned char out[OUT_LEN];
+    char const *msg;
 
     memset(salt, 0x00, SALT_LEN); /* pad with null bytes */
     memcpy(salt, "somesalt", 8);
@@ -68,6 +69,10 @@ int main() {
              "e346b1e1aa7ca58c9bb862e223ba5604064398d4394e49e90972c6b54cef43ed",
              "$argon2i$m=256,t=2,p=1$c29tZXNhbHQAAAAAAAAAAA$"
              "40ax4ap8pYybuGLiI7pWBAZDmNQ5TknpCXLGtUzvQ+0");
+    hashtest(2, 8, 2, "password",
+             "524179ce5cc9608228bddd4c2b78e394efa3fb0068703390abbd8afb1fa86368",
+             "$argon2i$m=256,t=2,p=2$c29tZXNhbHQAAAAAAAAAAA$"
+             "UkF5zlzJYIIovd1MK3jjlO+j+wBocDOQq72K+x+oY2g");
     hashtest(1, 16, 1, "password",
              "b49199e4ecb0f6659e6947f945e391c940b17106e1d0b0a9888006c7f87a789b",
              "$argon2i$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$"
@@ -110,6 +115,10 @@ int main() {
                         "password", strlen("password"), Argon2_i);
     assert(ret == ARGON2_DECODING_FAIL);
     printf("Recognise an invalid encoding: PASS\n");
+
+    msg = argon2_error_message(ret);
+    assert(strcmp(msg, "Decoding failed")==0);
+    printf("Decode an error message: PASS\n");
 
     return 0;
 }
