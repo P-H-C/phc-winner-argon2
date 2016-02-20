@@ -19,94 +19,6 @@
 #include "encoding.h"
 #include "core.h"
 
-/* Error messages */
-static const char *Argon2_ErrorMessage[] = {
-    /*{ARGON2_OK, */ "OK",
-    /*},
-
-    {ARGON2_OUTPUT_PTR_NULL, */ "Output pointer is NULL",
-    /*},
-
-{ARGON2_OUTPUT_TOO_SHORT, */ "Output is too short",
-    /*},
-{ARGON2_OUTPUT_TOO_LONG, */ "Output is too long",
-    /*},
-
-{ARGON2_PWD_TOO_SHORT, */ "Password is too short",
-    /*},
-{ARGON2_PWD_TOO_LONG, */ "Password is too long",
-    /*},
-
-{ARGON2_SALT_TOO_SHORT, */ "Salt is too short",
-    /*},
-{ARGON2_SALT_TOO_LONG, */ "Salt is too long",
-    /*},
-
-{ARGON2_AD_TOO_SHORT, */ "Associated data is too short",
-    /*},
-{ARGON2_AD_TOO_LONG, */ "Associated date is too long",
-    /*},
-
-{ARGON2_SECRET_TOO_SHORT, */ "Secret is too short",
-    /*},
-{ARGON2_SECRET_TOO_LONG, */ "Secret is too long",
-    /*},
-
-{ARGON2_TIME_TOO_SMALL, */ "Time cost is too small",
-    /*},
-{ARGON2_TIME_TOO_LARGE, */ "Time cost is too large",
-    /*},
-
-{ARGON2_MEMORY_TOO_LITTLE, */ "Memory cost is too small",
-    /*},
-{ARGON2_MEMORY_TOO_MUCH, */ "Memory cost is too large",
-    /*},
-
-{ARGON2_LANES_TOO_FEW, */ "Too few lanes",
-    /*},
-{ARGON2_LANES_TOO_MANY, */ "Too many lanes",
-    /*},
-
-{ARGON2_PWD_PTR_MISMATCH, */ "Password pointer is NULL, but password length is not 0",
-    /*},
-{ARGON2_SALT_PTR_MISMATCH, */ "Salt pointer is NULL, but salt length is not 0",
-    /*},
-{ARGON2_SECRET_PTR_MISMATCH, */ "Secret pointer is NULL, but secret length is not 0",
-    /*},
-{ARGON2_AD_PTR_MISMATCH, */ "Associated data pointer is NULL, but ad length is not 0",
-    /*},
-
-{ARGON2_MEMORY_ALLOCATION_ERROR, */ "Memory allocation error",
-    /*},
-
-{ARGON2_FREE_MEMORY_CBK_NULL, */ "The free memory callback is NULL",
-    /*},
-{ARGON2_ALLOCATE_MEMORY_CBK_NULL, */ "The allocate memory callback is NULL",
-    /*},
-
-{ARGON2_INCORRECT_PARAMETER, */ "Argon2_Context context is NULL",
-    /*},
-{ARGON2_INCORRECT_TYPE, */ "There is no such version of Argon2",
-    /*},
-
-{ARGON2_OUT_PTR_MISMATCH, */ "Output pointer mismatch",
-    /*},
-
-{ARGON2_THREADS_TOO_FEW, */ "Not enough threads",
-    /*},
-{ARGON2_THREADS_TOO_MANY, */ "Too many threads",
-    /*},
-{ARGON2_MISSING_ARGS, */ "Missing arguments",
-    /*},
-{ARGON2_ENCODING_FAIL, */ "Encoding failed",
-    /*},
-{ARGON2_DECODING_FAIL, */ "Decoding failed",
-    /*},
-{ARGON2_THREAD_FAIL */ "Threading failure",
-    /*,
-{ARGON2_DECODING_LENGTH_FAIL */ "Some of encoded parameters are too long or too short" /*},*/
-};
-
 int argon2_ctx(argon2_context *context, argon2_type type) {
     /* 1. Validate all inputs */
     int result = validate_inputs(context);
@@ -388,16 +300,42 @@ int argon2i_verify_ctx(argon2_context *context, const char *hash) {
 }
 
 const char *argon2_error_message(int error_code) {
-    enum {
-        /* Make sure---at compile time---that the enum size matches the array
-           size */
-        ERROR_STRING_CHECK =
-            1 /
-            !!((sizeof(Argon2_ErrorMessage) / sizeof(Argon2_ErrorMessage[0])) ==
-               ARGON2_ERROR_CODES_LENGTH)
-    };
-    if (error_code >= 0 && error_code < ARGON2_ERROR_CODES_LENGTH) {
-        return Argon2_ErrorMessage[(argon2_error_codes)error_code];
+    switch(error_code) {
+    case ARGON2_OK: return "OK";
+    case ARGON2_OUTPUT_PTR_NULL: return "Output pointer is NULL";
+    case ARGON2_OUTPUT_TOO_SHORT: return "Output is too short";
+    case ARGON2_OUTPUT_TOO_LONG: return "Output is too long";
+    case ARGON2_PWD_TOO_SHORT: return "Password is too short";
+    case ARGON2_PWD_TOO_LONG: return "Password is too long";
+    case ARGON2_SALT_TOO_SHORT: return "Salt is too short";
+    case ARGON2_SALT_TOO_LONG: return "Salt is too long";
+    case ARGON2_AD_TOO_SHORT: return "Associated data is too short";
+    case ARGON2_AD_TOO_LONG: return "Associated data is too long";
+    case ARGON2_SECRET_TOO_SHORT:  return "Secret is too short";
+    case ARGON2_SECRET_TOO_LONG: return "Secret is too long";
+    case ARGON2_TIME_TOO_SMALL: return "Time cost is too small";
+    case ARGON2_TIME_TOO_LARGE: return "Time cost is too large";
+    case ARGON2_MEMORY_TOO_LITTLE: return "Memory cost is too small";
+    case ARGON2_MEMORY_TOO_MUCH: return "Memory cost is too large";
+    case ARGON2_LANES_TOO_FEW: return "Too few lanes";
+    case ARGON2_LANES_TOO_MANY: return "Too many lanes";
+    case ARGON2_PWD_PTR_MISMATCH: return "Password pointer is NULL, but password length is not 0";
+    case ARGON2_SALT_PTR_MISMATCH: return "Salt pointer is NULL, but salt length is not 0";
+    case ARGON2_SECRET_PTR_MISMATCH: return "Secret pointer is NULL, but secret length is not 0";
+    case ARGON2_AD_PTR_MISMATCH: return "Associated data pointer is NULL, but ad length is not 0";
+    case ARGON2_MEMORY_ALLOCATION_ERROR: return "Memory allocation error";
+    case ARGON2_FREE_MEMORY_CBK_NULL: return "The free memory callback is NULL";
+    case ARGON2_ALLOCATE_MEMORY_CBK_NULL: return "The allocate memory callback is NULL";
+    case ARGON2_INCORRECT_PARAMETER: return "Argon2_Context context is NULL";
+    case ARGON2_INCORRECT_TYPE: return "There is no such version of Argon2";
+    case ARGON2_OUT_PTR_MISMATCH: return "Output pointer mismatch";
+    case ARGON2_THREADS_TOO_FEW: return "Not enough threads";
+    case ARGON2_THREADS_TOO_MANY: return "Too many threads";
+    case ARGON2_MISSING_ARGS: return "Missing arguments";
+    case ARGON2_ENCODING_FAIL: return "Encoding failed";
+    case ARGON2_DECODING_FAIL: return "Decoding failed";
+    case ARGON2_THREAD_FAIL: return "Threading failure";
+    case ARGON2_DECODING_LENGTH_FAIL: return "Some of encoded parameters are too long or too short";
+    default: return "Unknown error code";
     }
-    return "Unknown error code.";
 }
