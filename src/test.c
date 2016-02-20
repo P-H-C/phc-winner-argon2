@@ -117,7 +117,7 @@ int main() {
     printf("Recognise an invalid encoding: PASS\n");
 
     msg = argon2_error_message(ret);
-    assert(strcmp(msg, "Decoding failed")==0);
+    assert(strcmp(msg, "Decoding failed") == 0);
     printf("Decode an error message: PASS\n");
 
     return 0;
