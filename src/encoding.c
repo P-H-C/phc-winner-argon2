@@ -272,7 +272,6 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         unsigned long dec_x;                                                   \
         str = decode_decimal(str, &dec_x);                                     \
         if (str == NULL) {                                                     \
-            return 0;                                                          \
             return ARGON2_DECODING_FAIL;                                       \
         }                                                                      \
         (x) = dec_x;                                                           \
