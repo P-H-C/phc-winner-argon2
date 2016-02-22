@@ -104,7 +104,9 @@ static const char *Argon2_ErrorMessage[] = {
     /*},
 {ARGON2_THREAD_FAIL */ "Threading failure",
     /*,
-{ARGON2_DECODING_LENGTH_FAIL */ "Some of encoded parameters are too long or too short" /*},*/
+{ARGON2_DECODING_LENGTH_FAIL */ "Some of encoded parameters are too long or too short",
+    /*,
+{ARGON2_VERIFY_MISMATCH */ "The password does not match the supplied hash" /*},*/
 };
 
 int argon2_ctx(argon2_context *context, argon2_type type) {
@@ -334,15 +336,13 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     free(ctx.ad);
     free(ctx.salt);
 
-    if (ret != ARGON2_OK || argon2_compare(out, ctx.out, ctx.outlen)) {
-        free(out);
-        free(ctx.out);
-        return ARGON2_DECODING_FAIL;
+    if (ret == ARGON2_OK && argon2_compare(out, ctx.out, ctx.outlen)) {
+        ret = ARGON2_VERIFY_MISMATCH;
     }
     free(out);
     free(ctx.out);
 
-    return ARGON2_OK;
+    return ret;
 }
 
 int argon2i_verify(const char *encoded, const void *pwd, const size_t pwdlen) {

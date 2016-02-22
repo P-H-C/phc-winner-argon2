@@ -140,6 +140,8 @@ typedef enum Argon2_ErrorCodes {
 
     ARGON2_DECODING_LENGTH_FAIL = 34,
 
+    ARGON2_VERIFY_MISMATCH = 35,
+
     ARGON2_ERROR_CODES_LENGTH /* Do NOT remove; Do NOT add error codes after
                                  this
                                  error code */
