@@ -13,9 +13,10 @@
 
 #define _GNU_SOURCE 1
 
-#include <stdio.h>
-#include <stdint.h>
 #include <inttypes.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -28,24 +29,6 @@
 #define LANES_DEF 1
 #define THREADS_DEF 1
 #define OUT_LEN 32
-#define SALT_LEN 16
-/* Sample encode:
- $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
- * Maximumum lengths are defined as:
- * strlen $argon2i$ = 9
- * m=65536 with strlen (uint32_t)-1 = 10, so this total is 12
- * ,t=2,p=4 where each number could reach four digits in future, this = 14
- * $c29tZXNhbHQAAAAAAAAAAA Formula for this is (SALT_LEN * 4 + 3) / 3 + 1 = 23
- * $QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY per above formula, = 44
- * + NULL byte
- * 9 + 12 + 14 + 23 + 44 + 1 = 103
- * Rounded to 4 byte boundary: 104
- *
- * WARNING: 104 is only for the parameters supported by this
-   command-line utility. You'll need a longer ENCODED_LEN to support
-   longer salts and ouputs, as supported by the argon2 library
- */
-#define ENCODED_LEN 108
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -82,12 +65,11 @@ Base64-encoded hash string
 @threads actual parallelism
 @type String, only "d" and "i" are accepted
 */
-static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
+static void run(uint8_t *out, char *pwd, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type) {
     clock_t start_time, stop_time;
-    size_t pwdlen;
-    char encoded[ENCODED_LEN];
+    size_t pwdlen, saltlen, encodedlen;
     uint32_t i;
     int result;
 
@@ -103,11 +85,27 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     }
 
     pwdlen = strlen(pwd);
+    saltlen = strlen(salt);
 
     UNUSED_PARAMETER(lanes);
 
-    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, SALT_LEN,
-                         out, OUT_LEN, encoded, sizeof encoded, type);
+    /* 92 = sum of parameters max length + password length (32 chars in base64)
+       aka strlen("$argon2x$m=,t=,p=$$") = all info characters
+         + 1+log10(0xFFFFFFFF) = maximum memory cost, 2^32-1
+         + 1+log10(0xFFFFFF) = maximum iterations, 2^24-1
+         + 1+log10(0xFFFFFF) = maximum threads, 2^24 - 1
+         + 44 = base64 password
+         + null-byte = if one uses 16k iterations + 4gb memory + 16kk threads...
+    */
+    encodedlen = 92 + (size_t)(ceil(saltlen / 3.0) * 4);
+    char* encoded = malloc(encodedlen + 1);
+    if (!encoded) {
+        secure_wipe_memory(pwd, strlen(pwd));
+        fatal("could not allocate memory for hash");
+    }
+
+    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
+                         out, OUT_LEN, encoded, encodedlen, type);
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
 
@@ -127,6 +125,7 @@ static void run(uint8_t *out, char *pwd, uint8_t *salt, uint32_t t_cost,
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
     printf("Verification ok\n");
+    free(encoded);
 }
 
 int main(int argc, char *argv[]) {
@@ -135,16 +134,17 @@ int main(int argc, char *argv[]) {
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
-    uint8_t salt[SALT_LEN];
     argon2_type type = Argon2_i;
     int i;
     size_t n;
-    char pwd[128];
+    char pwd[128], *salt;
 
     if (argc < 2) {
         usage(argv[0]);
         return ARGON2_MISSING_ARGS;
     }
+
+    salt = argv[1];
 
     /* get password from stdin */
     while ((n = fread(pwd, 1, sizeof pwd - 1, stdin)) > 0) {
@@ -152,13 +152,6 @@ int main(int argc, char *argv[]) {
         if (pwd[n - 1] == '\n')
             pwd[n - 1] = '\0';
     }
-
-    /* get salt from command line */
-    if (strlen(argv[1]) > SALT_LEN) {
-        fatal("salt too long");
-    }
-    memset(salt, 0x00, SALT_LEN); /* pad with null bytes */
-    memcpy(salt, argv[1], strlen(argv[1]));
 
     /* parse options */
     for (i = 2; i < argc; i++) {
