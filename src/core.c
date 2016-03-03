@@ -88,12 +88,11 @@ int allocate_memory(block **memory, uint32_t m_cost) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
 
-        *memory = (block *)malloc(memory_size); /*2. Try to allocate*/
+        *memory = (block *)calloc(memory_size, 1); /*2. Try to allocate*/
 
         if (!*memory) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
-
         return ARGON2_OK;
     } else {
         return ARGON2_MEMORY_ALLOCATION_ERROR;

@@ -21,13 +21,15 @@
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"
 
-void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
+void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     uint32_t i;
 
-    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
-        block_XY[i] = state[i] = _mm_xor_si128(
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) { 
+       state[i] = _mm_xor_si128(
             state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
+        block_XY[i] =  _mm_xor_si128(
+            state[i], _mm_loadu_si128((__m128i const *)(&next_block[16 * i])));
     }
 
     for (i = 0; i < 8; ++i) {
@@ -51,7 +53,7 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
 void generate_addresses(const argon2_instance_t *instance,
                         const argon2_position_t *position,
                         uint64_t *pseudo_rands) {
-    block address_block, input_block;
+    block address_block, input_block, tmp_block;
     uint32_t i;
 
     init_block_value(&address_block, 0);
@@ -67,14 +69,20 @@ void generate_addresses(const argon2_instance_t *instance,
 
         for (i = 0; i < instance->segment_length; ++i) {
             if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
+                /*Temporary zero-initialized blocks*/
                 __m128i zero_block[ARGON2_OWORDS_IN_BLOCK];
                 __m128i zero2_block[ARGON2_OWORDS_IN_BLOCK];
                 memset(zero_block, 0, sizeof(zero_block));
                 memset(zero2_block, 0, sizeof(zero2_block));
+                init_block_value(&address_block, 0);
+                init_block_value(&tmp_block, 0);
+                /*Increasing index counter*/
                 input_block.v[6]++;
-                fill_block(zero_block, (uint8_t *)&input_block.v,
-                           (uint8_t *)&address_block.v);
-                fill_block(zero2_block, (uint8_t *)&address_block.v,
+                /*First iteration of G*/
+                fill_block_with_xor(zero_block, (uint8_t *)&input_block.v,
+                           (uint8_t *)&tmp_block.v);
+                /*Second iteration of G*/
+                fill_block_with_xor(zero2_block, (uint8_t *)&tmp_block.v,
                            (uint8_t *)&address_block.v);
             }
 
@@ -165,7 +173,7 @@ void fill_segment(const argon2_instance_t *instance,
         ref_block =
             instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
-        fill_block(state, (uint8_t *)ref_block->v, (uint8_t *)curr_block->v);
+        fill_block_with_xor(state, (uint8_t *)ref_block->v, (uint8_t *)curr_block->v);
     }
 
     free(pseudo_rands);
