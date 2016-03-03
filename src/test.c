@@ -109,14 +109,21 @@ int main() {
     printf("Fail on salt too short: PASS\n");
 
     /* Handle an invalid encoding correctly (it is missing a $) */
-    ret = argon2_verify("$argon2i$m=262144,t=2,p=1$"
-                        "c29tZXNhbHQAAAAAAAAAAAVSkjmMzo/"
-                        "HhoXmENAEypvaXDJaCi5ihaDeX4Ft8TmqY",
+    ret = argon2_verify("$argon2i$m=65536,t=2,p=1$"
+                        "c29tZXNhbHQAAAAAAAAAAA"
+                        "HH7u+eDpabMCRyL8hkocqfbKINpz+b8/FzGIG+riA54",
                         "password", strlen("password"), Argon2_i);
     assert(ret == ARGON2_DECODING_FAIL);
     printf("Recognise an invalid encoding: PASS\n");
 
-    msg = argon2_error_message(ret);
+    /* Handle an mismatching hash (the encoded password is "passwore") */
+    ret = argon2_verify("$argon2i$m=65536,t=2,p=1$c29tZXNhbHQAAAAAAAAAAA"
+                        "$tiY53ekuxy5gUQV9pEgGgu3cfe2vKl3l+lKxTna33I4",
+                        "password", strlen("password"), Argon2_i);
+    assert(ret == ARGON2_VERIFY_MISMATCH);
+    printf("Verify with mismatched password: PASS\n");
+
+    msg = argon2_error_message(ARGON2_DECODING_FAIL);
     assert(strcmp(msg, "Decoding failed")==0);
     printf("Decode an error message: PASS\n");
 
