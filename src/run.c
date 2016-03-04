@@ -28,13 +28,13 @@
 #define LOG_M_COST_DEF 12 /* 2^12 = 4 MiB */
 #define LANES_DEF 1
 #define THREADS_DEF 1
-#define OUT_LEN 32
+#define OUTLEN_DEF 32
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
     printf("Usage:  %s salt [-d] [-t iterations] [-m memory] "
-           "[-p parallelism]\n",
+           "[-p parallelism] [-h hash length]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -46,11 +46,17 @@ static void usage(const char *cmd) {
            LOG_M_COST_DEF);
     printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
+    printf("\t-h N\t\tSets hash output length to N bytes (default %d)\n",
+           OUTLEN_DEF);
 }
 
 static void fatal(const char *error) {
     fprintf(stderr, "Error: %s\n", error);
     exit(1);
+}
+
+static uint32_t b64len(uint32_t len) {
+    return (size_t)(ceil(len / 3.0) * 4);
 }
 
 /*
@@ -65,7 +71,7 @@ Base64-encoded hash string
 @threads actual parallelism
 @type String, only "d" and "i" are accepted
 */
-static void run(uint8_t *out, char *pwd, char *salt, uint32_t t_cost,
+static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type) {
     clock_t start_time, stop_time;
@@ -89,15 +95,20 @@ static void run(uint8_t *out, char *pwd, char *salt, uint32_t t_cost,
 
     UNUSED_PARAMETER(lanes);
 
-    /* 92 = sum of parameters max length + password length (32 chars in base64)
-       aka strlen("$argon2x$m=,t=,p=$$") = all info characters
-         + 1+log10(0xFFFFFFFF) = maximum memory cost, 2^32-1
-         + 1+log10(0xFFFFFF) = maximum iterations, 2^24-1
-         + 1+log10(0xFFFFFF) = maximum threads, 2^24 - 1
-         + 44 = base64 password
-         + null-byte = if one uses 16k iterations + 4gb memory + 16kk threads...
+    unsigned char* out = malloc(outlen + 1);
+    if (!out) {
+        secure_wipe_memory(pwd, strlen(pwd));
+        fatal("could not allocate memory for output");
+    }
+
+    /* 45 = strlen("$argon2x$m=4294967295,t=16777215,p=16777215$$")
+       aka strlen("$argon2x$m=,t=,p=$$") = 19
+         + log10(0xFFFFFFFF + 1) = maximum memory cost, 2^32-1 = 10
+         + log10(0xFFFFFF + 1) = maximum iterations, 2^24-1 = 8
+         + log10(0xFFFFFF + 1) = maximum threads, 2^24 - 1 = 8
+         + null-byte at the end
     */
-    encodedlen = 92 + (size_t)(ceil(saltlen / 3.0) * 4);
+    encodedlen = 45 + b64len(saltlen) + b64len(outlen);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
@@ -105,16 +116,17 @@ static void run(uint8_t *out, char *pwd, char *salt, uint32_t t_cost,
     }
 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
-                         out, OUT_LEN, encoded, encodedlen, type);
+                         out, outlen, encoded, encodedlen, type);
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
 
     stop_time = clock();
 
     printf("Hash:\t\t");
-    for (i = 0; i < OUT_LEN; ++i) {
+    for (i = 0; i < outlen; ++i) {
         printf("%02x", out[i]);
     }
+    free(out);
     printf("\n");
     printf("Encoded:\t%s\n", encoded);
 
@@ -129,7 +141,7 @@ static void run(uint8_t *out, char *pwd, char *salt, uint32_t t_cost,
 }
 
 int main(int argc, char *argv[]) {
-    unsigned char out[OUT_LEN];
+    uint32_t outlen = OUTLEN_DEF;
     uint32_t m_cost = 1 << LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
@@ -200,6 +212,15 @@ int main(int argc, char *argv[]) {
             } else {
                 fatal("missing -p argument");
             }
+        } else if (!strcmp(a, "-h")) {
+            if (i < argc - 1) {
+                i++;
+                input = strtoul(argv[i], NULL, 10);
+                outlen = input;
+                continue;
+            } else {
+                fatal("missing -h argument");
+            }
         } else if (!strcmp(a, "-d")) {
             type = Argon2_d;
         } else {
@@ -214,7 +235,7 @@ int main(int argc, char *argv[]) {
     printf("Iterations:\t%" PRIu32 " \n", t_cost);
     printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
     printf("Parallelism:\t%" PRIu32 " \n", lanes);
-    run(out, pwd, salt, t_cost, m_cost, lanes, threads, type);
+    run(outlen, pwd, salt, t_cost, m_cost, lanes, threads, type);
 
     return ARGON2_OK;
 }
