@@ -14,7 +14,6 @@
 #define _GNU_SOURCE 1
 
 #include <inttypes.h>
-#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,8 +55,24 @@ static void fatal(const char *error) {
 }
 
 static uint32_t b64len(uint32_t len) {
-    return (size_t)(ceil(len / 3.0) * 4);
+    return ((len + 2) / 3) * 4;
 }
+
+static uint32_t numlen(uint32_t num) {
+    uint32_t len = 1;
+    while (num >= 10) {
+        ++len;
+        num = num / 10;
+    }
+    return len;
+}
+
+static uint32_t enclen(uint32_t outlen, uint32_t saltlen, uint32_t t_cost,
+                           uint32_t m_cost, uint32_t lanes) {
+    return strlen("$argon2x$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost)
+        + numlen(lanes) + b64len(saltlen) + b64len(outlen);
+}
+
 
 /*
 Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the
@@ -101,14 +116,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for output");
     }
 
-    /* 45 = strlen("$argon2x$m=4294967295,t=16777215,p=16777215$$")
-       aka strlen("$argon2x$m=,t=,p=$$") = 19
-         + log10(0xFFFFFFFF + 1) = maximum memory cost, 2^32-1 = 10
-         + log10(0xFFFFFF + 1) = maximum iterations, 2^24-1 = 8
-         + log10(0xFFFFFF + 1) = maximum threads, 2^24 - 1 = 8
-         + null-byte at the end
-    */
-    encodedlen = 45 + b64len(saltlen) + b64len(outlen);
+    encodedlen = enclen(outlen, saltlen, t_cost, m_cost, lanes);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));

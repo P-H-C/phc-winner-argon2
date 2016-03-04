@@ -72,7 +72,7 @@ all: clean $(RUN) libs
 libs: $(LIB_SH) $(LIB_ST)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
-		$(CC) $(CFLAGS) $(LDFLAGS) $^ -lm -o $@
+		$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 $(BENCH):       $(SRC) $(SRC_BENCH)
 		$(CC) $(CFLAGS) $^ -o $@
