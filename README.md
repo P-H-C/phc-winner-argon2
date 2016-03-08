@@ -57,18 +57,20 @@ Parameters:
         -t N            Sets the number of iterations to N (default = 3)
         -m N            Sets the memory usage of 2^N KiB (default 12)
         -p N            Sets parallelism to N threads (default 1)
+        -h N            Sets hash output length to N bytes (default 32)
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
-iterations, consuming 64 MiB, and using four parallel threads:
+iterations, consuming 64 MiB, using four parallel threads and an output hash
+of 24 bytes
 ```
-$ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4
+$ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4 -h 24
 Type:           Argon2i
 Iterations:     2
 Memory:         65536 KiB
 Parallelism:    4
-Hash:           4162f32384d8f4790bd994cb73c83a4a29f076165ec18af3cfdcf10a8d1b9066
-Encoded:        $argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY
-0.271 seconds
+Hash:           5a028f1a99c9eae671ee448ab80057b78510430865abe57f
+Encoded:        $argon2i$m=65536,t=2,p=4$c29tZXNhbHQ$WgKPGpnJ6uZx7kSKuABXt4UQQwhlq+V/
+0.188 seconds
 Verification ok
 ```
 
