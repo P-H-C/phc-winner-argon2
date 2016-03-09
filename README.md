@@ -52,7 +52,7 @@ on your system. To show usage instructions, run
 Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism]
         Password is read from stdin
 Parameters:
-        salt            The salt to use, at most 16 characters
+        salt            The salt to use, at least 8 characters 
         -d              Use Argon2d instead of Argon2i (which is the default)
         -t N            Sets the number of iterations to N (default = 3)
         -m N            Sets the memory usage of 2^N KiB (default 12)
