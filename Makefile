@@ -23,12 +23,13 @@ CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
 				-Wextra -Wno-type-limits -Werror -coverage
 
-#OPT=TRUE
-ifeq ($(OPT), TRUE)
+OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=native src/opt.c -c 2>/dev/null; echo $$?)
+# Detect compatible platform
+ifneq ($(OPTTEST), 0)
+	SRC += src/ref.c
+else
 	CFLAGS += -march=native
 	SRC += src/opt.c
-else
-	SRC += src/ref.c
 endif
 
 BUILD_PATH := $(shell pwd)
