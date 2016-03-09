@@ -37,7 +37,7 @@ static void usage(const char *cmd) {
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
-    printf("\tsalt\t\tThe salt to use, at most 16 characters\n");
+    printf("\tsalt\t\tThe salt to use, at least 8 characters\n");
     printf("\t-d\t\tUse Argon2d instead of Argon2i (which is the default)\n");
     printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n",
            T_COST_DEF);
@@ -79,7 +79,7 @@ Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the
 Base64-encoded hash string
 @out output array with at least 32 bytes allocated
 @pwd NULL-terminated string, presumably from argv[]
-@salt salt array with at least SALTLEN_DEF bytes allocated
+@salt salt array
 @t_cost number of iterations
 @m_cost amount of requested memory in KB
 @lanes amount of requested parallelism
