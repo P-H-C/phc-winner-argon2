@@ -31,6 +31,7 @@
 
 enum argon2_core_constants {
     /* Version of the algorithm */
+    ARGON2_OLD_VERSION_NUMBER = 0x10,
     ARGON2_VERSION_NUMBER = 0x13,
 
     /* Memory block size in bytes */
@@ -77,6 +78,7 @@ void xor_block(block *dst, const block *src);
  */
 typedef struct Argon2_instance_t {
     block *memory;          /* Memory pointer */
+    uint32_t version;
     uint32_t passes;        /* Number of passes */
     uint32_t memory_blocks; /* Number of blocks in memory */
     uint32_t segment_length;

@@ -68,8 +68,8 @@ static uint32_t numlen(uint32_t num) {
 }
 
 static uint32_t enclen(uint32_t outlen, uint32_t saltlen, uint32_t t_cost,
-                           uint32_t m_cost, uint32_t lanes) {
-    return strlen("$argon2x$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost)
+                           uint32_t m_cost, uint32_t lanes, uint32_t version) {
+    return strlen("$argon2x$v=$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost) + numlen(version)
         + numlen(lanes) + b64len(saltlen) + b64len(outlen);
 }
 
@@ -116,7 +116,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for output");
     }
 
-    encodedlen = enclen(outlen, saltlen, t_cost, m_cost, lanes);
+    encodedlen = enclen(outlen, saltlen, t_cost, m_cost, lanes, ARGON2_VERSION_NUMBER);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
@@ -124,7 +124,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
     }
 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
-                         out, outlen, encoded, encodedlen, type);
+                         out, outlen, encoded, encodedlen, type, ARGON2_VERSION_NUMBER);
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
 
