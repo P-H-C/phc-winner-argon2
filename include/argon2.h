@@ -206,6 +206,12 @@ typedef struct Argon2_Context {
 /* Argon2 primitive type */
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
+/* Version of the algorithm */
+typedef enum Argon2_version {
+    ARGON2_OLD_VERSION_NUMBER = 0x10,
+    ARGON2_VERSION_NUMBER = 0x13
+} argon2_version;
+
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
  * @param  context  Pointer to the Argon2 internal structure

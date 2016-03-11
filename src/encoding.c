@@ -304,7 +304,8 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     else
         return ARGON2_INCORRECT_TYPE;
     ctx->version = ARGON2_OLD_VERSION_NUMBER;
-    CC_opt("$v=", DECIMAL(ctx->version)); /*Reading the version number if the default is suppressed */
+    /* Reading the version number if the default is suppressed */
+    CC_opt("$v=", DECIMAL(ctx->version));
     CC("$m=");
     DECIMAL(ctx->m_cost);
     CC(",t=");

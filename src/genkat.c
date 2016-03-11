@@ -23,20 +23,23 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
     unsigned i;
 
     if (blockhash != NULL && context != NULL) {
-        printf("=======================================");
+        printf("=======================================\n");
 
         switch (type) {
         case Argon2_d:
-            printf("Argon2d version %x\n",ARGON2_VERSION_NUMBER);
+            printf("Argon2d version number %02x\n", ARGON2_VERSION_NUMBER);
             break;
 
         case Argon2_i:
-            printf("Argon2i version %x\n", ARGON2_VERSION_NUMBER);
+            printf("Argon2i version number %02x\n", ARGON2_VERSION_NUMBER);
             break;
 
         default:
             break;
         }
+
+        printf("=======================================\n");
+
 
         printf("Memory: %u KiB, Iterations: %u, Parallelism: %u lanes, Tag "
                "length: %u bytes\n",

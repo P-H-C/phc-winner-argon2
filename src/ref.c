@@ -210,11 +210,12 @@ void fill_segment(const argon2_instance_t *instance,
         ref_block =
             instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
-        if (instance->version == ARGON2_OLD_VERSION_NUMBER) { //version 1.2.1 and earlier: overwrite, not XOR
+        if (instance->version == ARGON2_OLD_VERSION_NUMBER) {
+            /* version 1.2.1 and earlier: overwrite, not XOR */
             fill_block(instance->memory + prev_offset, ref_block, curr_block);
-        }
-        else {
-            fill_block_with_xor(instance->memory + prev_offset, ref_block, curr_block);
+        } else {
+            fill_block_with_xor(instance->memory + prev_offset, ref_block,
+                                curr_block);
         }
     }
 

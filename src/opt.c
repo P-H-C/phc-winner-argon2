@@ -48,7 +48,8 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     }
 }
 
-void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
+void fill_block_with_xor(__m128i *state, const uint8_t *ref_block,
+                         uint8_t *next_block) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     uint32_t i;
 
@@ -200,7 +201,14 @@ void fill_segment(const argon2_instance_t *instance,
         ref_block =
             instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
-        fill_block_with_xor(state, (uint8_t *)ref_block->v, (uint8_t *)curr_block->v);
+        if (instance->version == ARGON2_OLD_VERSION_NUMBER) {
+            /* version 1.2.1 and earlier: overwrite, not XOR */
+            fill_block(state, (uint8_t *)ref_block->v,
+                       (uint8_t *)curr_block->v);
+        } else {
+            fill_block_with_xor(state, (uint8_t *)ref_block->v,
+                                (uint8_t *)curr_block->v);
+        }
     }
 
     free(pseudo_rands);

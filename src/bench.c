@@ -61,10 +61,11 @@ static void benchmark() {
             clock_t start_time = clock();
             uint64_t start_cycles = rdtsc();
             
-            
-            argon2d_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen, salt_array, inlen, out, outlen);
+            argon2d_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
+                             salt_array, inlen, out, outlen);
             stop_cycles = rdtsc();
-            argon2i_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen, salt_array, inlen, out, outlen);
+            argon2i_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
+                             salt_array, inlen, out, outlen);
             stop_cycles_i = rdtsc();
             stop_time = clock();
 

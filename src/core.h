@@ -30,10 +30,6 @@
  * constants**************************************************/
 
 enum argon2_core_constants {
-    /* Version of the algorithm */
-    ARGON2_OLD_VERSION_NUMBER = 0x10,
-    ARGON2_VERSION_NUMBER = 0x13,
-
     /* Memory block size in bytes */
     ARGON2_BLOCK_SIZE = 1024,
     ARGON2_QWORDS_IN_BLOCK = ARGON2_BLOCK_SIZE / 8,
