@@ -34,7 +34,7 @@ void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next
 * @param next_block Pointer to the block to be XORed over. May coincide with @ref_block
 * @pre all block pointers must be valid
 */
-void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next_block);
+void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block);
 
 
 /*
