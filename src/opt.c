@@ -21,6 +21,33 @@
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"
 
+void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
+    __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
+    uint32_t i;
+
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
+        block_XY[i] = state[i] = _mm_xor_si128(
+            state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
+    }
+
+    for (i = 0; i < 8; ++i) {
+        BLAKE2_ROUND(state[8 * i + 0], state[8 * i + 1], state[8 * i + 2],
+            state[8 * i + 3], state[8 * i + 4], state[8 * i + 5],
+            state[8 * i + 6], state[8 * i + 7]);
+    }
+
+    for (i = 0; i < 8; ++i) {
+        BLAKE2_ROUND(state[8 * 0 + i], state[8 * 1 + i], state[8 * 2 + i],
+            state[8 * 3 + i], state[8 * 4 + i], state[8 * 5 + i],
+            state[8 * 6 + i], state[8 * 7 + i]);
+    }
+
+    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
+        state[i] = _mm_xor_si128(state[i], block_XY[i]);
+        _mm_storeu_si128((__m128i *)(&next_block[16 * i]), state[i]);
+    }
+}
+
 void fill_block_with_xor(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     uint32_t i;

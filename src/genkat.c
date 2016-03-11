@@ -27,11 +27,11 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
 
         switch (type) {
         case Argon2_d:
-            printf("Argon2d\n");
+            printf("Argon2d version %x\n",ARGON2_VERSION_NUMBER);
             break;
 
         case Argon2_i:
-            printf("Argon2i\n");
+            printf("Argon2i version %x\n", ARGON2_VERSION_NUMBER);
             break;
 
         default:
@@ -157,6 +157,7 @@ static void generate_testvectors(const char *type) {
 
     context.out = out;
     context.outlen = TEST_OUTLEN;
+    context.version = ARGON2_VERSION_NUMBER;
     context.pwd = pwd;
     context.pwdlen = TEST_PWDLEN;
     context.salt = salt;
