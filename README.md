@@ -49,7 +49,7 @@ results.
 on your system. To show usage instructions, run
 `./argon2` without arguments as
 ```
-Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism]
+Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism] [-h hash length]
         Password is read from stdin
 Parameters:
         salt            The salt to use, at least 8 characters 
@@ -68,8 +68,8 @@ Type:           Argon2i
 Iterations:     2
 Memory:         65536 KiB
 Parallelism:    4
-Hash:           5a028f1a99c9eae671ee448ab80057b78510430865abe57f
-Encoded:        $argon2i$m=65536,t=2,p=4$c29tZXNhbHQ$WgKPGpnJ6uZx7kSKuABXt4UQQwhlq+V/
+Hash:           45d7ac72e76f242b20b77b9bf9bf9d5915894e669a24e6c6
+Encoded:        $argon2i$v=19$m=65536,t=2,p=4$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG
 0.188 seconds
 Verification ok
 ```

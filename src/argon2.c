@@ -161,7 +161,8 @@ int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
                          char *encoded, const size_t encodedlen) {
 
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-                       NULL, hashlen, encoded, encodedlen, Argon2_i, ARGON2_VERSION_NUMBER);
+                       NULL, hashlen, encoded, encodedlen, Argon2_i,
+                       ARGON2_VERSION_NUMBER);
 }
 
 int argon2i_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
@@ -180,7 +181,8 @@ int argon2d_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
                          char *encoded, const size_t encodedlen) {
 
     return argon2_hash(t_cost, m_cost, parallelism, pwd, pwdlen, salt, saltlen,
-                       NULL, hashlen, encoded, encodedlen, Argon2_d, ARGON2_VERSION_NUMBER);
+                       NULL, hashlen, encoded, encodedlen, Argon2_d,
+                       ARGON2_VERSION_NUMBER);
 }
 
 int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
@@ -245,7 +247,8 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     }
 
     ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen,
-                      ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type, ctx.version);
+                      ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type,
+                      ctx.version);
 
     free(ctx.ad);
     free(ctx.salt);
@@ -378,4 +381,12 @@ const char *argon2_error_message(int error_code) {
     default:
         return "Unknown error code";
     }
+}
+
+uint32_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
+                           uint32_t parallelism, uint32_t saltlen,
+                           uint32_t hashlen) {
+    return strlen("$argon2x$v=$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost)
+        + numlen(parallelism) + b64len(saltlen) + b64len(hashlen)
+        + numlen(ARGON2_VERSION_NUMBER);
 }

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for file in `ls | grep '^[a-z2]*$' | xargs`
+for file in `ls | grep '^[a-z2]*\(_v\)\?[0-9]*$' | xargs`
 do
     new=`shasum -a 256 $file`
     old=`cat $file.shasum`

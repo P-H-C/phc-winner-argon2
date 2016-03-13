@@ -351,6 +351,19 @@ ARGON2_PUBLIC int argon2_verify_ctx(argon2_context *context, const char *hash,
  */
 ARGON2_PUBLIC const char *argon2_error_message(int error_code);
 
+/**
+ * Returns the encoded hash length for the given input parameters
+ * @param t_cost  Number of iterations
+ * @param m_cost  Memory usage in kibibytes
+ * @param parallelism  Number of threads; used to compute lanes
+ * @param saltlen  Salt size in bytes
+ * @param hashlen  Hash size in bytes
+ * @return  The encoded hash length in bytes
+ */
+ARGON2_PUBLIC uint32_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
+                                         uint32_t parallelism, uint32_t saltlen,
+                                         uint32_t hashlen);
+
 #if defined(__cplusplus)
 }
 #endif
