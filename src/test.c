@@ -41,10 +41,10 @@ void hashtest(uint32_t version, uint32_t t, uint32_t m, uint32_t p, char *pwd,
         assert(memcmp(encoded, mcfref, strlen(mcfref)) == 0);
     }
 
-    /*ret = argon2_verify(encoded, pwd, strlen(pwd), Argon2_i);
+    ret = argon2_verify(encoded, pwd, strlen(pwd), Argon2_i);
     assert(ret == ARGON2_OK);
     ret = argon2_verify(mcfref, pwd, strlen(pwd), Argon2_i);
-    assert(ret == ARGON2_OK);*/
+    assert(ret == ARGON2_OK);
 
     printf("PASS\n");
 }
