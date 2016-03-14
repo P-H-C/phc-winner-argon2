@@ -27,11 +27,11 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
 
         switch (type) {
         case Argon2_d:
-            printf("Argon2d version number %02x\n", context->version);
+            printf("Argon2d version number %d\n", context->version);
             break;
 
         case Argon2_i:
-            printf("Argon2i version number %02x\n", context->version);
+            printf("Argon2i version number %d\n", context->version);
             break;
 
         default:
