@@ -206,8 +206,13 @@ void fill_segment(const argon2_instance_t *instance,
             fill_block(state, (uint8_t *)ref_block->v,
                        (uint8_t *)curr_block->v);
         } else {
-            fill_block_with_xor(state, (uint8_t *)ref_block->v,
-                                (uint8_t *)curr_block->v);
+            if(0 == position.pass) {
+                fill_block(state, (uint8_t *)ref_block->v,
+                           (uint8_t *)curr_block->v);
+            } else {
+                fill_block_with_xor(state, (uint8_t *)ref_block->v,
+                                    (uint8_t *)curr_block->v);
+            }
         }
     }
 
