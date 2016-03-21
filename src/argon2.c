@@ -383,9 +383,8 @@ const char *argon2_error_message(int error_code) {
     }
 }
 
-uint32_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
-                           uint32_t parallelism, uint32_t saltlen,
-                           uint32_t hashlen) {
+size_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost, uint32_t parallelism,
+                         uint32_t saltlen, uint32_t hashlen) {
     return strlen("$argon2x$v=$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost)
         + numlen(parallelism) + b64len(saltlen) + b64len(hashlen)
         + numlen(ARGON2_VERSION_NUMBER);
