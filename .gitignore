@@ -13,3 +13,6 @@ testcase
 *.gcno
 *.gcov
 bench
+vs2015/build
+Argon2.sdf
+Argon2.VC.opendb
