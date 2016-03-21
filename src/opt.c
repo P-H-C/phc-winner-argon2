@@ -201,7 +201,7 @@ void fill_segment(const argon2_instance_t *instance,
         ref_block =
             instance->memory + instance->lane_length * ref_lane + ref_index;
         curr_block = instance->memory + curr_offset;
-        if (instance->version == ARGON2_OLD_VERSION_NUMBER) {
+        if (ARGON2_VERSION_10 == instance->version) {
             /* version 1.2.1 and earlier: overwrite, not XOR */
             fill_block(state, (uint8_t *)ref_block->v,
                        (uint8_t *)curr_block->v);
