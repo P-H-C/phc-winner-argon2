@@ -303,7 +303,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         CC("$argon2d");
     else
         return ARGON2_INCORRECT_TYPE;
-    ctx->version = ARGON2_OLD_VERSION_NUMBER;
+    ctx->version = ARGON2_VERSION_10;
     /* Reading the version number if the default is suppressed */
     CC_opt("$v=", DECIMAL(ctx->version));
     CC("$m=");

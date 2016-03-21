@@ -177,8 +177,7 @@ static void generate_testvectors(const char *type, const uint32_t version) {
     context.free_cbk = myown_deallocator;
     context.flags = 0;
 
-    if(ARGON2_OLD_VERSION_NUMBER == version ||
-       ARGON2_VERSION_NUMBER == version) {
+    if(ARGON2_VERSION_10 == version || ARGON2_VERSION_NUMBER == version) {
         context.version = version;
     } else {
         fatal("wrong Argon2 version number");

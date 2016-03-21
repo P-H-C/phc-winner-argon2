@@ -178,8 +178,6 @@ typedef struct Argon2_Context {
     uint8_t *out;    /* output array */
     uint32_t outlen; /* digest length */
 
-    uint32_t version; /*version number*/
-
     uint8_t *pwd;    /* password array */
     uint32_t pwdlen; /* password length */
 
@@ -197,6 +195,8 @@ typedef struct Argon2_Context {
     uint32_t lanes;   /* number of lanes */
     uint32_t threads; /* maximum number of threads */
 
+    uint32_t version; /* version number */
+
     allocate_fptr allocate_cbk; /* pointer to memory allocator */
     deallocate_fptr free_cbk;   /* pointer to memory deallocator */
 
@@ -208,8 +208,9 @@ typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
 
 /* Version of the algorithm */
 typedef enum Argon2_version {
-    ARGON2_OLD_VERSION_NUMBER = 0x10,
-    ARGON2_VERSION_NUMBER = 0x13
+    ARGON2_VERSION_10 = 0x10,
+    ARGON2_VERSION_13 = 0x13,
+    ARGON2_VERSION_NUMBER = ARGON2_VERSION_13
 } argon2_version;
 
 /*

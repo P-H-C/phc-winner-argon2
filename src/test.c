@@ -55,7 +55,7 @@ int main() {
     char const *msg;
     int version;
 
-    version = ARGON2_OLD_VERSION_NUMBER;
+    version = ARGON2_VERSION_10;
     printf("Test Argon2i version number: %02x\n", version);
 
     /* Multiple test cases for various input values */
