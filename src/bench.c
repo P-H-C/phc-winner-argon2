@@ -52,7 +52,6 @@ static void benchmark() {
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
         unsigned i;
         for (i = 0; i < 4; ++i) {
-            argon2_context context;
             uint32_t thread_n = thread_test[i];
             uint64_t stop_cycles, stop_cycles_i;
             clock_t stop_time;
@@ -61,28 +60,12 @@ static void benchmark() {
 
             clock_t start_time = clock();
             uint64_t start_cycles = rdtsc();
-
-            context.out = out;
-            context.outlen = outlen;
-            context.pwd = pwd_array;
-            context.pwdlen = inlen;
-            context.salt = salt_array;
-            context.saltlen = inlen;
-            context.secret = NULL;
-            context.secretlen = 0;
-            context.ad = NULL;
-            context.adlen = 0;
-            context.t_cost = t_cost;
-            context.m_cost = m_cost;
-            context.lanes = thread_n;
-            context.threads = thread_n;
-            context.allocate_cbk = NULL;
-            context.free_cbk = NULL;
-            context.flags = 0;
-
-            argon2d_ctx(&context);
+            
+            argon2d_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
+                             salt_array, inlen, out, outlen);
             stop_cycles = rdtsc();
-            argon2i_ctx(&context);
+            argon2i_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
+                             salt_array, inlen, out, outlen);
             stop_cycles_i = rdtsc();
             stop_time = clock();
 

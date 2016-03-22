@@ -54,26 +54,6 @@ static void fatal(const char *error) {
     exit(1);
 }
 
-static uint32_t b64len(uint32_t len) {
-    return ((len + 2) / 3) * 4;
-}
-
-static uint32_t numlen(uint32_t num) {
-    uint32_t len = 1;
-    while (num >= 10) {
-        ++len;
-        num = num / 10;
-    }
-    return len;
-}
-
-static uint32_t enclen(uint32_t outlen, uint32_t saltlen, uint32_t t_cost,
-                           uint32_t m_cost, uint32_t lanes) {
-    return strlen("$argon2x$m=,t=,p=$$") + numlen(t_cost) + numlen(m_cost)
-        + numlen(lanes) + b64len(saltlen) + b64len(outlen);
-}
-
-
 /*
 Runs Argon2 with certain inputs and parameters, inputs not cleared. Prints the
 Base64-encoded hash string
@@ -116,7 +96,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for output");
     }
 
-    encodedlen = enclen(outlen, saltlen, t_cost, m_cost, lanes);
+    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, saltlen, outlen);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
@@ -124,7 +104,8 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
     }
 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
-                         out, outlen, encoded, encodedlen, type);
+                         out, outlen, encoded, encodedlen, type,
+                         ARGON2_VERSION_NUMBER);
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
 
@@ -164,14 +145,14 @@ int main(int argc, char *argv[]) {
         return ARGON2_MISSING_ARGS;
     }
 
-    salt = argv[1];
-
     /* get password from stdin */
     while ((n = fread(pwd, 1, sizeof pwd - 1, stdin)) > 0) {
         pwd[n] = '\0';
         if (pwd[n - 1] == '\n')
             pwd[n - 1] = '\0';
     }
+
+    salt = argv[1];
 
     /* parse options */
     for (i = 2; i < argc; i++) {
@@ -247,3 +228,4 @@ int main(int argc, char *argv[]) {
 
     return ARGON2_OK;
 }
+

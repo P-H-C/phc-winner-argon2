@@ -31,4 +31,10 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 */
 int decode_string(argon2_context *ctx, const char *str, argon2_type type);
 
+/* Returns the length of the encoded byte stream with length len */
+uint32_t b64len(uint32_t len);
+
+/* Returns the length of the encoded number num */
+uint32_t numlen(uint32_t num);
+
 #endif

@@ -229,7 +229,7 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  *
  * The code below applies the following format:
  *
- *  $argon2<T>$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
+ *  $argon2<T>[$v=<num>]$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
  *
  * where <T> is either 'd' or 'i', <num> is a decimal integer (positive, fits in
  * an 'unsigned long'), and <bin> is Base64-encoded data (no '=' padding
@@ -303,6 +303,9 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         CC("$argon2d");
     else
         return ARGON2_INCORRECT_TYPE;
+    ctx->version = ARGON2_VERSION_10;
+    /* Reading the version number if the default is suppressed */
+    CC_opt("$v=", DECIMAL(ctx->version));
     CC("$m=");
     DECIMAL(ctx->m_cost);
     CC(",t=");
@@ -368,15 +371,17 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     } while ((void)0, 0)
 
     if (type == Argon2_i)
-        SS("$argon2i$m=");
+        SS("$argon2i$v=");
     else if (type == Argon2_d)
-        SS("$argon2d$m=");
+        SS("$argon2d$v=");
     else
         return ARGON2_ENCODING_FAIL;
 
     if (validate_inputs(ctx) != ARGON2_OK) {
         return validate_inputs(ctx);
     }
+    SX(ctx->version);
+    SS("$m=");
     SX(ctx->m_cost);
     SS(",t=");
     SX(ctx->t_cost);
@@ -404,4 +409,17 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 #undef SS
 #undef SX
 #undef SB
+}
+
+uint32_t b64len(uint32_t len) {
+    return ((len + 2) / 3) * 4;
+}
+
+uint32_t numlen(uint32_t num) {
+    uint32_t len = 1;
+    while (num >= 10) {
+        ++len;
+        num = num / 10;
+    }
+    return len;
 }

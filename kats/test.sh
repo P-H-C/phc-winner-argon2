@@ -1,47 +1,49 @@
 #!/bin/sh
 
-make genkat > /dev/null
-if [ $? -ne 0 ]
-then
-  exit $?
-fi
+for opttest in "" "OPTTEST=1"
+do
+  if [ "" = "$opttest" ]
+  then
+    printf "Default build\n"
+  else
+    printf "Force OPTTEST=1\n"
+  fi
 
-printf "argon2i "
-./genkat i > tmp
-if diff tmp kats/argon2i
-then printf "OK"
-else printf "ERROR"
-fi
-printf "\n"
+  make genkat $opttest > /dev/null
+  if [ $? -ne 0 ]
+  then
+    exit $?
+  fi
 
-printf "argon2d "
-./genkat d > tmp
-if diff tmp kats/argon2d
-then printf "OK"
-else printf "ERROR"
-fi
-printf "\n"
+  i=0
+  for version in 16 19
+  do
+    for type in i d
+    do
+      i=$(($i+1))
 
-make genkat OPT=TRUE > /dev/null
-if [ $? -ne 0 ]
-then
-  exit $?
-fi
+      printf "argon2$type v=$version: "
 
-printf "argon2i "
-./genkat i > tmp
-if diff tmp kats/argon2i
-then printf "OK"
-else printf "ERROR"
-fi
-printf "\n"
+      if [ 19 -eq $version ]
+      then
+        kats="kats/argon2"$type
+      else
+        kats="kats/argon2"$type"_v"$version
+      fi
 
-printf "argon2d "
-./genkat d > tmp
-if diff tmp kats/argon2d
-then printf "OK"
-else printf "ERROR"
-fi
-printf "\n"
+      ./genkat $type $version > tmp
+      if diff tmp $kats
+      then
+        printf "OK"
+      else
+        printf "ERROR"
+        exit $i
+      fi
+      printf "\n"
+    done
+  done
+done
 
 rm -f tmp
+
+exit 0

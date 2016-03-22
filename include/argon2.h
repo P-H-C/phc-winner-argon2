@@ -195,6 +195,8 @@ typedef struct Argon2_Context {
     uint32_t lanes;   /* number of lanes */
     uint32_t threads; /* maximum number of threads */
 
+    uint32_t version; /* version number */
+
     allocate_fptr allocate_cbk; /* pointer to memory allocator */
     deallocate_fptr free_cbk;   /* pointer to memory deallocator */
 
@@ -203,6 +205,13 @@ typedef struct Argon2_Context {
 
 /* Argon2 primitive type */
 typedef enum Argon2_type { Argon2_d = 0, Argon2_i = 1 } argon2_type;
+
+/* Version of the algorithm */
+typedef enum Argon2_version {
+    ARGON2_VERSION_10 = 0x10,
+    ARGON2_VERSION_13 = 0x13,
+    ARGON2_VERSION_NUMBER = ARGON2_VERSION_13
+} argon2_version;
 
 /*
  * Function that performs memory-hard hashing with certain degree of parallelism
@@ -275,7 +284,8 @@ ARGON2_PUBLIC int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
                               const size_t pwdlen, const void *salt,
                               const size_t saltlen, void *hash,
                               const size_t hashlen, char *encoded,
-                              const size_t encodedlen, argon2_type type);
+                              const size_t encodedlen, argon2_type type,
+                              const uint32_t version);
 
 /**
  * Verifies a password against an encoded string
@@ -341,6 +351,19 @@ ARGON2_PUBLIC int argon2_verify_ctx(argon2_context *context, const char *hash,
  * @return  The error message associated with the given error code
  */
 ARGON2_PUBLIC const char *argon2_error_message(int error_code);
+
+/**
+ * Returns the encoded hash length for the given input parameters
+ * @param t_cost  Number of iterations
+ * @param m_cost  Memory usage in kibibytes
+ * @param parallelism  Number of threads; used to compute lanes
+ * @param saltlen  Salt size in bytes
+ * @param hashlen  Hash size in bytes
+ * @return  The encoded hash length in bytes
+ */
+ARGON2_PUBLIC size_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
+                                       uint32_t parallelism, uint32_t saltlen,
+                                       uint32_t hashlen);
 
 #if defined(__cplusplus)
 }

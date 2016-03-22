@@ -23,20 +23,23 @@ void initial_kat(const uint8_t *blockhash, const argon2_context *context,
     unsigned i;
 
     if (blockhash != NULL && context != NULL) {
-        printf("=======================================");
+        printf("=======================================\n");
 
         switch (type) {
         case Argon2_d:
-            printf("Argon2d\n");
+            printf("Argon2d version number %d\n", context->version);
             break;
 
         case Argon2_i:
-            printf("Argon2i\n");
+            printf("Argon2i version number %d\n", context->version);
             break;
 
         default:
             break;
         }
+
+        printf("=======================================\n");
+
 
         printf("Memory: %u KiB, Iterations: %u, Parallelism: %u lanes, Tag "
                "length: %u bytes\n",
@@ -130,7 +133,7 @@ static void fatal(const char *error) {
     exit(1);
 }
 
-static void generate_testvectors(const char *type) {
+static void generate_testvectors(const char *type, const uint32_t version) {
 #define TEST_OUTLEN 32
 #define TEST_PWDLEN 32
 #define TEST_SALTLEN 16
@@ -157,6 +160,7 @@ static void generate_testvectors(const char *type) {
 
     context.out = out;
     context.outlen = TEST_OUTLEN;
+    context.version = ARGON2_VERSION_NUMBER;
     context.pwd = pwd;
     context.pwdlen = TEST_PWDLEN;
     context.salt = salt;
@@ -173,6 +177,12 @@ static void generate_testvectors(const char *type) {
     context.free_cbk = myown_deallocator;
     context.flags = 0;
 
+    if(ARGON2_VERSION_10 == version || ARGON2_VERSION_NUMBER == version) {
+        context.version = version;
+    } else {
+        fatal("wrong Argon2 version number");
+    }
+
 #undef TEST_OUTLEN
 #undef TEST_PWDLEN
 #undef TEST_SALTLEN
@@ -188,7 +198,15 @@ static void generate_testvectors(const char *type) {
 }
 
 int main(int argc, char *argv[]) {
+    /* Argon2 type */
     const char *type = (argc > 1) ? argv[1] : "i";
-    generate_testvectors(type);
+
+    /* Argon2 version number */
+    uint32_t version = ARGON2_VERSION_NUMBER;
+    if(argc > 2) {
+        version = strtoul(argv[2], NULL, 10);
+    }
+
+    generate_testvectors(type, version);
     return ARGON2_OK;
 }
