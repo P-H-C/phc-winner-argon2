@@ -411,15 +411,16 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 #undef SB
 }
 
-uint32_t b64len(uint32_t len) {
+size_t b64len(uint32_t len) {
     return ((len + 2) / 3) * 4;
 }
 
-uint32_t numlen(uint32_t num) {
-    uint32_t len = 1;
+size_t numlen(uint32_t num) {
+    size_t len = 1;
     while (num >= 10) {
         ++len;
         num = num / 10;
     }
     return len;
 }
+
