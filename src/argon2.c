@@ -211,13 +211,14 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     uint8_t *out;
     int ret;
     int decode_result;
+    uint32_t encoded_len;
 
     if(encoded == NULL) {
         return ARGON2_DECODING_FAIL;
     }
 
     /* max values, to be updated in decode_string */
-    uint32_t encoded_len = strlen(encoded);
+    encoded_len = strlen(encoded);
     ctx.adlen = encoded_len;
     ctx.saltlen = encoded_len;
     ctx.outlen = encoded_len;
