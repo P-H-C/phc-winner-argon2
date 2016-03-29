@@ -21,7 +21,7 @@ OBJ = $(SRC:.c=.o)
 
 CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
-				-Wextra -Wno-type-limits -Werror -coverage
+				-Wextra -Wno-type-limits -Werror -coverage -DTEST_LARGE_RAM
 
 OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=native src/opt.c -c \
 			-o /dev/null 2>/dev/null; echo $$?)
