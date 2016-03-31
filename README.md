@@ -200,7 +200,8 @@ their documentation):
 
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
 * [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
-* [Javascript](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
+* [JavaScript](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
+* [JavaScript](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
 * [Lua](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 * [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
