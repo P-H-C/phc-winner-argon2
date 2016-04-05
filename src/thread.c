@@ -1,6 +1,6 @@
 #include "thread.h"
 #if defined(_WIN32)
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 int argon2_thread_create(argon2_thread_handle_t *handle,
