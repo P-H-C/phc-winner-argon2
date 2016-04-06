@@ -28,6 +28,7 @@
 #define LANES_DEF 1
 #define THREADS_DEF 1
 #define OUTLEN_DEF 32
+#define MAX_PASS_LEN 128
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
@@ -161,7 +162,7 @@ int main(int argc, char *argv[]) {
     int raw_only = 0;
     int i;
     size_t n;
-    char pwd[128], *salt;
+    char pwd[MAX_PASS_LEN], *salt;
 
     if (argc < 2) {
         usage(argv[0]);
@@ -169,10 +170,17 @@ int main(int argc, char *argv[]) {
     }
 
     /* get password from stdin */
-    while ((n = fread(pwd, 1, sizeof pwd - 1, stdin)) > 0) {
-        pwd[n] = '\0';
-        if (pwd[n - 1] == '\n')
-            pwd[n - 1] = '\0';
+    n = fread(pwd, 1, sizeof pwd - 1, stdin);
+    if(n < 1) {
+        fatal("no password read");
+    }
+    if(n == MAX_PASS_LEN-1) {
+        fatal("Provided password longer than supported in command line utility");
+    }
+
+    pwd[n] = '\0';
+    if (pwd[n - 1] == '\n') {
+        pwd[n - 1] = '\0';
     }
 
     salt = argv[1];
