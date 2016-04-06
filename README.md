@@ -50,7 +50,7 @@ results.
 on your system. To show usage instructions, run
 `./argon2` without arguments as
 ```
-Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism] [-h hash length]
+Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism] [-h hash length] [-e|-r]
         Password is read from stdin
 Parameters:
         salt            The salt to use, at least 8 characters 
@@ -59,6 +59,8 @@ Parameters:
         -m N            Sets the memory usage of 2^N KiB (default 12)
         -p N            Sets parallelism to N threads (default 1)
         -h N            Sets hash output length to N bytes (default 32)
+        -e              Output only encoded hash
+        -r              Output only the raw bytes of the hash
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
 iterations, consuming 64 MiB, using four parallel threads and an output hash
