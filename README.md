@@ -125,28 +125,36 @@ int main(void)
     argon2i_hash_raw(t_cost, m_cost, parallelism, pwd, pwdlen, salt, SALTLEN, hash1, HASHLEN);
 
     // low-level API
-    uint32_t lanes = parallelism;
-    uint32_t threads = parallelism;
     argon2_context context = {
-        hash2, HASHLEN,
-        pwd, pwdlen,
-        salt, SALTLEN,
-        NULL, 0, /* secret data */
-        NULL, 0, /* associated data */
+        hash2,  /* output array, at least HASHLEN in size */
+        HASHLEN, /* digest length */
+        pwd, /* password array */
+        pwdlen, /* password length */
+        salt,  /* salt array */
+        SALTLEN, /* salt length */
+        NULL, 0, /* optional secret data */
+        NULL, 0, /* optional associated data */
         t_cost, m_cost, parallelism, parallelism,
+        ARGON2_VERSION_13, /* algorithm version */
         NULL, NULL, /* custom memory allocation / deallocation functions */
         ARGON2_DEFAULT_FLAGS /* by default the password is zeroed on exit */
     };
-    argon2i( &context );
+
+    int rc = argon2i_ctx( &context );
+    if(ARGON2_OK != rc) {
+        printf("Error: %s\n", argon2_error_message(rc));
+        exit(1);
+    }
     free(pwd);
 
     for( int i=0; i<HASHLEN; ++i ) printf( "%02x", hash1[i] ); printf( "\n" );
     if (memcmp(hash1, hash2, HASHLEN)) {
-        for( int i=0; i<HASHLEN; ++i ) printf( "%02x", hash2[i] ); printf( "\n" );
-        printf("fail\n");
+        for( int i=0; i<HASHLEN; ++i ) {
+            printf( "%02x", hash2[i] );
+        }
+        printf("\nfail\n");
     }
     else printf("ok\n");
-
     return 0;
 }
 ```
