@@ -54,6 +54,10 @@ ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 endif
+ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
+	LIB_EXT := dll
+	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
+endif
 ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),OpenBSD FreeBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
