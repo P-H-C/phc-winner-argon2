@@ -33,8 +33,8 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s salt [-d] [-t iterations] [-m memory] "
-           "[-p parallelism] [-h hash length] [-e|-r]\n",
+    printf("Usage:  %s [-h] salt [-d] [-t iterations] [-m memory] "
+           "[-p parallelism] [-l hash length] [-e|-r]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -46,10 +46,11 @@ static void usage(const char *cmd) {
            LOG_M_COST_DEF);
     printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
-    printf("\t-h N\t\tSets hash output length to N bytes (default %d)\n",
+    printf("\t-l N\t\tSets hash output length to N bytes (default %d)\n",
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
+    printf("\t-h\t\tPrint %s usage\n", cmd);
 }
 
 static void fatal(const char *error) {
@@ -167,6 +168,9 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         usage(argv[0]);
         return ARGON2_MISSING_ARGS;
+    } else if (argc >= 2 && strcmp(argv[1], "-h") == 0) {
+        usage(argv[0]);
+        return 1;
     }
 
     /* get password from stdin */
@@ -189,7 +193,10 @@ int main(int argc, char *argv[]) {
     for (i = 2; i < argc; i++) {
         const char *a = argv[i];
         unsigned long input = 0;
-        if (!strcmp(a, "-m")) {
+        if (!strcmp(a, "-h")) {
+            usage(argv[0]);
+            return 1;
+        } else if (!strcmp(a, "-m")) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
@@ -232,14 +239,14 @@ int main(int argc, char *argv[]) {
             } else {
                 fatal("missing -p argument");
             }
-        } else if (!strcmp(a, "-h")) {
+        } else if (!strcmp(a, "-l")) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
                 outlen = input;
                 continue;
             } else {
-                fatal("missing -h argument");
+                fatal("missing -l argument");
             }
         } else if (!strcmp(a, "-d")) {
             type = Argon2_d;
