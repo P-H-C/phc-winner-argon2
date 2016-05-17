@@ -48,9 +48,9 @@ results.
 
 `argon2` is a command-line utility to test specific Argon2 instances
 on your system. To show usage instructions, run
-`./argon2` without arguments as
+`./argon2 -h` as
 ```
-Usage:  ./argon2 salt [-d] [-t iterations] [-m memory] [-p parallelism] [-h hash length] [-e|-r]
+Usage:  ./argon2 [-h] salt [-d] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r]
         Password is read from stdin
 Parameters:
         salt            The salt to use, at least 8 characters 
@@ -58,15 +58,16 @@ Parameters:
         -t N            Sets the number of iterations to N (default = 3)
         -m N            Sets the memory usage of 2^N KiB (default 12)
         -p N            Sets parallelism to N threads (default 1)
-        -h N            Sets hash output length to N bytes (default 32)
+        -l N            Sets hash output length to N bytes (default 32)
         -e              Output only encoded hash
         -r              Output only the raw bytes of the hash
+        -h              Print argon2 usage
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
 iterations, consuming 64 MiB, using four parallel threads and an output hash
 of 24 bytes
 ```
-$ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4 -h 24
+$ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4 -l 24
 Type:           Argon2i
 Iterations:     2
 Memory:         65536 KiB
