@@ -62,6 +62,12 @@ ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),OpenBSD FreeBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
 endif
+ifeq ($(KERNEL_NAME), SunOS)
+	CC := gcc
+	CFLAGS += -D_REENTRANT
+	LIB_EXT := so
+	LIB_CFLAGS := -shared -fPIC
+endif
 
 ifeq ($(KERNEL_NAME), Linux)
 ifeq ($(CC), clang)
