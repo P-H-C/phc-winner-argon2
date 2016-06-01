@@ -42,7 +42,7 @@ ifeq ($(KERNEL_NAME), Linux)
 	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
 	SO_LDFLAGS := -Wl,-soname,libargon2.so.0
 endif
-ifeq ($(KERNEL_NAME), NetBSD)
+ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),FreeBSD NetBSD OpenBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
 endif
@@ -57,10 +57,6 @@ endif
 ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
-endif
-ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),OpenBSD FreeBSD))
-	LIB_EXT := so
-	LIB_CFLAGS := -shared -fPIC
 endif
 ifeq ($(KERNEL_NAME), SunOS)
 	CC := gcc
