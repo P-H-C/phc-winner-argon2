@@ -76,7 +76,7 @@ Base64-encoded hash string
 @m_cost amount of requested memory in KB
 @lanes amount of requested parallelism
 @threads actual parallelism
-@type String, only "d" and "i" are acceptedi
+@type String, only "d" and "i" are accepted
 @encoded_only display only the encoded hash
 @raw_only display only the hexadecimal of the hash
 */
