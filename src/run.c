@@ -100,6 +100,9 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
 
     pwdlen = strlen(pwd);
     saltlen = strlen(salt);
+    if(UINT32_MAX < saltlen) {
+        fatal("salt is too long");
+    }
 
     UNUSED_PARAMETER(lanes);
 
@@ -109,7 +112,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for output");
     }
 
-    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, saltlen, outlen);
+    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
