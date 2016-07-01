@@ -280,7 +280,7 @@ ARGON2_PUBLIC int argon2d_hash_raw(const uint32_t t_cost, const uint32_t m_cost,
 
 /* generic function underlying the above ones */
 ARGON2_PUBLIC int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
-                              const uint32_t parallelism, const void *pwd,
+                              const uint32_t threads, const uint32_t lanes, const void *pwd,
                               const size_t pwdlen, const void *salt,
                               const size_t saltlen, void *hash,
                               const size_t hashlen, char *encoded,

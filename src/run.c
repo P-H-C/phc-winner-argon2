@@ -34,7 +34,7 @@
 
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-d] [-t iterations] [-m memory] "
-           "[-p parallelism] [-l hash length] [-e|-r]\n",
+           "[-p parallelism] [-n threads] [-l hash length] [-e|-r]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -44,7 +44,9 @@ static void usage(const char *cmd) {
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
            LOG_M_COST_DEF);
-    printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
+    printf("\t-p N\t\tSets parallelism to N lanes (default %d)\n",
+           THREADS_DEF);
+    printf("\t-n N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
     printf("\t-l N\t\tSets hash output length to N bytes (default %d)\n",
            OUTLEN_DEF);
@@ -119,7 +121,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for hash");
     }
 
-    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
+    result = argon2_hash(t_cost, m_cost, threads, lanes, pwd, pwdlen, salt, saltlen,
                          out, outlen, encoded, encodedlen, type,
                          ARGON2_VERSION_NUMBER);
     if (result != ARGON2_OK)
@@ -227,17 +229,27 @@ int main(int argc, char *argv[]) {
                 continue;
             } else {
                 fatal("missing -t argument");
-            }
+	    }
+        } else if (!strcmp(a, "-n")) {
+	    if (i < argc - 1) {
+		i++;
+		input = strtoul(argv[i], NULL, 10);
+		if (input == 0 || input == ULONG_MAX ||
+		    input > ARGON2_MAX_THREADS) {
+		    fatal("bad numeric input for -n");
+		}
+		threads = input;
+		continue;
+	    }
         } else if (!strcmp(a, "-p")) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
                 if (input == 0 || input == ULONG_MAX ||
-                    input > ARGON2_MAX_THREADS || input > ARGON2_MAX_LANES) {
+                    input > ARGON2_MAX_LANES) {
                     fatal("bad numeric input for -p");
                 }
-                threads = input;
-                lanes = threads;
+                lanes = input;
                 continue;
             } else {
                 fatal("missing -p argument");
