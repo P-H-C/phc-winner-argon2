@@ -27,47 +27,46 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{12956597-5E42-433A-93F3-D4EFF50AA207}</ProjectGuid>
-    <RootNamespace>Argon2</RootNamespace>
+    <ProjectGuid>{19D911A1-533C-4475-B313-F372481A35D4}</ProjectGuid>
+    <RootNamespace>Argon2RefDll</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>Argon2OptTestCI</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -98,34 +97,34 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|Win32'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
-    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)vs2015\build\</OutDir>
     <IntDir>$(SolutionDir)vs2015\build\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -202,15 +201,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\argon2.c" />
-    <ClCompile Include="..\..\src\blake2\blake2b.c" />
-    <ClCompile Include="..\..\src\core.c" />
-    <ClCompile Include="..\..\src\encoding.c" />
-    <ClCompile Include="..\..\src\opt.c" />
-    <ClCompile Include="..\..\src\test.c" />
-    <ClCompile Include="..\..\src\thread.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\include\argon2.h" />
     <ClInclude Include="..\..\src\blake2\blake2-impl.h" />
     <ClInclude Include="..\..\src\blake2\blake2.h" />
@@ -218,8 +208,16 @@
     <ClInclude Include="..\..\src\blake2\blamka-round-ref.h" />
     <ClInclude Include="..\..\src\core.h" />
     <ClInclude Include="..\..\src\encoding.h" />
-    <ClInclude Include="..\..\src\opt.h" />
+    <ClInclude Include="..\..\src\ref.h" />
     <ClInclude Include="..\..\src\thread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\argon2.c" />
+    <ClCompile Include="..\..\src\blake2\blake2b.c" />
+    <ClCompile Include="..\..\src\core.c" />
+    <ClCompile Include="..\..\src\encoding.c" />
+    <ClCompile Include="..\..\src\ref.c" />
+    <ClCompile Include="..\..\src\thread.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
