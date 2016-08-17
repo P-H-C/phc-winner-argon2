@@ -412,7 +412,18 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 }
 
 size_t b64len(uint32_t len) {
-    return (((size_t)len + 2) / 3) * 4;
+    size_t olen = ((size_t)len / 3) << 2;
+
+    switch (len % 3) {
+    case 2:
+        olen++;
+    /* fall through */
+    case 1:
+        olen += 2;
+        break;
+    }
+
+    return olen;
 }
 
 size_t numlen(uint32_t num) {
