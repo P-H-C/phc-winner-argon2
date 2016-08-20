@@ -575,7 +575,7 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
         if (ARGON2_OK != result) {
             return result;
         }
-        memcpy(&(instance->memory), p, sizeof(instance->memory));
+        instance->memory = (block *)p;
     } else {
         result = allocate_memory(&(instance->memory), instance->memory_blocks);
         if (ARGON2_OK != result) {
