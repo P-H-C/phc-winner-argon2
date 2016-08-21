@@ -23,13 +23,16 @@ CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
 				-Wextra -Wno-type-limits -Werror -coverage -DTEST_LARGE_RAM
 
-OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=native src/opt.c -c \
+OPTTARGET ?= native
+OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=$(OPTTARGET) src/opt.c -c \
 			-o /dev/null 2>/dev/null; echo $$?)
 # Detect compatible platform
 ifneq ($(OPTTEST), 0)
+$(info Building without optimizations)
 	SRC += src/ref.c
 else
-	CFLAGS += -march=native
+$(info Building with optimizations for $(OPTTARGET))
+	CFLAGS += -march=$(OPTTARGET)
 	SRC += src/opt.c
 endif
 
