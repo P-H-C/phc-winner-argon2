@@ -214,6 +214,7 @@ their documentation):
 * [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
 * [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
 * [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
+* [JavaScript (browser)](https://github.com/antelle/argon2-browser), by [@antelle](https://github.com/antelle)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
 * [Lua (native)](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 * [Lua (ffi)](https://github.com/thibaultCha/lua-argon2-ffi) by [@thibaultCha](https://github.com/thibaultCha)
