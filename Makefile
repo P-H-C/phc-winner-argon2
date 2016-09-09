@@ -53,6 +53,10 @@ ifeq ($(KERNEL_NAME), Darwin)
 	LIB_EXT := dylib
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
 endif
+ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
+	LIB_EXT := dll
+	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
+endif
 ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
