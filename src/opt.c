@@ -21,13 +21,23 @@
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"
 
-void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
+void fill_block(__m128i *state, const block *ref_block, block *next_block,
+                int with_xor) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
-    uint32_t i;
+    unsigned int i;
 
-    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
-        block_XY[i] = state[i] = _mm_xor_si128(
-            state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
+    if (with_xor) {
+        for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
+            state[i] = _mm_xor_si128(
+                state[i], _mm_loadu_si128((const __m128i *)ref_block->v + i));
+            block_XY[i] = _mm_xor_si128(
+                state[i], _mm_loadu_si128((const __m128i *)next_block->v + i));
+        }
+    } else {
+        for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
+            block_XY[i] = state[i] = _mm_xor_si128(
+                state[i], _mm_loadu_si128((const __m128i *)ref_block->v + i));
+        }
     }
 
     for (i = 0; i < 8; ++i) {
@@ -44,37 +54,7 @@ void fill_block(__m128i *state, const uint8_t *ref_block, uint8_t *next_block) {
 
     for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
         state[i] = _mm_xor_si128(state[i], block_XY[i]);
-        _mm_storeu_si128((__m128i *)(&next_block[16 * i]), state[i]);
-    }
-}
-
-void fill_block_with_xor(__m128i *state, const uint8_t *ref_block,
-                         uint8_t *next_block) {
-    __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
-    uint32_t i;
-
-    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) { 
-       state[i] = _mm_xor_si128(
-            state[i], _mm_loadu_si128((__m128i const *)(&ref_block[16 * i])));
-        block_XY[i] =  _mm_xor_si128(
-            state[i], _mm_loadu_si128((__m128i const *)(&next_block[16 * i])));
-    }
-
-    for (i = 0; i < 8; ++i) {
-        BLAKE2_ROUND(state[8 * i + 0], state[8 * i + 1], state[8 * i + 2],
-                     state[8 * i + 3], state[8 * i + 4], state[8 * i + 5],
-                     state[8 * i + 6], state[8 * i + 7]);
-    }
-
-    for (i = 0; i < 8; ++i) {
-        BLAKE2_ROUND(state[8 * 0 + i], state[8 * 1 + i], state[8 * 2 + i],
-                     state[8 * 3 + i], state[8 * 4 + i], state[8 * 5 + i],
-                     state[8 * 6 + i], state[8 * 7 + i]);
-    }
-
-    for (i = 0; i < ARGON2_OWORDS_IN_BLOCK; i++) {
-        state[i] = _mm_xor_si128(state[i], block_XY[i]);
-        _mm_storeu_si128((__m128i *)(&next_block[16 * i]), state[i]);
+        _mm_storeu_si128((__m128i *)next_block->v + i, state[i]);
     }
 }
 
@@ -107,11 +87,9 @@ void generate_addresses(const argon2_instance_t *instance,
                 /*Increasing index counter*/
                 input_block.v[6]++;
                 /*First iteration of G*/
-                fill_block_with_xor(zero_block, (uint8_t *)&input_block.v,
-                           (uint8_t *)&tmp_block.v);
+                fill_block(zero_block, &input_block, &tmp_block, 1);
                 /*Second iteration of G*/
-                fill_block_with_xor(zero2_block, (uint8_t *)&tmp_block.v,
-                           (uint8_t *)&address_block.v);
+                fill_block(zero2_block, &tmp_block, &address_block, 1);
             }
 
             pseudo_rands[i] = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
@@ -203,15 +181,12 @@ void fill_segment(const argon2_instance_t *instance,
         curr_block = instance->memory + curr_offset;
         if (ARGON2_VERSION_10 == instance->version) {
             /* version 1.2.1 and earlier: overwrite, not XOR */
-            fill_block(state, (uint8_t *)ref_block->v,
-                       (uint8_t *)curr_block->v);
+            fill_block(state, ref_block, curr_block, 0);
         } else {
             if(0 == position.pass) {
-                fill_block(state, (uint8_t *)ref_block->v,
-                           (uint8_t *)curr_block->v);
+                fill_block(state, ref_block, curr_block, 0);
             } else {
-                fill_block_with_xor(state, (uint8_t *)ref_block->v,
-                                    (uint8_t *)curr_block->v);
+                fill_block(state, ref_block, curr_block, 1);
             }
         }
     }

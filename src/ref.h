@@ -17,24 +17,16 @@
 #include "core.h"
 
 /*
- * Function fills a new memory block by XORing over @next_block. @next_block must be initialized
+ * Function fills a new memory block and optionally XORs the old block over the new one.
+ * @next_block must be initialized.
  * @param prev_block Pointer to the previous block
  * @param ref_block Pointer to the reference block
  * @param next_block Pointer to the block to be constructed
+ * @param with_xor Whether to XOR into the new block (1) or just overwrite (0)
  * @pre all block pointers must be valid
  */
-void fill_block_with_xor(const block *prev_block, const block *ref_block,
-                block *next_block);
-
-/* LEGACY CODE: version 1.2.1 and earlier
-* Function fills a new memory block by overwriting @next_block. 
-* @param prev_block Pointer to the previous block
-* @param ref_block Pointer to the reference block
-* @param next_block Pointer to the block to be constructed
-* @pre all block pointers must be valid
-*/
 void fill_block(const block *prev_block, const block *ref_block,
-    block *next_block);
+                block *next_block, int with_xor);
 
 /*
  * Generate pseudo-random values to reference blocks in the segment and puts
