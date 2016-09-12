@@ -28,16 +28,4 @@
  */
 void fill_block(__m128i *s, const block *ref_block, block *next_block, int with_xor);
 
-/*
- * Generate pseudo-random values to reference blocks in the segment and puts
- * them into the array
- * @param instance Pointer to the current instance
- * @param position Pointer to the current position
- * @param pseudo_rands Pointer to the array of 64-bit values
- * @pre pseudo_rands must point to @a instance->segment_length allocated values
- */
-void generate_addresses(const argon2_instance_t *instance,
-                        const argon2_position_t *position,
-                        uint64_t *pseudo_rands);
-
 #endif /* ARGON2_OPT_H */

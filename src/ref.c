@@ -67,47 +67,22 @@ void fill_block(const block *prev_block, const block *ref_block,
     xor_block(next_block, &blockR);
 }
 
-void generate_addresses(const argon2_instance_t *instance,
-                        const argon2_position_t *position,
-                        uint64_t *pseudo_rands) {
-    block zero_block, input_block, address_block,tmp_block;
-    uint32_t i;
-
-    init_block_value(&zero_block, 0);
-    init_block_value(&input_block, 0);
-
-    if (instance != NULL && position != NULL) {
-        input_block.v[0] = position->pass;
-        input_block.v[1] = position->lane;
-        input_block.v[2] = position->slice;
-        input_block.v[3] = instance->memory_blocks;
-        input_block.v[4] = instance->passes;
-        input_block.v[5] = instance->type;
-
-        for (i = 0; i < instance->segment_length; ++i) {
-            if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
-                input_block.v[6]++;
-                init_block_value(&tmp_block, 0);
-                init_block_value(&address_block, 0);
-                fill_block(&zero_block, &input_block, &tmp_block, 1);
-                fill_block(&zero_block, &tmp_block, &address_block, 1);
-            }
-
-            pseudo_rands[i] = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
-        }
-    }
+static void next_addresses(block *address_block, block *input_block,
+                           const block *zero_block) {
+    input_block->v[6]++;
+    fill_block(zero_block, input_block, address_block, 0);
+    fill_block(zero_block, address_block, address_block, 0);
 }
 
 void fill_segment(const argon2_instance_t *instance,
                   argon2_position_t position) {
     block *ref_block = NULL, *curr_block = NULL;
+    block address_block, input_block, zero_block;
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index;
     uint32_t i;
     int data_independent_addressing;
-    /* Pseudo-random values that determine the reference block position */
-    uint64_t *pseudo_rands = NULL;
 
     if (instance == NULL) {
         return;
@@ -115,21 +90,27 @@ void fill_segment(const argon2_instance_t *instance,
 
     data_independent_addressing = (instance->type == Argon2_i);
 
-    pseudo_rands =
-        (uint64_t *)malloc(sizeof(uint64_t) * (instance->segment_length));
-
-    if (pseudo_rands == NULL) {
-        return;
-    }
-
     if (data_independent_addressing) {
-        generate_addresses(instance, &position, pseudo_rands);
+        init_block_value(&zero_block, 0);
+        init_block_value(&input_block, 0);
+
+        input_block.v[0] = position.pass;
+        input_block.v[1] = position.lane;
+        input_block.v[2] = position.slice;
+        input_block.v[3] = instance->memory_blocks;
+        input_block.v[4] = instance->passes;
+        input_block.v[5] = instance->type;
     }
 
     starting_index = 0;
 
     if ((0 == position.pass) && (0 == position.slice)) {
         starting_index = 2; /* we have already generated the first two blocks */
+
+        /* Don't forget to generate the first block of addresses: */
+        if (data_independent_addressing) {
+            next_addresses(&address_block, &input_block, &zero_block);
+        }
     }
 
     /* Offset of the current block */
@@ -154,7 +135,10 @@ void fill_segment(const argon2_instance_t *instance,
         /* 1.2 Computing the index of the reference block */
         /* 1.2.1 Taking pseudo-random value from the previous block */
         if (data_independent_addressing) {
-            pseudo_rand = pseudo_rands[i];
+            if (i % ARGON2_ADDRESSES_IN_BLOCK == 0) {
+                next_addresses(&address_block, &input_block, &zero_block);
+            }
+            pseudo_rand = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
         } else {
             pseudo_rand = instance->memory[prev_offset].v[0];
         }
@@ -191,6 +175,4 @@ void fill_segment(const argon2_instance_t *instance,
             }
         }
     }
-
-    free(pseudo_rands);
 }
