@@ -2,7 +2,7 @@
 # Argon2 source code package
 # 
 # This work is licensed under a Creative Commons CC0 1.0 License/Waiver.
-# 
+#
 # You should have received a copy of the CC0 Public Domain Dedication along with
 # this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
 #
@@ -13,11 +13,13 @@ GENKAT = genkat
 
 DIST = phc-winner-argon2
 
+CCTEST := $(CC)
+
 SRC = src/argon2.c src/core.c src/blake2/blake2b.c src/thread.c src/encoding.c
 SRC_RUN = src/run.c
 SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
-OBJ = $(SRC:.c=.o)
+OBJ = $(SRC:%.c=%.o)
 
 CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
@@ -54,8 +56,11 @@ ifeq ($(KERNEL_NAME), Darwin)
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
 endif
 ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
+  CC := x86_64-w64-mingw32-gcc.exe
+  CCTEST := gcc
 	LIB_EXT := dll
-	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
+	LIB_CFLAGS := -shared
+  CFLAGS += -m64
 endif
 ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
 	LIB_EXT := dll
@@ -84,16 +89,16 @@ LIB_ST := lib$(LIB_NAME).a
 .PHONY: clean dist format $(GENKAT)
 
 all: clean $(RUN) libs 
-libs: $(LIB_SH) $(LIB_ST)
+libs: $(OBJ) $(LIB_SH) $(LIB_ST)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
 		$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 $(BENCH):       $(SRC) $(SRC_BENCH)
-		$(CC) $(CFLAGS) $^ -o $@
+		$(CCTEST) $(CFLAGS) $^ -o $@
 
 $(GENKAT):      $(SRC) $(SRC_GENKAT)
-		$(CC) $(CFLAGS) $^ -o $@ -DGENKAT
+		$(CCTEST) $(CFLAGS) $^ -o $@ -DGENKAT
 
 $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -o $@
@@ -103,7 +108,7 @@ $(LIB_ST): 	$(OBJ)
 
 clean:
 		rm -f $(RUN) $(BENCH) $(GENKAT)
-		rm -f $(LIB_SH) $(LIB_ST) kat-argon2* 
+		rm -f $(LIB_SH) $(LIB_ST) kat-argon2* lib$(LIB_NAME).$(LIB_EXT).a
 		rm -f testcase
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
@@ -115,12 +120,17 @@ dist:
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
 test:   $(SRC) src/test.c
-		$(CC) $(CFLAGS)  -Wextra -Wno-type-limits $^ -o testcase
+		$(CCTEST) $(CFLAGS) -Wextra -Wno-type-limits $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
 testci:   $(SRC) src/test.c
-		$(CC) $(CI_CFLAGS) $^ -o testcase
+		$(CCTEST) $(CI_CFLAGS) $^ -o testcase
+		@sh kats/test.sh
+		./testcase
+
+testx:   $(SRC) src/test.c
+		$(CCTEST) $(CFLAGS) $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
@@ -129,3 +139,6 @@ testci:   $(SRC) src/test.c
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" \
 			-i include/*.h src/*.c src/*.h src/blake2/*.c src/blake2/*.h
+
+# debug
+print-%: ; @echo $* is $($*)
