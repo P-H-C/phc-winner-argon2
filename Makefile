@@ -80,11 +80,25 @@ endif
 
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
+LIBRARIES = $(LIB_SH) $(LIB_ST)
+HEADERS = include/argon2.h
 
-.PHONY: clean dist format $(GENKAT)
+INSTALL = install
+
+DESTDIR =
+PREFIX = /usr
+INCLUDE_REL = include
+LIBRARY_REL = lib
+BINARY_REL = bin
+
+INST_INCLUDE = $(DESTDIR)$(PREFIX)/$(INCLUDE_REL)
+INST_LIBRARY = $(DESTDIR)$(PREFIX)/$(LIBRARY_REL)
+INST_BINARY = $(DESTDIR)$(PREFIX)/$(BINARY_REL)
+
+.PHONY: clean dist format $(GENKAT) all install
 
 all: clean $(RUN) libs 
-libs: $(LIB_SH) $(LIB_ST)
+libs: $(LIBRARIES)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
 		$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
@@ -129,3 +143,11 @@ testci:   $(SRC) src/test.c
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" \
 			-i include/*.h src/*.c src/*.h src/blake2/*.c src/blake2/*.h
+
+install: $(RUN) libs
+	$(INSTALL) -d $(INST_INCLUDE)
+	$(INSTALL) $(HEADERS) $(INST_INCLUDE)
+	$(INSTALL) -d $(INST_LIBRARY)
+	$(INSTALL) $(LIBRARIES) $(INST_LIBRARY)
+	$(INSTALL) -d $(INST_BINARY)
+	$(INSTALL) $(RUN) $(INST_BINARY)
