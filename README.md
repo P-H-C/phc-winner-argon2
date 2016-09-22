@@ -42,7 +42,7 @@ Please report bugs as issues on this repository.
 `make` builds the executable `argon2`, the static library `libargon2.a`,
 and the shared library `libargon2.so` (or `libargon2.dylib` on OSX).
 Make sure to run `make test` to verify that your build produces valid
-results.
+results. `make install PREFIX=/usr` installs it to your system.
 
 ### Command-line utility
 
