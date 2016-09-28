@@ -239,15 +239,17 @@ executed by running:
 
 Except for the components listed below, the Argon2 code in this
 repository is copyright (c) 2015 Daniel Dinu, Dmitry Khovratovich (main
-authors), Jean-Philippe Aumasson and Samuel Neves, and under
-[CC0 license](https://creativecommons.org/about/cc0).
+authors), Jean-Philippe Aumasson and Samuel Neves, and dual licensed under the
+[CC0 License](https://creativecommons.org/about/cc0) and the
+[Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0). For more info
+see the LICENSE file.
 
 The string encoding routines in [`src/encoding.c`](src/encoding.c) are
-copyright (c) 2015 Thomas Pornin, and under [CC0
-license](https://creativecommons.org/about/cc0).
+copyright (c) 2015 Thomas Pornin, and under
+[CC0 License](https://creativecommons.org/about/cc0).
 
 The BLAKE2 code in [`src/blake2/`](src/blake2) is copyright (c) Samuel
-Neves, 2013-2015, and under [CC0
-license](https://creativecommons.org/about/cc0).
+Neves, 2013-2015, and under
+[CC0 License](https://creativecommons.org/about/cc0).
 
 All licenses are therefore GPL-compatible.
