@@ -149,7 +149,10 @@ void fill_segment(const argon2_instance_t *instance,
         return;
     }
 
-    data_independent_addressing = (instance->type == Argon2_i);
+    data_independent_addressing =
+        (instance->type == Argon2_i) ||
+        (instance->type == Argon2_id && (position.pass == 0) &&
+         (position.slice < ARGON2_SYNC_POINTS / 2));
 
     pseudo_rands =
         (uint64_t *)malloc(sizeof(uint64_t) * (instance->segment_length));

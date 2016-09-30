@@ -20,7 +20,7 @@ function main() {
         Write-Output "$opt"
 
         foreach ($version in @(16, 19)) {
-            foreach ($type in @("i", "d")) {
+            foreach ($type in @("i", "d", "id")) {
                 $i++
 
                 if ("Ref" -eq $opt) {

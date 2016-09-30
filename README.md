@@ -17,15 +17,19 @@ effective use of multiple computing units, while still providing defense
 against tradeoff attacks (by exploiting the cache and memory organization
 of the recent processors).
 
-Argon2 has two variants: Argon2d and Argon2i. Argon2d is faster and
-uses data-depending memory access, which makes it highly resistant
+Argon2 has three variants: Argon2i, Argon2d, and Argon2id. Argon2d is faster
+and uses data-depending memory access, which makes it highly resistant
 against GPU cracking attacks and suitable for applications with no threats
 from side-channel timing attacks (eg. cryptocurrencies). Argon2i instead
 uses data-independent memory access, which is preferred for password
 hashing and password-based key derivation, but it is slower as it makes
-more passes over the memory to protect from tradeoff attacks.
+more passes over the memory to protect from tradeoff attacks. Argon2id is a
+hybrid of Argon2i and Argon2d, using a combonation of data-depending and
+data-independant memory accesses, which gives some of Argon2i's resistance to
+side-channel cache timing attacks and much of Argon2d's resistance to GPU 
+cracking attacks.
 
-Argon2i and Argon2d are parametrized by:
+Argon2i, Argon2d, and Argon2id are parametrized by:
 
 * A **time** cost, which defines the amount of computation realized and
   therefore the execution time, given in number of iterations
@@ -50,11 +54,13 @@ results. `make install PREFIX=/usr` installs it to your system.
 on your system. To show usage instructions, run
 `./argon2 -h` as
 ```
-Usage:  ./argon2 [-h] salt [-d] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r]
+Usage:  ./argon2 [-h] salt [-i|-d|-id] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r]
         Password is read from stdin
 Parameters:
-        salt            The salt to use, at least 8 characters 
-        -d              Use Argon2d instead of Argon2i (which is the default)
+        salt            The salt to use, at least 8 characters
+        -i              Use Argon2i (this is the default)
+        -d              Use Argon2d instead of Argon2i
+        -id             Use Argon2id instead of Argon2i
         -t N            Sets the number of iterations to N (default = 3)
         -m N            Sets the memory usage of 2^N KiB (default 12)
         -p N            Sets parallelism to N threads (default 1)
@@ -162,10 +168,12 @@ int main(void)
 
 To use Argon2d instead of Argon2i call `argon2d_hash` instead of
 `argon2i_hash` using the high-level API, and `argon2d` instead of
-`argon2i` using the low-level API.
+`argon2i` using the low-level API. Similarly for Argon2id, call `argond2id_hash`
+and `argon2id`.
 
 To produce the crypt-like encoding rather than the raw hash, call
-`argon2i_hash_encoded` for Argon2i and `argon2d_hash_encoded` for Argon2d.
+`argon2i_hash_encoded` for Argon2i, `argon2d_hash_encoded` for Argon2d, and
+`argon2id_hash_encoded` for Argon2id
 
 See [`include/argon2.h`](include/argon2.h) for API details.
 

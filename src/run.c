@@ -37,13 +37,15 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-d] [-t iterations] [-m memory] "
+    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m memory] "
            "[-p parallelism] [-l hash length] [-e|-r]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
     printf("\tsalt\t\tThe salt to use, at least 8 characters\n");
-    printf("\t-d\t\tUse Argon2d instead of Argon2i (which is the default)\n");
+    printf("\t-i\t\tUse Argon2i (this is the default)\n");
+    printf("\t-d\t\tUse Argon2d instead of Argon2i\n");
+    printf("\t-id\t\tUse Argon2id instead of Argon2i\n");
     printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n",
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
@@ -80,7 +82,7 @@ Base64-encoded hash string
 @m_cost amount of requested memory in KB
 @lanes amount of requested parallelism
 @threads actual parallelism
-@type String, only "d" and "i" are accepted
+@type Argon2 type we want to run
 @encoded_only display only the encoded hash
 @raw_only display only the hexadecimal of the hash
 */
@@ -116,7 +118,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
         fatal("could not allocate memory for output");
     }
 
-    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen);
+    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen, type);
     char* encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
@@ -165,7 +167,8 @@ int main(int argc, char *argv[]) {
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
     uint32_t threads = THREADS_DEF;
-    argon2_type type = Argon2_i;
+    argon2_type type = Argon2_i; /* Argon2i is the default type */
+    int types_specified = 0;
     int encoded_only = 0;
     int raw_only = 0;
     int i;
@@ -255,8 +258,15 @@ int main(int argc, char *argv[]) {
             } else {
                 fatal("missing -l argument");
             }
+        } else if (!strcmp(a, "-i")) {
+            type = Argon2_i;
+            ++types_specified;
         } else if (!strcmp(a, "-d")) {
             type = Argon2_d;
+            ++types_specified;
+        } else if (!strcmp(a, "-id")) {
+            type = Argon2_id;
+            ++types_specified;
         } else if (!strcmp(a, "-e")) {
             encoded_only = 1;
         } else if (!strcmp(a, "-r")) {
@@ -266,15 +276,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (types_specified > 1) {
+        fatal("cannot specify multiple Argon2 types");
+    }
+
     if(encoded_only && raw_only)
         fatal("cannot provide both -e and -r");
 
     if(!encoded_only && !raw_only) {
-        if (type == Argon2_i) {
-            printf("Type:\t\tArgon2i\n");
-        } else {
-            printf("Type:\t\tArgon2d\n");
-        }
+        printf("Type:\t\t%s\n", argon2_type2string(type, 1));
         printf("Iterations:\t%" PRIu32 " \n", t_cost);
         printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
         printf("Parallelism:\t%" PRIu32 " \n", lanes);
