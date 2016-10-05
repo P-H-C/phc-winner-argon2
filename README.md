@@ -24,7 +24,7 @@ from side-channel timing attacks (eg. cryptocurrencies). Argon2i instead
 uses data-independent memory access, which is preferred for password
 hashing and password-based key derivation, but it is slower as it makes
 more passes over the memory to protect from tradeoff attacks. Argon2id is a
-hybrid of Argon2i and Argon2d, using a combonation of data-depending and
+hybrid of Argon2i and Argon2d, using a combination of data-depending and
 data-independant memory accesses, which gives some of Argon2i's resistance to
 side-channel cache timing attacks and much of Argon2d's resistance to GPU 
 cracking attacks.
