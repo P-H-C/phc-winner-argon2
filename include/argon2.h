@@ -227,7 +227,7 @@ typedef enum Argon2_version {
 /*
  * Function that gives the string representation of an argon2_type.
  * @param type The argon2_type that we want the string for
- * @param uppercase Wheather the string should have the first letter uppercase
+ * @param uppercase Whether the string should have the first letter uppercase
  * @return NULL if invalid type, otherwise the string representation.
  */
 ARGON2_PUBLIC const char *argon2_type2string(argon2_type type, int uppercase);
