@@ -308,6 +308,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     size_t maxsaltlen = ctx->saltlen;
     size_t maxoutlen = ctx->outlen;
     int validation_result;
+    const char* type_string;
 
     ctx->adlen = 0;
     ctx->saltlen = 0;
@@ -316,7 +317,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
     /* We should start with the argon2_type we are using */
     CC("$");
-    const char* type_string = argon2_type2string(type, 0);
+    type_string = argon2_type2string(type, 0);
     if (type_string) {
         CC(type_string);
     } else {
@@ -391,8 +392,8 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         dst_len -= sb_len;                                                     \
     } while ((void)0, 0)
 
-    SS("$");
     const char* type_string = argon2_type2string(type, 0);
+    SS("$");
     if (type_string) {
         SS(type_string);
     } else {
