@@ -92,6 +92,8 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
     clock_t start_time, stop_time;
     size_t pwdlen, saltlen, encodedlen;
     int result;
+    unsigned char * out = NULL;
+    char * encoded = NULL;
 
     start_time = clock();
 
@@ -112,14 +114,14 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
 
     UNUSED_PARAMETER(lanes);
 
-    unsigned char* out = malloc(outlen + 1);
+    out = malloc(outlen + 1);
     if (!out) {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("could not allocate memory for output");
     }
 
     encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen, type);
-    char* encoded = malloc(encodedlen + 1);
+    encoded = malloc(encodedlen + 1);
     if (!encoded) {
         secure_wipe_memory(pwd, strlen(pwd));
         fatal("could not allocate memory for hash");
