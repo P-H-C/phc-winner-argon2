@@ -62,6 +62,7 @@ static void benchmark() {
     uint32_t t_cost = 3;
     uint32_t m_cost;
     uint32_t thread_test[4] = {1, 2, 4,  8};
+    argon2_type types[3] = {Argon2_i, Argon2_d, Argon2_id};
 
     memset(pwd_array, 0, inlen);
     memset(salt_array, 1, inlen);
@@ -69,37 +70,33 @@ static void benchmark() {
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
         unsigned i;
         for (i = 0; i < 4; ++i) {
+
+            double run_time = 0;
             uint32_t thread_n = thread_test[i];
-            uint64_t stop_cycles, stop_cycles_i;
-            clock_t stop_time;
-            uint64_t delta_d, delta_i;
-            double mcycles_d, mcycles_i, run_time;
 
-            clock_t start_time = clock();
-            uint64_t start_cycles = rdtsc();
-            
-            argon2d_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
-                             salt_array, inlen, out, outlen);
-            stop_cycles = rdtsc();
-            argon2i_hash_raw(t_cost, m_cost, thread_n, pwd_array, inlen,
-                             salt_array, inlen, out, outlen);
-            stop_cycles_i = rdtsc();
-            stop_time = clock();
+            unsigned j;
+            for (j = 0; j < 3; ++j) {
 
-            delta_d = (stop_cycles - start_cycles) / (m_cost);
-            delta_i = (stop_cycles_i - stop_cycles) / (m_cost);
-            mcycles_d = (double)(stop_cycles - start_cycles) / (1UL << 20);
-            mcycles_i = (double)(stop_cycles_i - stop_cycles) / (1UL << 20);
-            printf("Argon2d %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
-                   "Mcycles \n",
-                   t_cost, m_cost >> 10, thread_n, (float)delta_d / 1024,
-                   mcycles_d);
-            printf("Argon2i %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
-                   "Mcycles \n",
-                   t_cost, m_cost >> 10, thread_n, (float)delta_i / 1024,
-                   mcycles_i);
+                argon2_type type = types[j];
+                clock_t start_time = clock();
+                uint64_t start_cycles = rdtsc();
 
-            run_time = ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
+                argon2_hash(t_cost, m_cost, thread_n, pwd_array, inlen,
+                            salt_array, inlen, out, outlen, NULL, 0, type,
+                            ARGON2_VERSION_NUMBER);
+
+                clock_t stop_time = clock();
+                uint64_t stop_cycles = rdtsc();
+
+                uint64_t delta = (stop_cycles - start_cycles) / (m_cost);
+                double mcycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
+                run_time += ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
+
+                printf("%s %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
+                       "Mcycles \n", argon2_type2string(type, 1), t_cost,
+                       m_cost >> 10, thread_n, (float)delta / 1024, mcycles);
+            }
+
             printf("%2.4f seconds\n\n", run_time);
         }
     }

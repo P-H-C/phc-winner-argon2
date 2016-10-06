@@ -18,7 +18,7 @@ do
   i=0
   for version in 16 19
   do
-    for type in i d
+    for type in i d id
     do
       i=$(($i+1))
 

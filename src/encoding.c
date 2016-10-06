@@ -308,21 +308,26 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     size_t maxsaltlen = ctx->saltlen;
     size_t maxoutlen = ctx->outlen;
     int validation_result;
+    const char* type_string;
 
     ctx->adlen = 0;
     ctx->saltlen = 0;
     ctx->outlen = 0;
     ctx->pwdlen = 0;
 
-    if (type == Argon2_i)
-        CC("$argon2i");
-    else if (type == Argon2_d)
-        CC("$argon2d");
-    else
+    /* We should start with the argon2_type we are using */
+    CC("$");
+    type_string = argon2_type2string(type, 0);
+    if (type_string) {
+        CC(type_string);
+    } else {
         return ARGON2_INCORRECT_TYPE;
-    ctx->version = ARGON2_VERSION_10;
+    }
+
     /* Reading the version number if the default is suppressed */
+    ctx->version = ARGON2_VERSION_10;
     CC_opt("$v=", DECIMAL(ctx->version));
+
     CC("$m=");
     DECIMAL(ctx->m_cost);
     CC(",t=");
@@ -387,16 +392,19 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
         dst_len -= sb_len;                                                     \
     } while ((void)0, 0)
 
-    if (type == Argon2_i)
-        SS("$argon2i$v=");
-    else if (type == Argon2_d)
-        SS("$argon2d$v=");
-    else
+    const char* type_string = argon2_type2string(type, 0);
+    SS("$");
+    if (type_string) {
+        SS(type_string);
+    } else {
         return ARGON2_ENCODING_FAIL;
+    }
 
     if (validate_inputs(ctx) != ARGON2_OK) {
         return validate_inputs(ctx);
     }
+
+    SS("$v=");
     SX(ctx->version);
     SS("$m=");
     SX(ctx->m_cost);
