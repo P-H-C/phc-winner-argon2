@@ -136,12 +136,12 @@ dist:
 		cd ..; \
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
-test:   $(SRC) src/test.c
+test:           $(SRC) src/test.c
 		$(CC) $(CFLAGS)  -Wextra -Wno-type-limits $^ -o testcase
 		@sh kats/test.sh
 		./testcase
 
-testci:   $(SRC) src/test.c
+testci:         $(SRC) src/test.c
 		$(CC) $(CI_CFLAGS) $^ -o testcase
 		@sh kats/test.sh
 		./testcase
