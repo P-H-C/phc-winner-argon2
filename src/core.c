@@ -277,6 +277,7 @@ int fill_memory_blocks(argon2_instance_t *instance) {
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
             int rc;
             uint32_t l;
+            int join_error = 0;
 
             /* 2. Calling threads */
             for (l = 0; l < instance->lanes; ++l) {
@@ -318,8 +319,11 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                  ++l) {
                 rc = argon2_thread_join(thread[l]);
                 if (rc) {
-                    return ARGON2_THREAD_FAIL;
+                    join_error = 1;
                 }
+            }
+            if (join_error) {
+                return ARGON2_THREAD_FAIL;
             }
         }
 
