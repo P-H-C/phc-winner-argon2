@@ -323,6 +323,8 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                 }
             }
             if (join_error) {
+                free(thr_data);
+                free(thread);
                 return ARGON2_THREAD_FAIL;
             }
         }
