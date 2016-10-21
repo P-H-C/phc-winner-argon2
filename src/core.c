@@ -287,8 +287,7 @@ int fill_memory_blocks(argon2_instance_t *instance) {
 
                 /* 2.1 Join a thread if limit is exceeded */
                 if (l >= instance->threads) {
-                    rc = argon2_thread_join(thread[l - instance->threads]);
-                    if (rc) {
+                    if (argon2_thread_join(thread[l - instance->threads])) {
                         rc = ARGON2_THREAD_FAIL;
                         goto fail;
                     }
@@ -303,9 +302,8 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                     instance; /* preparing the thread input */
                 memcpy(&(thr_data[l].pos), &position,
                        sizeof(argon2_position_t));
-                rc = argon2_thread_create(&thread[l], &fill_segment_thr,
-                                          (void *)&thr_data[l]);
-                if (rc) {
+                if (argon2_thread_create(&thread[l], &fill_segment_thr,
+                                         (void *)&thr_data[l])) {
                     rc = ARGON2_THREAD_FAIL;
                     goto fail;
                 }
