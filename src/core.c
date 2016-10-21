@@ -278,7 +278,6 @@ int fill_memory_blocks(argon2_instance_t *instance) {
 
     for (r = 0; r < instance->passes; ++r) {
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
-            int rc;
             uint32_t l;
 
             /* 2. Calling threads */
