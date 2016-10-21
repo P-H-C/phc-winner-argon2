@@ -317,8 +317,7 @@ int fill_memory_blocks(argon2_instance_t *instance) {
             /* 3. Joining remaining threads */
             for (l = instance->lanes - instance->threads; l < instance->lanes;
                  ++l) {
-                rc = argon2_thread_join(thread[l]);
-                if (rc) {
+                if (argon2_thread_join(thread[l])) {
                     rc = ARGON2_THREAD_FAIL;
                     goto fail;
                 }
