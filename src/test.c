@@ -128,8 +128,15 @@ int main() {
     ret = argon2_verify("$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ"
                         "9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ",
                         "password", strlen("password"), Argon2_i);
-    assert(ret == ARGON2_OUTPUT_TOO_SHORT);
+    assert(ret == ARGON2_DECODING_FAIL);
     printf("Recognise an invalid encoding: PASS\n");
+
+    /* Handle an invalid encoding correctly (salt is too short) */
+    ret = argon2_verify("$argon2i$m=65536,t=2,p=1$"
+                        "$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ",
+                        "password", strlen("password"), Argon2_i);
+    assert(ret == ARGON2_SALT_TOO_SHORT);
+    printf("Recognise an invalid salt in encoding: PASS\n");
 
     /* Handle an mismatching hash (the encoded password is "passwore") */
     ret = argon2_verify("$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ"
@@ -200,8 +207,15 @@ int main() {
     ret = argon2_verify("$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ"
                         "wWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA",
                         "password", strlen("password"), Argon2_i);
-    assert(ret == ARGON2_OUTPUT_TOO_SHORT);
+    assert(ret == ARGON2_DECODING_FAIL);
     printf("Recognise an invalid encoding: PASS\n");
+
+    /* Handle an invalid encoding correctly (salt is too short) */
+    ret = argon2_verify("$argon2i$v=19$m=65536,t=2,p=1$"
+                        "$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ",
+                        "password", strlen("password"), Argon2_i);
+    assert(ret == ARGON2_SALT_TOO_SHORT);
+    printf("Recognise an invalid salt in encoding: PASS\n");
 
     /* Handle an mismatching hash (the encoded password is "passwore") */
     ret = argon2_verify("$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ"

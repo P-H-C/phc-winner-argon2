@@ -354,37 +354,37 @@ int validate_inputs(const argon2_context *context) {
         return ARGON2_OUTPUT_TOO_LONG;
     }
 
-    /* Validate password length */
+    /* Validate password (required param) */
     if (NULL == context->pwd) {
         if (0 != context->pwdlen) {
             return ARGON2_PWD_PTR_MISMATCH;
         }
-    } else {
-        if (ARGON2_MIN_PWD_LENGTH > context->pwdlen) {
-            return ARGON2_PWD_TOO_SHORT;
-        }
-
-        if (ARGON2_MAX_PWD_LENGTH < context->pwdlen) {
-            return ARGON2_PWD_TOO_LONG;
-        }
     }
 
-    /* Validate salt length */
+    if (ARGON2_MIN_PWD_LENGTH > context->pwdlen) {
+      return ARGON2_PWD_TOO_SHORT;
+    }
+
+    if (ARGON2_MAX_PWD_LENGTH < context->pwdlen) {
+        return ARGON2_PWD_TOO_LONG;
+    }
+
+    /* Validate salt (required param) */
     if (NULL == context->salt) {
         if (0 != context->saltlen) {
             return ARGON2_SALT_PTR_MISMATCH;
         }
-    } else {
-        if (ARGON2_MIN_SALT_LENGTH > context->saltlen) {
-            return ARGON2_SALT_TOO_SHORT;
-        }
-
-        if (ARGON2_MAX_SALT_LENGTH < context->saltlen) {
-            return ARGON2_SALT_TOO_LONG;
-        }
     }
 
-    /* Validate secret length */
+    if (ARGON2_MIN_SALT_LENGTH > context->saltlen) {
+        return ARGON2_SALT_TOO_SHORT;
+    }
+
+    if (ARGON2_MAX_SALT_LENGTH < context->saltlen) {
+        return ARGON2_SALT_TOO_LONG;
+    }
+
+    /* Validate secret (optional param) */
     if (NULL == context->secret) {
         if (0 != context->secretlen) {
             return ARGON2_SECRET_PTR_MISMATCH;
@@ -393,13 +393,12 @@ int validate_inputs(const argon2_context *context) {
         if (ARGON2_MIN_SECRET > context->secretlen) {
             return ARGON2_SECRET_TOO_SHORT;
         }
-
         if (ARGON2_MAX_SECRET < context->secretlen) {
             return ARGON2_SECRET_TOO_LONG;
         }
     }
 
-    /* Validate associated data */
+    /* Validate associated data (optional param) */
     if (NULL == context->ad) {
         if (0 != context->adlen) {
             return ARGON2_AD_PTR_MISMATCH;
@@ -408,7 +407,6 @@ int validate_inputs(const argon2_context *context) {
         if (ARGON2_MIN_AD_LENGTH > context->adlen) {
             return ARGON2_AD_TOO_SHORT;
         }
-
         if (ARGON2_MAX_AD_LENGTH < context->adlen) {
             return ARGON2_AD_TOO_LONG;
         }
