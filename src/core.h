@@ -30,8 +30,7 @@
 
 #define CONST_CAST(x) (x)(uintptr_t)
 
-/*************************Argon2 internal
- * constants**************************************************/
+/**********************Argon2 internal constants*******************************/
 
 enum argon2_core_constants {
     /* Memory block size in bytes */
@@ -49,8 +48,7 @@ enum argon2_core_constants {
     ARGON2_PREHASH_SEED_LENGTH = 72
 };
 
-/*************************Argon2 internal data
- * types**************************************************/
+/*************************Argon2 internal data types***********************/
 
 /*
  * Structure for the (1KB) memory block implemented as 128 64-bit words.
@@ -87,6 +85,7 @@ typedef struct Argon2_instance_t {
     uint32_t threads;
     argon2_type type;
     int print_internals; /* whether to print the memory blocks */
+    argon2_context *context_ptr; /* points back to original context */
 } argon2_instance_t;
 
 /*
@@ -106,32 +105,43 @@ typedef struct Argon2_thread_data {
     argon2_position_t pos;
 } argon2_thread_data;
 
-/*************************Argon2 core
- * functions**************************************************/
+/*************************Argon2 core functions********************************/
 
-/* Allocates memory to the given pointer
+/* Allocates memory to the given pointer, uses the appropriate allocator as
+ * specified in the context. Total allocated memory is num*size.
+ * @param context argon2_context which specifies the allocator
  * @param memory pointer to the pointer to the memory
- * @param m_cost number of blocks to allocate in the memory
+ * @param size the size in bytes for each element to be allocated
+ * @param num the number of elements to be allocated
  * @return ARGON2_OK if @memory is a valid pointer and memory is allocated
  */
-int allocate_memory(block **memory, uint32_t m_cost);
+int allocate_memory(const argon2_context *context, uint8_t **memory,
+                    size_t num, size_t size);
 
-/* Function that securely cleans the memory
+/*
+ * Frees memory at the given pointer, uses the appropriate deallocator as
+ * specified in the context. Also cleans the memory using clear_internal_memory.
+ * @param context argon2_context which specifies the deallocator
+ * @param memory pointer to buffer to be freed
+ * @param size the size in bytes for each element to be deallocated
+ * @param num the number of elements to be deallocated
+ */
+void free_memory(const argon2_context *context, uint8_t *memory,
+                 size_t num, size_t size);
+
+/* Function that securely cleans the memory. This ignores any flags set
+ * regarding clearing memory. Usually one just calls clear_internal_memory.
  * @param mem Pointer to the memory
  * @param s Memory size in bytes
  */
 void secure_wipe_memory(void *v, size_t n);
 
-/* Clears memory
- * @param instance pointer to the current instance
- * @param clear_memory indicates if we clear the memory with zeros.
+/* Function that securely clears the memory if FLAG_clear_internal_memory is
+ * set. If the flag isn't set, this function does nothing.
+ * @param mem Pointer to the memory
+ * @param s Memory size in bytes
  */
-void clear_memory(argon2_instance_t *instance, int clear);
-
-/* Deallocates memory
- * @param memory pointer to the blocks
- */
-void free_memory(block *memory);
+void clear_internal_memory(void *v, size_t n);
 
 /*
  * Computes absolute position of reference block in the lane following a skewed
@@ -205,6 +215,7 @@ void finalize(const argon2_context *context, argon2_instance_t *instance);
 /*
  * Function that fills the segment using previous segments also from other
  * threads
+ * @param context current context
  * @param instance Pointer to the current instance
  * @param position Current position
  * @pre all block pointers must be valid

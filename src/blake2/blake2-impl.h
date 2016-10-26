@@ -151,6 +151,6 @@ static BLAKE2_INLINE uint64_t rotr64(const uint64_t w, const unsigned c) {
     return (w >> c) | (w << (64 - c));
 }
 
-void secure_wipe_memory(void *v, size_t n);
+void clear_internal_memory(void *v, size_t n);
 
 #endif

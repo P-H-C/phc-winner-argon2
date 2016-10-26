@@ -84,10 +84,14 @@ extern "C" {
 #define ARGON2_MIN_SECRET UINT32_C(0)
 #define ARGON2_MAX_SECRET UINT32_C(0xFFFFFFFF)
 
+/* Flags to determine which fields are securely wiped (default = no wipe). */
+#define ARGON2_DEFAULT_FLAGS UINT32_C(0)
 #define ARGON2_FLAG_CLEAR_PASSWORD (UINT32_C(1) << 0)
 #define ARGON2_FLAG_CLEAR_SECRET (UINT32_C(1) << 1)
-#define ARGON2_FLAG_CLEAR_MEMORY (UINT32_C(1) << 2)
-#define ARGON2_DEFAULT_FLAGS (ARGON2_FLAG_CLEAR_MEMORY)
+
+/* Global flag to determine if we are wiping internal memory buffers. This flag
+ * is defined in core.c and deafults to 1 (wipe internal memory). */
+extern int FLAG_clear_internal_memory;
 
 /* Error codes */
 typedef enum Argon2_ErrorCodes {

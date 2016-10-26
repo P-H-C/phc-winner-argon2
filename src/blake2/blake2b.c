@@ -61,7 +61,7 @@ static BLAKE2_INLINE void blake2b_increment_counter(blake2b_state *S,
 }
 
 static BLAKE2_INLINE void blake2b_invalidate_state(blake2b_state *S) {
-    secure_wipe_memory(S, sizeof(*S));      /* wipe */
+    clear_internal_memory(S, sizeof(*S));      /* wipe */
     blake2b_set_lastblock(S); /* invalidate for further use */
 }
 
@@ -157,7 +157,8 @@ int blake2b_init_key(blake2b_state *S, size_t outlen, const void *key,
         memset(block, 0, BLAKE2B_BLOCKBYTES);
         memcpy(block, key, keylen);
         blake2b_update(S, block, BLAKE2B_BLOCKBYTES);
-        secure_wipe_memory(block, BLAKE2B_BLOCKBYTES); /* Burn the key from stack */
+        /* Burn the key from stack */
+        clear_internal_memory(block, BLAKE2B_BLOCKBYTES);
     }
     return 0;
 }
@@ -284,9 +285,9 @@ int blake2b_final(blake2b_state *S, void *out, size_t outlen) {
     }
 
     memcpy(out, buffer, S->outlen);
-    secure_wipe_memory(buffer, sizeof(buffer));
-    secure_wipe_memory(S->buf, sizeof(S->buf));
-    secure_wipe_memory(S->h, sizeof(S->h));
+    clear_internal_memory(buffer, sizeof(buffer));
+    clear_internal_memory(S->buf, sizeof(S->buf));
+    clear_internal_memory(S->h, sizeof(S->h));
     return 0;
 }
 
@@ -324,7 +325,7 @@ int blake2b(void *out, size_t outlen, const void *in, size_t inlen,
     ret = blake2b_final(&S, out, outlen);
 
 fail:
-    secure_wipe_memory(&S, sizeof(S));
+    clear_internal_memory(&S, sizeof(S));
     return ret;
 }
 
@@ -382,7 +383,7 @@ int blake2b_long(void *pout, size_t outlen, const void *in, size_t inlen) {
         memcpy(out, out_buffer, toproduce);
     }
 fail:
-    secure_wipe_memory(&blake_state, sizeof(blake_state));
+    clear_internal_memory(&blake_state, sizeof(blake_state));
     return ret;
 #undef TRY
 }

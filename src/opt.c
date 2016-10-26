@@ -144,9 +144,9 @@ void fill_segment(const argon2_instance_t *instance,
         (instance->type == Argon2_id && (position.pass == 0) &&
          (position.slice < ARGON2_SYNC_POINTS / 2));
 
-    pseudo_rands =
-        (uint64_t *)malloc(sizeof(uint64_t) * instance->segment_length);
-    if (pseudo_rands == NULL) {
+    if (allocate_memory(instance->context_ptr, (uint8_t **)&pseudo_rands,
+                        instance->segment_length, sizeof(uint64_t))
+        != ARGON2_OK) {
         return;
     }
 
@@ -223,5 +223,6 @@ void fill_segment(const argon2_instance_t *instance,
         }
     }
 
-    free(pseudo_rands);
+    free_memory(instance->context_ptr, (uint8_t *)pseudo_rands,
+                instance->segment_length, sizeof(uint64_t));
 }
