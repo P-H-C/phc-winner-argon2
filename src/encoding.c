@@ -39,11 +39,6 @@
  *   the parameters, salts and outputs. It does not compute the hash
  *   itself.
  *
- *   -- The third section is test code, with a main() function. With
- *   this section, the whole file compiles as a stand-alone program
- *   that exercises the encoding and decoding functions with some
- *   test vectors.
- *
  * The code was originally written by Thomas Pornin <pornin@bolet.org>,
  * to whom comments and remarks may be sent. It is released under what
  * should amount to Public Domain or its closest equivalent; the
@@ -246,19 +241,18 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  *
  * The code below applies the following format:
  *
- *  $argon2<T>[$v=<num>]$m=<num>,t=<num>,p=<num>[,keyid=<bin>][,data=<bin>][$<bin>[$<bin>]]
+ *  $argon2<T>[$v=<num>]$m=<num>,t=<num>,p=<num>$<bin>$<bin>
  *
- * where <T> is either 'd' or 'i', <num> is a decimal integer (positive, fits in
- * an 'unsigned long'), and <bin> is Base64-encoded data (no '=' padding
+ * where <T> is either 'd', 'id', or 'i', <num> is a decimal integer (positive,
+ * fits in an 'unsigned long'), and <bin> is Base64-encoded data (no '=' padding
  * characters, no newline or whitespace).
- * The "keyid" is a binary identifier for a key (up to 8 bytes);
- * "data" is associated data (up to 32 bytes). When the 'keyid'
- * (resp. the 'data') is empty, then it is ommitted from the output.
  *
  * The last two binary chunks (encoded in Base64) are, in that order,
- * the salt and the output. Both are optional, but you cannot have an
- * output without a salt. The binary salt length is between 8 and 48 bytes.
- * The output length is always exactly 32 bytes.
+ * the salt and the output. Both are required. The binary salt length and the
+ * output length must be in the permisable ranges as defined in argon2.h.
+ *
+ * The ctx struct must contain buffers large enough to hold the salt and pwd
+ * when it is fed into decode_string.
  */
 
 int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
@@ -273,7 +267,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         str += cc_len;                                                         \
     } while ((void)0, 0)
 
-/* prefix checking with supplied code */
+/* optional prefix checking with supplied code */
 #define CC_opt(prefix, code)                                                   \
     do {                                                                       \
         size_t cc_len = strlen(prefix);                                        \
@@ -283,7 +277,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         }                                                                      \
     } while ((void)0, 0)
 
-/* Decoding  prefix into decimal */
+/* Decoding prefix into decimal */
 #define DECIMAL(x)                                                             \
     do {                                                                       \
         unsigned long dec_x;                                                   \
@@ -294,6 +288,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         (x) = dec_x;                                                           \
     } while ((void)0, 0)
 
+/* Decoding base64 into a binary buffer */
 #define BIN(buf, max_len, len)                                                 \
     do {                                                                       \
         size_t bin_len = (max_len);                                            \
@@ -304,25 +299,22 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
         (len) = (uint32_t)bin_len;                                             \
     } while ((void)0, 0)
 
-    size_t maxadlen = ctx->adlen;
     size_t maxsaltlen = ctx->saltlen;
     size_t maxoutlen = ctx->outlen;
     int validation_result;
     const char* type_string;
 
-    ctx->adlen = 0;
     ctx->saltlen = 0;
     ctx->outlen = 0;
-    ctx->pwdlen = 0;
 
     /* We should start with the argon2_type we are using */
-    CC("$");
     type_string = argon2_type2string(type, 0);
-    if (type_string) {
-        CC(type_string);
-    } else {
+    if (!type_string) {
         return ARGON2_INCORRECT_TYPE;
     }
+
+    CC("$");
+    CC(type_string);
 
     /* Reading the version number if the default is suppressed */
     ctx->version = ARGON2_VERSION_10;
@@ -336,17 +328,11 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     DECIMAL(ctx->lanes);
     ctx->threads = ctx->lanes;
 
-    CC_opt(",data=", BIN(ctx->ad, maxadlen, ctx->adlen));
-    if (*str == 0) {
-        return ARGON2_OK;
-    }
     CC("$");
     BIN(ctx->salt, maxsaltlen, ctx->saltlen);
-    if (*str == 0) {
-        return ARGON2_OK;
-    }
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
+
     validation_result = validate_inputs(ctx);
     if (validation_result != ARGON2_OK) {
         return validation_result;
@@ -393,19 +379,23 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     } while ((void)0, 0)
 
     const char* type_string = argon2_type2string(type, 0);
-    SS("$");
-    if (type_string) {
-        SS(type_string);
-    } else {
-        return ARGON2_ENCODING_FAIL;
+    int validation_result = validate_inputs(ctx);
+
+    if (!type_string) {
+      return ARGON2_ENCODING_FAIL;
     }
 
-    if (validate_inputs(ctx) != ARGON2_OK) {
-        return validate_inputs(ctx);
+    if (validation_result != ARGON2_OK) {
+      return validation_result;
     }
+
+
+    SS("$");
+    SS(type_string);
 
     SS("$v=");
     SX(ctx->version);
+
     SS("$m=");
     SX(ctx->m_cost);
     SS(",t=");
@@ -413,19 +403,8 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
     SS(",p=");
     SX(ctx->lanes);
 
-    if (ctx->adlen > 0) {
-        SS(",data=");
-        SB(ctx->ad, ctx->adlen);
-    }
-
-    if (ctx->saltlen == 0)
-        return ARGON2_OK;
-
     SS("$");
     SB(ctx->salt, ctx->saltlen);
-
-    if (ctx->outlen == 0)
-        return ARGON2_OK;
 
     SS("$");
     SB(ctx->out, ctx->outlen);
