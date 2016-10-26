@@ -304,9 +304,6 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     int validation_result;
     const char* type_string;
 
-    ctx->saltlen = 0;
-    ctx->outlen = 0;
-
     /* We should start with the argon2_type we are using */
     type_string = argon2_type2string(type, 0);
     if (!type_string) {
@@ -333,10 +330,22 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     CC("$");
     BIN(ctx->out, maxoutlen, ctx->outlen);
 
+    /* The rest of the fields get the default values */
+    ctx->secret = NULL;
+    ctx->secretlen = 0;
+    ctx->ad = NULL;
+    ctx->adlen = 0;
+    ctx->allocate_cbk = NULL;
+    ctx->free_cbk = NULL;
+    ctx->flags = ARGON2_DEFAULT_FLAGS;
+
+    /* On return, must have valid context */
     validation_result = validate_inputs(ctx);
     if (validation_result != ARGON2_OK) {
         return validation_result;
     }
+
+    /* Can't have any additional characters */
     if (*str == 0) {
         return ARGON2_OK;
     } else {
