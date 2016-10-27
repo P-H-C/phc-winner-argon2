@@ -29,21 +29,21 @@
 * is less than the number of required characters (including the
 * terminating 0), then this function returns ARGON2_ENCODING_ERROR.
 *
-* if ctx->outlen is 0, then the hash string will be a salt string
-* (no output). if ctx->saltlen is also 0, then the string will be a
-* parameter-only string (no salt and no output).
-*
 * on success, ARGON2_OK is returned.
-*
-* No other parameters are checked
 */
 int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
                   argon2_type type);
 
 /*
 * Decodes an Argon2 hash string into the provided structure 'ctx'.
-* The fields ctx.saltlen, ctx.adlen, ctx.outlen set the maximal salt, ad, out
-* length values that are allowed; invalid input string causes an error.
+* The only fields that must be set prior to this call are ctx.saltlen and
+* ctx.outlen (which must be the maximal salt and out length values that are
+* allowed), ctx.salt and ctx.out (which must be buffers of the specified
+* length), and ctx.pwd and ctx.pwdlen which must hold a valid password.
+*
+* Invalid input string causes an error. On success, the ctx is valid and all
+* fields have been initialized.
+*
 * Returned value is ARGON2_OK on success, other ARGON2_ codes on error.
 */
 int decode_string(argon2_context *ctx, const char *str, argon2_type type);

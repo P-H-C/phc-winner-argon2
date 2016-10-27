@@ -238,69 +238,60 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
                   argon2_type type) {
 
     argon2_context ctx;
-    uint8_t *out;
-    int ret;
-    int decode_result;
-    uint32_t encoded_len;
-    size_t encoded_len_tmp;
+    uint8_t *desired_result = NULL;
 
-    if(encoded == NULL) {
+    int ret = ARGON2_OK;
+
+    size_t encoded_len;
+    uint32_t max_field_len;
+
+    if (encoded == NULL) {
         return ARGON2_DECODING_FAIL;
     }
 
-    encoded_len_tmp = strlen(encoded);
-    /* max values, to be updated in decode_string */
-    if (UINT32_MAX < encoded_len_tmp) {
+    encoded_len = strlen(encoded);
+    if (encoded_len > UINT32_MAX) {
         return ARGON2_DECODING_FAIL;
     }
 
-    encoded_len = (uint32_t)encoded_len_tmp;
-    ctx.adlen = encoded_len;
-    ctx.saltlen = encoded_len;
-    ctx.outlen = encoded_len;
-    ctx.allocate_cbk = NULL;
-    ctx.free_cbk = NULL;
-    ctx.secret = NULL;
-    ctx.secretlen = 0;
-    ctx.pwdlen = 0;
-    ctx.pwd = NULL;
-    ctx.ad = malloc(ctx.adlen);
+    /* No field can be longer than the encoded length */
+    max_field_len = (uint32_t)encoded_len;
+
+    ctx.saltlen = max_field_len;
+    ctx.outlen = max_field_len;
+
     ctx.salt = malloc(ctx.saltlen);
     ctx.out = malloc(ctx.outlen);
-    if (!ctx.out || !ctx.salt || !ctx.ad) {
-        free(ctx.ad);
-        free(ctx.salt);
-        free(ctx.out);
-        return ARGON2_MEMORY_ALLOCATION_ERROR;
-    }
-    out = malloc(ctx.outlen);
-    if (!out) {
-        free(ctx.ad);
-        free(ctx.salt);
-        free(ctx.out);
-        return ARGON2_MEMORY_ALLOCATION_ERROR;
-    }
-    decode_result = decode_string(&ctx, encoded, type);
-    if (decode_result != ARGON2_OK) {
-        free(ctx.ad);
-        free(ctx.salt);
-        free(ctx.out);
-        free(out);
-        return decode_result;
+    if (!ctx.salt || !ctx.out) {
+        ret = ARGON2_MEMORY_ALLOCATION_ERROR;
+        goto fail;
     }
 
-    ret = argon2_hash(ctx.t_cost, ctx.m_cost, ctx.threads, pwd, pwdlen,
-                      ctx.salt, ctx.saltlen, out, ctx.outlen, NULL, 0, type,
-                      ctx.version);
+    ctx.pwd = (uint8_t *)pwd;
+    ctx.pwdlen = pwdlen;
 
-    free(ctx.ad);
+    ret = decode_string(&ctx, encoded, type);
+    if (ret != ARGON2_OK) {
+        goto fail;
+    }
+
+    /* Set aside the desired result, and get a new buffer. */
+    desired_result = ctx.out;
+    ctx.out = malloc(ctx.outlen);
+    if (!ctx.out) {
+        ret = ARGON2_MEMORY_ALLOCATION_ERROR;
+        goto fail;
+    }
+
+    ret = argon2_verify_ctx(&ctx, (char *)desired_result, type);
+    if (ret != ARGON2_OK) {
+        goto fail;
+    }
+
+fail:
     free(ctx.salt);
-
-    if (ret == ARGON2_OK && argon2_compare(out, ctx.out, ctx.outlen)) {
-        ret = ARGON2_VERIFY_MISMATCH;
-    }
-    free(out);
     free(ctx.out);
+    free(desired_result);
 
     return ret;
 }
@@ -334,18 +325,16 @@ int argon2id_ctx(argon2_context *context) {
 
 int argon2_verify_ctx(argon2_context *context, const char *hash,
                       argon2_type type) {
-    int result;
-    if (0 == context->outlen || NULL == hash) {
-        return ARGON2_OUT_PTR_MISMATCH;
+    int ret = argon2_ctx(context, type);
+    if (ret != ARGON2_OK) {
+        return ret;
     }
 
-    result = argon2_ctx(context, type);
-
-    if (ARGON2_OK != result) {
-        return result;
+    if (argon2_compare((uint8_t *)hash, context->out, context->outlen)) {
+        return ARGON2_VERIFY_MISMATCH;
     }
 
-    return 0 == memcmp(hash, context->out, context->outlen);
+    return ARGON2_OK;
 }
 
 int argon2d_verify_ctx(argon2_context *context, const char *hash) {
