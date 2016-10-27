@@ -91,10 +91,33 @@ for using Argon2.
 
 The example program below hashes the string "password" with Argon2i
 using the high-level API and then using the low-level API. While the
-high-level API only takes input/output buffers and the two cost
-parameters, the low-level API additionally takes parallelism parameters
-and several others, as defined in [`include/argon2.h`](include/argon2.h).
+high-level API takes the three cost parameters (time, memory, and
+parallelism), the password input buffer, the salt input buffer, and the
+output buffers, the low-level API takes in these and additional parameters
+, as defined in [`include/argon2.h`](include/argon2.h).
 
+There are many additional parameters, but we will highlight three of them here.
+
+1. The `secret` parameter, which is used for [keyed hashing](
+   https://en.wikipedia.org/wiki/Hash-based_message_authentication_code).
+   This allows a secret key to be input at hashing time (from some external
+   location) and be folded into the value of the hash. This means that even if
+   your salts and hashes are compromized, an attacker cannot brute-force to find
+   the password without the key.
+
+2. The `ad` parameter, which is used to fold any additional data into the hash
+   value. Functionally, this behaves almost exactly like the `secret` or `salt`
+   parameters; the `ad` parameter is folding into the value of the hash.
+   However, this parameter is used for different data. The `salt` should be a
+   random string stored alongside your password. The `secret` should be a random
+   key only usable at hashing time. The `ad` is for any other data.
+
+3. The `flags` parameter, which determines which memory should be securely
+   erased. This is useful if you want to securly delete the `pwd` or `secret`
+   fields right after they are used. To do this set `flags` to either
+   `ARGON2_FLAG_CLEAR_PASSWORD` or `ARGON2_FLAG_CLEAR_SECRET`. To change how
+   internal memory is cleared, change the global flag
+   `FLAG_clear_internal_memory` (defaults to clearing internal memory).
 
 Here the time cost `t_cost` is set to 2 iterations, the
 memory cost `m_cost` is set to 2<sup>16</sup> kibibytes (64 mebibytes),
