@@ -249,7 +249,7 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  *
  * The last two binary chunks (encoded in Base64) are, in that order,
  * the salt and the output. Both are required. The binary salt length and the
- * output length must be in the permisable ranges as defined in argon2.h.
+ * output length must be in the allowed ranges defined in argon2.h.
  *
  * The ctx struct must contain buffers large enough to hold the salt and pwd
  * when it is fed into decode_string.
