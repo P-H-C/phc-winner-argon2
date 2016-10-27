@@ -144,7 +144,8 @@ int main(void)
         t_cost, m_cost, parallelism, parallelism,
         ARGON2_VERSION_13, /* algorithm version */
         NULL, NULL, /* custom memory allocation / deallocation functions */
-        ARGON2_DEFAULT_FLAGS /* by default the password is zeroed on exit */
+        /* by default only internal memory is cleared (pwd is not wiped) */
+        ARGON2_DEFAULT_FLAGS
     };
 
     int rc = argon2i_ctx( &context );

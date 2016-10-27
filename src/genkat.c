@@ -169,7 +169,7 @@ static void generate_testvectors(argon2_type type, const uint32_t version) {
     context.threads = lanes;
     context.allocate_cbk = myown_allocator;
     context.free_cbk = myown_deallocator;
-    context.flags = 0;
+    context.flags = ARGON2_DEFAULT_FLAGS;
 
 #undef TEST_OUTLEN
 #undef TEST_PWDLEN

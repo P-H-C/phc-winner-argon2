@@ -139,7 +139,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     result = argon2_ctx(&context, type);
 
     if (result != ARGON2_OK) {
-        secure_wipe_memory(out, hashlen);
+        clear_internal_memory(out, hashlen);
         free(out);
         return result;
     }
@@ -152,13 +152,13 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
         if (encode_string(encoded, encodedlen, &context, type) != ARGON2_OK) {
-            secure_wipe_memory(out, hashlen); /* wipe buffers if error */
-            secure_wipe_memory(encoded, encodedlen);
+            clear_internal_memory(out, hashlen); /* wipe buffers if error */
+            clear_internal_memory(encoded, encodedlen);
             free(out);
             return ARGON2_ENCODING_FAIL;
         }
     }
-    secure_wipe_memory(out, hashlen);
+    clear_internal_memory(out, hashlen);
     free(out);
 
     return ARGON2_OK;
