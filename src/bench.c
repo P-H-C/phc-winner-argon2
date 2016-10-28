@@ -70,26 +70,29 @@ static void benchmark() {
     for (m_cost = (uint32_t)1 << 10; m_cost <= (uint32_t)1 << 22; m_cost *= 2) {
         unsigned i;
         for (i = 0; i < 4; ++i) {
-
             double run_time = 0;
             uint32_t thread_n = thread_test[i];
 
             unsigned j;
             for (j = 0; j < 3; ++j) {
+                clock_t start_time, stop_time;
+                uint64_t start_cycles, stop_cycles;
+                uint64_t delta;
+                double mcycles;
 
                 argon2_type type = types[j];
-                clock_t start_time = clock();
-                uint64_t start_cycles = rdtsc();
+                start_time = clock();
+                start_cycles = rdtsc();
 
                 argon2_hash(t_cost, m_cost, thread_n, pwd_array, inlen,
                             salt_array, inlen, out, outlen, NULL, 0, type,
                             ARGON2_VERSION_NUMBER);
 
-                clock_t stop_time = clock();
-                uint64_t stop_cycles = rdtsc();
+                stop_cycles = rdtsc();
+                stop_time = clock();
 
-                uint64_t delta = (stop_cycles - start_cycles) / (m_cost);
-                double mcycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
+                delta = (stop_cycles - start_cycles) / (m_cost);
+                mcycles = (double)(stop_cycles - start_cycles) / (1UL << 20);
                 run_time += ((double)stop_time - start_time) / (CLOCKS_PER_SEC);
 
                 printf("%s %d iterations  %d MiB %d threads:  %2.2f cpb %2.2f "
