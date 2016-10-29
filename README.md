@@ -26,7 +26,7 @@ hashing and password-based key derivation, but it is slower as it makes
 more passes over the memory to protect from tradeoff attacks. Argon2id is a
 hybrid of Argon2i and Argon2d, using a combination of data-depending and
 data-independent memory accesses, which gives some of Argon2i's resistance to
-side-channel cache timing attacks and much of Argon2d's resistance to GPU 
+side-channel cache timing attacks and much of Argon2d's resistance to GPU
 cracking attacks.
 
 Argon2i, Argon2d, and Argon2id are parametrized by:
@@ -242,6 +242,7 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
+* [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
 * [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
 * [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
