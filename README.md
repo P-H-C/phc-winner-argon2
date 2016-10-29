@@ -261,7 +261,7 @@ their documentation):
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
 
 
-## Test Suite
+## Test suite
 
 There are two sets of test suites. One is a low level test for the hash
 function, the other tests the higher level API. Both of these are built and
