@@ -38,7 +38,7 @@
 
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m memory] "
-           "[-p parallelism] [-l hash length] [-e|-r] [-10|-13]\n",
+           "[-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -56,8 +56,7 @@ static void usage(const char *cmd) {
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
-    printf("\t-10\t\tArgon2 v1.0\n");
-    printf("\t-13\t\tArgon2 v1.3\n");
+    printf("\t-v (10|13)\tArgon2 version\n");
     printf("\t-h\t\tPrint %s usage\n", cmd);
 }
 
@@ -277,10 +276,19 @@ int main(int argc, char *argv[]) {
             encoded_only = 1;
         } else if (!strcmp(a, "-r")) {
             raw_only = 1;
-        } else if (!strcmp(a, "-10")) {
-            version = ARGON2_VERSION_10;
-        } else if (!strcmp(a, "-13")) {
-            version = ARGON2_VERSION_13;
+        } else if (!strcmp(a, "-v")) {
+            if (i < argc - 1) {
+                i++;
+                if (!strcmp(argv[i], "10")) {
+                    version = ARGON2_VERSION_10;
+                } else if (!strcmp(argv[i], "13")) {
+                    version = ARGON2_VERSION_13;
+                } else {
+                    fatal("invalid Argon2 version");
+                }
+            } else {
+                fatal("missing -v argument");
+            }
         } else {
             fatal("unknown argument");
         }

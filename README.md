@@ -54,7 +54,7 @@ results. `make install PREFIX=/usr` installs it to your system.
 on your system. To show usage instructions, run
 `./argon2 -h` as
 ```
-Usage:  ./argon2 [-h] salt [-i|-d|-id] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r] [-10|-13]
+Usage:  ./argon2 [-h] salt [-i|-d|-id] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]
         Password is read from stdin
 Parameters:
         salt            The salt to use, at least 8 characters
@@ -67,8 +67,7 @@ Parameters:
         -l N            Sets hash output length to N bytes (default 32)
         -e              Output only encoded hash
         -r              Output only the raw bytes of the hash
-        -10             Argon2 v1.0
-        -13             Argon2 v1.3
+        -v (10|13)      Argon2 version
         -h              Print argon2 usage
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
