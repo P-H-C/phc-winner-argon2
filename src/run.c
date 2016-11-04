@@ -56,7 +56,8 @@ static void usage(const char *cmd) {
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
-    printf("\t-v (10|13)\tArgon2 version\n");
+    printf("\t-v (10|13)\tArgon2 version (defaults to the most recent version, currently %x)\n",
+            ARGON2_VERSION_NUMBER);
     printf("\t-h\t\tPrint %s usage\n", cmd);
 }
 

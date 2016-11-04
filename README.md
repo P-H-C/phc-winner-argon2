@@ -67,7 +67,7 @@ Parameters:
         -l N            Sets hash output length to N bytes (default 32)
         -e              Output only encoded hash
         -r              Output only the raw bytes of the hash
-        -v (10|13)      Argon2 version
+        -v (10|13)      Argon2 version (defaults to the most recent version, currently 13)
         -h              Print argon2 usage
 ```
 For example, to hash "password" using "somesalt" as a salt and doing 2
