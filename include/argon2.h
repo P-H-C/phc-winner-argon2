@@ -421,6 +421,7 @@ ARGON2_PUBLIC const char *argon2_error_message(int error_code);
  * @param parallelism  Number of threads; used to compute lanes
  * @param saltlen  Salt size in bytes
  * @param hashlen  Hash size in bytes
+ * @param type The argon2_type that we want the encoded length for
  * @return  The encoded hash length in bytes
  */
 ARGON2_PUBLIC size_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
