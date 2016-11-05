@@ -38,7 +38,7 @@
 
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m memory] "
-           "[-p parallelism] [-l hash length] [-e|-r]\n",
+           "[-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -56,6 +56,8 @@ static void usage(const char *cmd) {
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
+    printf("\t-v (10|13)\tArgon2 version (defaults to the most recent version, currently %x)\n",
+            ARGON2_VERSION_NUMBER);
     printf("\t-h\t\tPrint %s usage\n", cmd);
 }
 
@@ -85,10 +87,11 @@ Base64-encoded hash string
 @type Argon2 type we want to run
 @encoded_only display only the encoded hash
 @raw_only display only the hexadecimal of the hash
+@version Argon2 version
 */
 static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
-                argon2_type type, int encoded_only, int raw_only) {
+                argon2_type type, int encoded_only, int raw_only, uint32_t version) {
     clock_t start_time, stop_time;
     size_t pwdlen, saltlen, encodedlen;
     int result;
@@ -129,7 +132,7 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
                          out, outlen, encoded, encodedlen, type,
-                         ARGON2_VERSION_NUMBER);
+                         version);
     if (result != ARGON2_OK)
         fatal(argon2_error_message(result));
 
@@ -173,6 +176,7 @@ int main(int argc, char *argv[]) {
     int types_specified = 0;
     int encoded_only = 0;
     int raw_only = 0;
+    uint32_t version = ARGON2_VERSION_NUMBER;
     int i;
     size_t n;
     char pwd[MAX_PASS_LEN], *salt;
@@ -273,6 +277,19 @@ int main(int argc, char *argv[]) {
             encoded_only = 1;
         } else if (!strcmp(a, "-r")) {
             raw_only = 1;
+        } else if (!strcmp(a, "-v")) {
+            if (i < argc - 1) {
+                i++;
+                if (!strcmp(argv[i], "10")) {
+                    version = ARGON2_VERSION_10;
+                } else if (!strcmp(argv[i], "13")) {
+                    version = ARGON2_VERSION_13;
+                } else {
+                    fatal("invalid Argon2 version");
+                }
+            } else {
+                fatal("missing -v argument");
+            }
         } else {
             fatal("unknown argument");
         }
@@ -293,7 +310,7 @@ int main(int argc, char *argv[]) {
     }
 
     run(outlen, pwd, salt, t_cost, m_cost, lanes, threads, type,
-       encoded_only, raw_only);
+       encoded_only, raw_only, version);
 
     return ARGON2_OK;
 }
