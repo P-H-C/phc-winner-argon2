@@ -173,3 +173,11 @@ ifdef LINKED_LIB_SH
 endif
 	$(INSTALL) -d $(INST_BINARY)
 	$(INSTALL) $(RUN) $(INST_BINARY)
+
+uninstall:
+	cd $(INST_INCLUDE) && rm -f $(HEADERS)
+	cd $(INST_LIBRARY) && rm -f $(LIBRARIES)
+ifdef LINKED_LIB_SH
+	cd $(INST_LIBRARY) && rm -f $(LINKED_LIB_SH)
+endif
+	cd $(INST_BINARY) && rm -f $(RUN)
