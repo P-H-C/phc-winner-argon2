@@ -165,19 +165,16 @@ format:
 
 install: $(RUN) libs
 	$(INSTALL) -d $(INST_INCLUDE)
-	$(INSTALL) $(HEADERS) $(INST_INCLUDE)
+	$(INSTALL) -m 0644 $(HEADERS) $(INST_INCLUDE)
 	$(INSTALL) -d $(INST_LIBRARY)
 	$(INSTALL) $(LIBRARIES) $(INST_LIBRARY)
 ifdef LINKED_LIB_SH
-	ln -rs $(INST_LIBRARY)/$(LIB_SH) $(INST_LIBRARY)/$(LINKED_LIB_SH)
+	cd $(INST_LIBRARY) && ln -s $(notdir $(LIB_SH) $(LINKED_LIB_SH))
 endif
 	$(INSTALL) -d $(INST_BINARY)
 	$(INSTALL) $(RUN) $(INST_BINARY)
 
 uninstall:
-	cd $(INST_INCLUDE) && rm -f $(HEADERS)
-	cd $(INST_LIBRARY) && rm -f $(LIBRARIES)
-ifdef LINKED_LIB_SH
-	cd $(INST_LIBRARY) && rm -f $(LINKED_LIB_SH)
-endif
-	cd $(INST_BINARY) && rm -f $(RUN)
+	cd $(INST_INCLUDE) && rm -f $(notdir $(HEADERS))
+	cd $(INST_LIBRARY) && rm -f $(notdir $(LIBRARIES) $(LINKED_LIB_SH))
+	cd $(INST_BINARY) && rm -f $(notdir $(RUN))
