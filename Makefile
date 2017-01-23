@@ -20,7 +20,7 @@ BENCH = bench
 GENKAT = genkat
 
 # Increment on an ABI breaking change
-ABIVERSION = 1
+ABI_VERSION = 0
 
 DIST = phc-winner-argon2
 
@@ -52,7 +52,7 @@ KERNEL_NAME := $(shell uname -s)
 
 LIB_NAME=argon2
 ifeq ($(KERNEL_NAME), Linux)
-	LIB_EXT := so.$(ABIVERSION)
+	LIB_EXT := so.$(ABI_VERSION)
 	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
 	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
 	LINKED_LIB_EXT := so
@@ -62,7 +62,7 @@ ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),FreeBSD NetBSD OpenBSD))
 	LIB_CFLAGS := -shared -fPIC
 endif
 ifeq ($(KERNEL_NAME), Darwin)
-	LIB_EXT := $(ABIVERSION).dylib
+	LIB_EXT := $(ABI_VERSION).dylib
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
 	LINKED_LIB_EXT := dylib
 endif
