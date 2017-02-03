@@ -258,16 +258,27 @@ static void *fill_segment_thr(void *thread_data)
     return 0;
 }
 
-int fill_memory_blocks(argon2_instance_t *instance) {
+/* Single-threaded version for p=1 case */
+static int fill_memory_blocks_st(argon2_instance_t *instance){
+    uint32_t r, s, l;
+
+    for (r = 0; r < instance->passes; ++r) {
+        for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
+	        for (l = 0; l < instance->lanes; ++l) {
+	            argon2_position_t position = { r, l, (uint8_t)s, 0 };
+	            fill_segment(instance, position);
+	        }
+	    }
+     }
+	 return ARGON2_OK;
+}
+
+/* Multi-threaded version for p > 1 case */
+static int fill_memory_blocks_mt(argon2_instance_t *instance) {
     uint32_t r, s;
     argon2_thread_handle_t *thread = NULL;
     argon2_thread_data *thr_data = NULL;
     int rc = ARGON2_OK;
-
-    if (instance == NULL || instance->lanes == 0) {
-        rc = ARGON2_THREAD_FAIL;
-        goto fail;
-    }
 
     /* 1. Allocating space for threads */
     thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
@@ -340,6 +351,14 @@ fail:
         free(thr_data);
     }
     return rc;
+}
+
+int fill_memory_blocks(argon2_instance_t *instance) {
+	if (instance == NULL || instance->lanes == 0)
+	    return ARGON2_THREAD_FAIL;
+
+	return instance->threads == 1 ?
+			fill_memory_blocks_st(instance) : fill_memory_blocks_mt(instance);
 }
 
 int validate_inputs(const argon2_context *context) {
