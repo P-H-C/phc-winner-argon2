@@ -355,7 +355,7 @@ fail:
 
 int fill_memory_blocks(argon2_instance_t *instance) {
 	if (instance == NULL || instance->lanes == 0)
-	    return ARGON2_THREAD_FAIL;
+	    return ARGON2_INCORRECT_PARAMETER;
 
 	return instance->threads == 1 ?
 			fill_memory_blocks_st(instance) : fill_memory_blocks_mt(instance);
