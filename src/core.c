@@ -259,18 +259,21 @@ static void *fill_segment_thr(void *thread_data)
 }
 
 /* Single-threaded version for p=1 case */
-static int fill_memory_blocks_st(argon2_instance_t *instance){
+static int fill_memory_blocks_st(argon2_instance_t *instance) {
     uint32_t r, s, l;
 
     for (r = 0; r < instance->passes; ++r) {
         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
-	        for (l = 0; l < instance->lanes; ++l) {
-	            argon2_position_t position = { r, l, (uint8_t)s, 0 };
-	            fill_segment(instance, position);
-	        }
-	    }
-     }
-	 return ARGON2_OK;
+            for (l = 0; l < instance->lanes; ++l) {
+                argon2_position_t position = {r, l, (uint8_t)s, 0};
+                fill_segment(instance, position);
+            }
+        }
+#ifdef GENKAT
+        internal_kat(instance, r); /* Print all memory blocks */
+#endif
+    }
+    return ARGON2_OK;
 }
 
 /* Multi-threaded version for p > 1 case */
@@ -354,8 +357,9 @@ fail:
 }
 
 int fill_memory_blocks(argon2_instance_t *instance) {
-	if (instance == NULL || instance->lanes == 0)
+	if (instance == NULL || instance->lanes == 0) {
 	    return ARGON2_INCORRECT_PARAMETER;
+    }
 
 	return instance->threads == 1 ?
 			fill_memory_blocks_st(instance) : fill_memory_blocks_mt(instance);
