@@ -4,7 +4,7 @@
 # Copyright 2015
 # Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, and Samuel Neves
 #
-# You may use this work under the terms of a Creative Commons CC0 1.0 
+# You may use this work under the terms of a Creative Commons CC0 1.0
 # License/Waiver or the Apache Public License 2.0, at your option. The terms of
 # these licenses can be found at:
 #
@@ -18,6 +18,9 @@
 RUN = argon2
 BENCH = bench
 GENKAT = genkat
+
+# Increment on an ABI breaking change
+ABI_VERSION = 0
 
 DIST = phc-winner-argon2
 
@@ -49,17 +52,19 @@ KERNEL_NAME := $(shell uname -s)
 
 LIB_NAME=argon2
 ifeq ($(KERNEL_NAME), Linux)
-	LIB_EXT := so
+	LIB_EXT := so.$(ABI_VERSION)
 	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
-	SO_LDFLAGS := -Wl,-soname,libargon2.so.0
+	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
+	LINKED_LIB_EXT := so
 endif
 ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),FreeBSD NetBSD OpenBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
 endif
 ifeq ($(KERNEL_NAME), Darwin)
-	LIB_EXT := dylib
+	LIB_EXT := $(ABI_VERSION).dylib
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
+	LINKED_LIB_EXT := dylib
 endif
 ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
 	LIB_EXT := dll
@@ -88,6 +93,12 @@ endif
 
 LIB_SH := lib$(LIB_NAME).$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
+
+ifdef LINKED_LIB_EXT
+LINKED_LIB_SH := lib$(LIB_NAME).$(LINKED_LIB_EXT)
+endif
+
+
 LIBRARIES = $(LIB_SH) $(LIB_ST)
 HEADERS = include/argon2.h
 
@@ -105,7 +116,7 @@ INST_BINARY = $(DESTDIR)$(PREFIX)/$(BINARY_REL)
 
 .PHONY: clean dist format $(GENKAT) all install
 
-all: clean $(RUN) libs 
+all: clean $(RUN) libs
 libs: $(LIBRARIES)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
@@ -125,7 +136,7 @@ $(LIB_ST): 	$(OBJ)
 
 clean:
 		rm -f $(RUN) $(BENCH) $(GENKAT)
-		rm -f $(LIB_SH) $(LIB_ST) kat-argon2* 
+		rm -f $(LIB_SH) $(LIB_ST) kat-argon2*
 		rm -f testcase
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
@@ -154,8 +165,16 @@ format:
 
 install: $(RUN) libs
 	$(INSTALL) -d $(INST_INCLUDE)
-	$(INSTALL) $(HEADERS) $(INST_INCLUDE)
+	$(INSTALL) -m 0644 $(HEADERS) $(INST_INCLUDE)
 	$(INSTALL) -d $(INST_LIBRARY)
 	$(INSTALL) $(LIBRARIES) $(INST_LIBRARY)
+ifdef LINKED_LIB_SH
+	cd $(INST_LIBRARY) && ln -s $(notdir $(LIB_SH) $(LINKED_LIB_SH))
+endif
 	$(INSTALL) -d $(INST_BINARY)
 	$(INSTALL) $(RUN) $(INST_BINARY)
+
+uninstall:
+	cd $(INST_INCLUDE) && rm -f $(notdir $(HEADERS))
+	cd $(INST_LIBRARY) && rm -f $(notdir $(LIBRARIES) $(LINKED_LIB_SH))
+	cd $(INST_BINARY) && rm -f $(notdir $(RUN))
