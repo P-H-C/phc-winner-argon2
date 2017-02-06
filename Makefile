@@ -30,9 +30,15 @@ SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
+CFLAGS += -std=c89 -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
 				-Wextra -Wno-type-limits -Werror -coverage -DTEST_LARGE_RAM
+
+ifeq ($(NO_THREADS), 1)
+CFLAGS += -DARGON2_NO_THREADS
+else
+CFLAGS += -pthread
+endif
 
 OPTTARGET ?= native
 OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=$(OPTTARGET) src/opt.c -c \

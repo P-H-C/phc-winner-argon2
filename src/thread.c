@@ -15,6 +15,8 @@
  * software. If not, they may be obtained at the above URLs.
  */
 
+#if !defined(ARGON2_NO_THREADS)
+
 #include "thread.h"
 #if defined(_WIN32)
 #include <windows.h>
@@ -51,3 +53,5 @@ void argon2_thread_exit(void) {
     pthread_exit(NULL);
 #endif
 }
+
+#endif /* ARGON2_NO_THREADS */
