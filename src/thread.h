@@ -17,6 +17,7 @@
 
 #ifndef ARGON2_THREAD_H
 #define ARGON2_THREAD_H
+#include <stdint.h>
 /*
         Here we implement an abstraction layer for the simpĺe requirements
         of the Argon2 code. We only require 3 primitives---thread creation,

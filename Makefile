@@ -30,7 +30,7 @@ SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
+CFLAGS += -std=c99 -pthread -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
 				-Wextra -Wno-type-limits -Werror -coverage -DTEST_LARGE_RAM
 
@@ -71,10 +71,12 @@ ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 endif
 ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
+	CC=GCC
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 endif
 ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
+	CC=GCC
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 endif
