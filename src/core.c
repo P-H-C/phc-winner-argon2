@@ -246,18 +246,6 @@ uint32_t index_alpha(const argon2_instance_t *instance,
     return absolute_position;
 }
 
-#ifdef _WIN32
-static unsigned __stdcall fill_segment_thr(void *thread_data)
-#else
-static void *fill_segment_thr(void *thread_data)
-#endif
-{
-    argon2_thread_data *my_data = thread_data;
-    fill_segment(my_data->instance_ptr, my_data->pos);
-    argon2_thread_exit();
-    return 0;
-}
-
 /* Single-threaded version for p=1 case */
 static int fill_memory_blocks_st(argon2_instance_t *instance) {
     uint32_t r, s, l;
@@ -274,6 +262,20 @@ static int fill_memory_blocks_st(argon2_instance_t *instance) {
 #endif
     }
     return ARGON2_OK;
+}
+
+#if !defined(ARGON2_NO_THREADS)
+
+#ifdef _WIN32
+static unsigned __stdcall fill_segment_thr(void *thread_data)
+#else
+static void *fill_segment_thr(void *thread_data)
+#endif
+{
+    argon2_thread_data *my_data = thread_data;
+    fill_segment(my_data->instance_ptr, my_data->pos);
+    argon2_thread_exit();
+    return 0;
 }
 
 /* Multi-threaded version for p > 1 case */
@@ -356,13 +358,18 @@ fail:
     return rc;
 }
 
+#endif /* ARGON2_NO_THREADS */
+
 int fill_memory_blocks(argon2_instance_t *instance) {
 	if (instance == NULL || instance->lanes == 0) {
 	    return ARGON2_INCORRECT_PARAMETER;
     }
-
-	return instance->threads == 1 ?
+#if defined(ARGON2_NO_THREADS)
+    return fill_memory_blocks_st(instance);
+#else
+    return instance->threads == 1 ?
 			fill_memory_blocks_st(instance) : fill_memory_blocks_mt(instance);
+#endif
 }
 
 int validate_inputs(const argon2_context *context) {
