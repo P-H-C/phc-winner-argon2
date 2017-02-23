@@ -177,7 +177,7 @@ There are two flavors of \textsf{Argon2}\ -- \textsf{Argon2d} and \textsf{Argon2
   \item Version number $v$ is one byte $0x13$;
   \item Secret value $K$ (serves as key if necessary, but we do not assume any key use by default) may have any length from $0$ to $2^{32}-1$ bytes.
   \item Associated data $X$ may have any length from $0$ to $2^{32}-1$ bytes.
-  \item Type $y$ of \textsf{Argon2}: 0 for  \textsf{Argon2d}, 1 for \textsf{Argon2i}.
+  \item Type $y$ of \textsf{Argon2}: 0 for  \textsf{Argon2d}, 1 for \textsf{Argon2i}, 2 for \textsf{Argon2id}.
 \end{itemize}
 
 \textsf{Argon2}\ uses internal compression function ${G}$ with two 1024-byte inputs and a 1024-byte output, and internal hash function ${H}$. Here ${H}$ is the Blake2b hash function, and ${G}$ is based on  its internal permutation. The mode of operation of \textsf{Argon2} is quite simple when no parallelism is used: function ${G}$ is iterated $m$ times. At step $i$ a block with index $\phi(i)<i$ is taken from the memory (Figure~\ref{fig:generic}), where $\phi(i)$ is either determined by the previous block in \textsf{Argon2d}, or is a fixed value in \textsf{Argon2i}.
