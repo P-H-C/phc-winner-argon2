@@ -175,7 +175,7 @@ There are two flavors of \textsf{Argon2}\ -- \textsf{Argon2d} and \textsf{Argon2
   \item Memory size $m$ can be any integer number of kilobytes from $8p$ to $2^{32}-1$. The actual number of blocks is $m'$, which is $m$ rounded down to the nearest multiple of $4p$. 
   \item Number of iterations $t$ (used to tune the running time independently of the memory size) can be any integer number from 1 to $2^{32}-1$;
   \item Version number $v$ is one byte $0x13$;
-  \item Secret value $K$ (serves as key if necessary, but we do not assume any key use by default) may have any length from $0$ to $32$ bytes.
+  \item Secret value $K$ (serves as key if necessary, but we do not assume any key use by default) may have any length from $0$ to $2^{32}-1$ bytes.
   \item Associated data $X$ may have any length from $0$ to $2^{32}-1$ bytes.
   \item Type $y$ of \textsf{Argon2}: 0 for  \textsf{Argon2d}, 1 for \textsf{Argon2i}.
 \end{itemize}
