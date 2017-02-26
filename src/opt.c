@@ -20,13 +20,22 @@
 #include <stdlib.h>
 
 #include "argon2.h"
-#include "opt.h"
+#include "core.h"
 
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"
 
-void fill_block(__m128i *state, const block *ref_block, block *next_block,
-                int with_xor) {
+/*
+ * Function fills a new memory block and optionally XORs the old block over the new one.
+ * Memory must be initialized.
+ * @param state Pointer to the just produced block. Content will be updated(!)
+ * @param ref_block Pointer to the reference block
+ * @param next_block Pointer to the block to be XORed over. May coincide with @ref_block
+ * @param with_xor Whether to XOR into the new block (1) or just overwrite (0)
+ * @pre all block pointers must be valid
+ */
+static void fill_block(__m128i *state, const block *ref_block,
+                       block *next_block, int with_xor) {
     __m128i block_XY[ARGON2_OWORDS_IN_BLOCK];
     unsigned int i;
 
