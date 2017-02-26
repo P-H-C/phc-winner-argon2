@@ -20,15 +20,24 @@
 #include <stdlib.h>
 
 #include "argon2.h"
-#include "ref.h"
+#include "core.h"
 
 #include "blake2/blamka-round-ref.h"
 #include "blake2/blake2-impl.h"
 #include "blake2/blake2.h"
 
 
-void fill_block(const block *prev_block, const block *ref_block,
-                block *next_block, int with_xor) {
+/*
+ * Function fills a new memory block and optionally XORs the old block over the new one.
+ * @next_block must be initialized.
+ * @param prev_block Pointer to the previous block
+ * @param ref_block Pointer to the reference block
+ * @param next_block Pointer to the block to be constructed
+ * @param with_xor Whether to XOR into the new block (1) or just overwrite (0)
+ * @pre all block pointers must be valid
+ */
+static void fill_block(const block *prev_block, const block *ref_block,
+                       block *next_block, int with_xor) {
     block blockR, block_tmp;
     unsigned i;
 
