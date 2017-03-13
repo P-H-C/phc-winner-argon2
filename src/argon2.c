@@ -72,6 +72,10 @@ int argon2_ctx(argon2_context *context, argon2_type type) {
     instance.threads = context->threads;
     instance.type = type;
 
+    if (instance.threads > instance.lanes) {
+        instance.threads = instance.lanes;
+    }
+
     /* 3. Initialization: Hashing inputs, allocating memory, filling first
      * blocks
      */
