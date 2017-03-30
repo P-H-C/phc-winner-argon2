@@ -91,7 +91,6 @@ static void argon2_ctx_test() {
             argon2_context ctx = contexts[i].context;
             {
                 const int ec = argon2_ctx(&ctx, types[t]);
-                /* assert(ec == contexts[i].expected[0]); */
                 if (ec != contexts[i].expected[0]) {
                     printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
                     argon2_error_message(contexts[i].expected[0]), argon2_error_message(ec));
@@ -101,13 +100,21 @@ static void argon2_ctx_test() {
             memcpy(hash, ctx.out, ctx.outlen);
             {
                 const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
-                assert(ec == contexts[i].expected[1]);
+                if (ec != contexts[i].expected[1]) {
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    argon2_error_message(contexts[i].expected[1]), argon2_error_message(ec));
+                    abort();
+                }
             }
             memcpy(hash, ctx.out, ctx.outlen);
             hash[0] ^= 1;
             {
                 const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
-                assert(ec == contexts[i].expected[2]);
+                if (ec != contexts[i].expected[2]) {
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    argon2_error_message(contexts[i].expected[2]), argon2_error_message(ec));
+                    abort();
+                }
             }
             printf("argon2_ctx_test %s test %u OK\n", type_strings[t], (unsigned)i);
         }
