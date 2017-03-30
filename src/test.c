@@ -77,7 +77,6 @@ static void argon2_ctx_test() {
     size_t i, t;
 
     static const int types[] = { Argon2_d, Argon2_i, Argon2_id };
-    static const char *type_strings[] = { "Argon2_d", "Argon2_i", "Argon2_id" };
     static const struct {
         argon2_context context;
         int expected[3];
@@ -92,7 +91,7 @@ static void argon2_ctx_test() {
             {
                 const int ec = argon2_ctx(&ctx, types[t]);
                 if (ec != contexts[i].expected[0]) {
-                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", argon2_type2string(types[t], 1), (unsigned)i,
                     argon2_error_message(contexts[i].expected[0]), argon2_error_message(ec));
                     abort();
                 }
@@ -101,7 +100,7 @@ static void argon2_ctx_test() {
             {
                 const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
                 if (ec != contexts[i].expected[1]) {
-                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", argon2_type2string(types[t], 1), (unsigned)i,
                     argon2_error_message(contexts[i].expected[1]), argon2_error_message(ec));
                     abort();
                 }
@@ -111,12 +110,12 @@ static void argon2_ctx_test() {
             {
                 const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
                 if (ec != contexts[i].expected[2]) {
-                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", argon2_type2string(types[t], 1), (unsigned)i,
                     argon2_error_message(contexts[i].expected[2]), argon2_error_message(ec));
                     abort();
                 }
             }
-            printf("argon2_ctx_test %s test %u OK\n", type_strings[t], (unsigned)i);
+            printf("argon2_ctx_test %s test %u OK\n", argon2_type2string(types[t], 1), (unsigned)i);
         }
     }
 #undef ARRAY_SIZE
