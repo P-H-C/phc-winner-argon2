@@ -35,7 +35,7 @@
  * argon2_verify() correctly verifies value
  */
 
-void hashtest(uint32_t version, uint32_t t, uint32_t m, uint32_t p, char *pwd,
+static void hashtest(uint32_t version, uint32_t t, uint32_t m, uint32_t p, char *pwd,
               char *salt, char *hexref, char *mcfref) {
     unsigned char out[OUT_LEN];
     unsigned char hex_out[OUT_LEN * 2 + 4];
@@ -66,11 +66,63 @@ void hashtest(uint32_t version, uint32_t t, uint32_t m, uint32_t p, char *pwd,
     printf("PASS\n");
 }
 
+
+static void argon2_ctx_test() {
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+    static const char pwd[32] = "password";
+    static const char salt[32] = "salt and pepper";
+    static const char secret[32] = "secrets and lies";
+    static const char ad[32] = "associated lore";
+    static unsigned char out[32] = { 0 };
+    size_t i, t;
+
+    static const int types[] = { Argon2_d, Argon2_i, Argon2_id };
+    static const char *type_strings[] = { "Argon2_d", "Argon2_i", "Argon2_id" };
+    static const struct {
+        argon2_context context;
+        int expected[3];
+    } contexts[] = {
+        #include "test_contexts.h"
+    };
+
+    for(t = 0; t < ARRAY_SIZE(types); ++t) {
+        for(i = 0; i < ARRAY_SIZE(contexts); ++i) {
+            unsigned char hash[OUT_LEN] = {0};
+            argon2_context ctx = contexts[i].context;
+            {
+                const int ec = argon2_ctx(&ctx, types[t]);
+                /* assert(ec == contexts[i].expected[0]); */
+                if (ec != contexts[i].expected[0]) {
+                    printf("argon2_ctx_test %s #%u: expected %s, got %s\n", type_strings[t], (unsigned)i,
+                    argon2_error_message(contexts[i].expected[0]), argon2_error_message(ec));
+                    abort();
+                }
+            }
+            memcpy(hash, ctx.out, ctx.outlen);
+            {
+                const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
+                assert(ec == contexts[i].expected[1]);
+            }
+            memcpy(hash, ctx.out, ctx.outlen);
+            hash[0] ^= 1;
+            {
+                const int ec = argon2_verify_ctx(&ctx, (const char *)hash, types[t]);
+                assert(ec == contexts[i].expected[2]);
+            }
+            printf("argon2_ctx_test %s test %u OK\n", type_strings[t], (unsigned)i);
+        }
+    }
+#undef ARRAY_SIZE
+    printf("PASS\n");
+}
+
 int main() {
     int ret;
     unsigned char out[OUT_LEN];
     char const *msg;
     int version;
+
+    argon2_ctx_test();
 
     version = ARGON2_VERSION_10;
     printf("Test Argon2i version number: %02x\n", version);
@@ -81,7 +133,7 @@ int main() {
              "$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ"
              "$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ");
 #ifdef TEST_LARGE_RAM
-    hashtest(version, 2, 20, 1, "password", "somesalt",  
+    hashtest(version, 2, 20, 1, "password", "somesalt",
             "9690ec55d28d3ed32562f2e73ea62b02b018757643a2ae6e79528459de8106e9",
             "$argon2i$m=1048576,t=2,p=1$c29tZXNhbHQ"
             "$lpDsVdKNPtMlYvLnPqYrArAYdXZDoq5ueVKEWd6BBuk");
