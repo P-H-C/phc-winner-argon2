@@ -197,10 +197,6 @@ int main(int argc, char *argv[]) {
         fatal("Provided password longer than supported in command line utility");
     }
 
-    if (pwd[pwdlen - 1] == '\n') {
-        --pwdlen;
-    }
-
     salt = argv[1];
 
     /* parse options */
