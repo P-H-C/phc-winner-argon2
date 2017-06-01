@@ -37,8 +37,8 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m memory] "
-           "[-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]\n",
+    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m log2(memory in KiB)] "
+           "[-k memory in KiB] [-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -50,6 +50,8 @@ static void usage(const char *cmd) {
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
            LOG_M_COST_DEF);
+    printf("\t-k N\t\tSets the memory usage N KiB (default %d)\n",
+           1 << LOG_M_COST_DEF);
     printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
     printf("\t-l N\t\tSets hash output length to N bytes (default %d)\n",
@@ -227,6 +229,21 @@ int main(int argc, char *argv[]) {
                 continue;
             } else {
                 fatal("missing -m argument");
+            }
+        } else if (!strcmp(a, "-k")) {
+            if (i < argc - 1) {
+                i++;
+                input = strtoul(argv[i], NULL, 10);
+                if (input == 0 || input == ULONG_MAX) {
+                    fatal("bad numeric input for -k");
+                }
+                m_cost = ARGON2_MIN(input, UINT32_C(0xFFFFFFFF));
+                if (m_cost > ARGON2_MAX_MEMORY) {
+                    fatal("m_cost overflow");
+                }
+                continue;
+            } else {
+                fatal("missing -k argument");
             }
         } else if (!strcmp(a, "-t")) {
             if (i < argc - 1) {
