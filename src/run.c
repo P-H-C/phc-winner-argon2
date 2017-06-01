@@ -50,7 +50,7 @@ static void usage(const char *cmd) {
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
            LOG_M_COST_DEF);
-    printf("\t-k N\t\tSets the memory usage N KiB (default %d)\n",
+    printf("\t-k N\t\tSets the memory usage of N KiB (default %d)\n",
            1 << LOG_M_COST_DEF);
     printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
