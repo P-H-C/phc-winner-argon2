@@ -267,8 +267,7 @@ ARGON2_PUBLIC int argon2i_hash_encoded(const uint32_t t_cost,
                                        const size_t encodedlen);
 
 /**
- * Hashes a password with Argon2i, producing a raw hash by allocating memory at
- * @hash
+ * Hashes a password with Argon2i, producing a raw hash at @hash
  * @param t_cost Number of iterations
  * @param m_cost Sets memory usage to m_cost kibibytes
  * @param parallelism Number of threads and compute lanes
