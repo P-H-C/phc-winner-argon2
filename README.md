@@ -256,6 +256,7 @@ their documentation):
 * [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
 * [Python (native)](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
 * [Python (ffi)](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
+* [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
