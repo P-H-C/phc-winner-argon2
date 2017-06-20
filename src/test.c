@@ -4,7 +4,7 @@
  * Copyright 2015
  * Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson, and Samuel Neves
  *
- * You may use this work under the terms of a Creative Commons CC0 1.0 
+ * You may use this work under the terms of a Creative Commons CC0 1.0
  * License/Waiver or the Apache Public License 2.0, at your option. The terms of
  * these licenses can be found at:
  *
@@ -81,7 +81,7 @@ int main() {
              "$argon2i$m=65536,t=2,p=1$c29tZXNhbHQ"
              "$9sTbSlTio3Biev89thdrlKKiCaYsjjYVJxGAL3swxpQ");
 #ifdef TEST_LARGE_RAM
-    hashtest(version, 2, 20, 1, "password", "somesalt",  
+    hashtest(version, 2, 20, 1, "password", "somesalt",
             "9690ec55d28d3ed32562f2e73ea62b02b018757643a2ae6e79528459de8106e9",
             "$argon2i$m=1048576,t=2,p=1$c29tZXNhbHQ"
             "$lpDsVdKNPtMlYvLnPqYrArAYdXZDoq5ueVKEWd6BBuk");
@@ -160,10 +160,10 @@ int main() {
              "$argon2i$v=19$m=65536,t=2,p=1$c29tZXNhbHQ"
              "$wWKIMhR9lyDFvRz9YTZweHKfbftvj+qf+YFY4NeBbtA");
 #ifdef TEST_LARGE_RAM
-    hashtest(version, 2, 20, 1, "password", "somesalt",  
+    hashtest(version, 2, 20, 1, "password", "somesalt",
              "d1587aca0922c3b5d6a83edab31bee3c4ebaef342ed6127a55d19b2351ad1f41",
-             "$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ"  
-             "$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E");  
+             "$argon2i$v=19$m=1048576,t=2,p=1$c29tZXNhbHQ"
+             "$0Vh6ygkiw7XWqD7asxvuPE667zQu1hJ6VdGbI1GtH0E");
 #endif
     hashtest(version, 2, 18, 1, "password", "somesalt",
              "296dbae80b807cdceaad44ae741b506f14db0959267b183b118f9b24229bc7cb",
