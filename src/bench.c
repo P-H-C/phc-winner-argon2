@@ -45,7 +45,7 @@ static uint64_t rdtsc(void) {
 }
 
 /*
- * Benchmarks Argon2 with salt length 16, password length 16, t_cost 1,
+ * Benchmarks Argon2 with salt length 16, password length 16, t_cost 3,
    and different m_cost and threads
  */
 static void benchmark() {
