@@ -37,8 +37,9 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] [-m memory] "
-           "[-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]\n",
+    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
+           "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
+           "[-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
@@ -50,6 +51,8 @@ static void usage(const char *cmd) {
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
            LOG_M_COST_DEF);
+    printf("\t-k N\t\tSets the memory usage of N KiB (default %d)\n",
+           1 << LOG_M_COST_DEF);
     printf("\t-p N\t\tSets parallelism to N threads (default %d)\n",
            THREADS_DEF);
     printf("\t-l N\t\tSets hash output length to N bytes (default %d)\n",
@@ -173,6 +176,7 @@ int main(int argc, char *argv[]) {
     uint32_t threads = THREADS_DEF;
     argon2_type type = Argon2_i; /* Argon2i is the default type */
     int types_specified = 0;
+    int m_cost_specified = 0;
     int encoded_only = 0;
     int raw_only = 0;
     uint32_t version = ARGON2_VERSION_NUMBER;
@@ -207,6 +211,10 @@ int main(int argc, char *argv[]) {
             usage(argv[0]);
             return 1;
         } else if (!strcmp(a, "-m")) {
+            if (m_cost_specified) {
+                fatal("-m or -k can only be used once");
+            }
+            m_cost_specified = 1;
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
@@ -221,6 +229,25 @@ int main(int argc, char *argv[]) {
                 continue;
             } else {
                 fatal("missing -m argument");
+            }
+        } else if (!strcmp(a, "-k")) {
+            if (m_cost_specified) {
+                fatal("-m or -k can only be used once");
+            }
+            m_cost_specified = 1;
+            if (i < argc - 1) {
+                i++;
+                input = strtoul(argv[i], NULL, 10);
+                if (input == 0 || input == ULONG_MAX) {
+                    fatal("bad numeric input for -k");
+                }
+                m_cost = ARGON2_MIN(input, UINT32_C(0xFFFFFFFF));
+                if (m_cost > ARGON2_MAX_MEMORY) {
+                    fatal("m_cost overflow");
+                }
+                continue;
+            } else {
+                fatal("missing -k argument");
             }
         } else if (!strcmp(a, "-t")) {
             if (i < argc - 1) {
