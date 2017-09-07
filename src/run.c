@@ -89,11 +89,11 @@ Base64-encoded hash string
 @raw_only display only the hexadecimal of the hash
 @version Argon2 version
 */
-static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
+static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type, int encoded_only, int raw_only, uint32_t version) {
     clock_t start_time, stop_time;
-    size_t pwdlen, saltlen, encodedlen;
+    size_t saltlen, encodedlen;
     int result;
     unsigned char * out = NULL;
     char * encoded = NULL;
@@ -105,11 +105,10 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
     }
 
     if (!salt) {
-        clear_internal_memory(pwd, strlen(pwd));
+        clear_internal_memory(pwd, pwdlen);
         fatal("salt missing");
     }
 
-    pwdlen = strlen(pwd);
     saltlen = strlen(salt);
     if(UINT32_MAX < saltlen) {
         fatal("salt is too long");
@@ -119,14 +118,14 @@ static void run(uint32_t outlen, char *pwd, char *salt, uint32_t t_cost,
 
     out = malloc(outlen + 1);
     if (!out) {
-        clear_internal_memory(pwd, strlen(pwd));
+        clear_internal_memory(pwd, pwdlen);
         fatal("could not allocate memory for output");
     }
 
     encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen, type);
     encoded = malloc(encodedlen + 1);
     if (!encoded) {
-        clear_internal_memory(pwd, strlen(pwd));
+        clear_internal_memory(pwd, pwdlen);
         fatal("could not allocate memory for hash");
     }
 
@@ -178,7 +177,7 @@ int main(int argc, char *argv[]) {
     int raw_only = 0;
     uint32_t version = ARGON2_VERSION_NUMBER;
     int i;
-    size_t n;
+    size_t pwdlen;
     char pwd[MAX_PASS_LEN], *salt;
 
     if (argc < 2) {
@@ -190,17 +189,12 @@ int main(int argc, char *argv[]) {
     }
 
     /* get password from stdin */
-    n = fread(pwd, 1, sizeof pwd - 1, stdin);
-    if(n < 1) {
+    pwdlen = fread(pwd, 1, sizeof pwd, stdin);
+    if(pwdlen < 1) {
         fatal("no password read");
     }
-    if(n == MAX_PASS_LEN-1) {
+    if(pwdlen == MAX_PASS_LEN) {
         fatal("Provided password longer than supported in command line utility");
-    }
-
-    pwd[n] = '\0';
-    if (pwd[n - 1] == '\n') {
-        pwd[n - 1] = '\0';
     }
 
     salt = argv[1];
@@ -309,7 +303,7 @@ int main(int argc, char *argv[]) {
         printf("Parallelism:\t%" PRIu32 " \n", lanes);
     }
 
-    run(outlen, pwd, salt, t_cost, m_cost, lanes, threads, type,
+    run(outlen, pwd, pwdlen, salt, t_cost, m_cost, lanes, threads, type,
        encoded_only, raw_only, version);
 
     return ARGON2_OK;
