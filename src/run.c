@@ -17,7 +17,6 @@
 
 #define _GNU_SOURCE 1
 
-#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +34,10 @@
 #define MAX_PASS_LEN 128
 
 #define UNUSED_PARAMETER(x) (void)(x)
+
+#ifndef PRIu32
+#define PRIu32 "I32u"
+#endif
 
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
