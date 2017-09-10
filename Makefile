@@ -123,7 +123,7 @@ INST_BINARY = $(DESTDIR)$(PREFIX)/$(BINARY_REL)
 
 .PHONY: clean dist format $(GENKAT) all install
 
-all: clean $(RUN) libs
+all: $(RUN) libs
 libs: $(LIBRARIES)
 
 $(RUN):	        $(SRC) $(SRC_RUN)
