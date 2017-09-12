@@ -35,10 +35,6 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
-#ifndef PRIu32
-#define PRIu32 "I32u"
-#endif
-
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
            "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
@@ -328,9 +324,9 @@ int main(int argc, char *argv[]) {
 
     if(!encoded_only && !raw_only) {
         printf("Type:\t\t%s\n", argon2_type2string(type, 1));
-        printf("Iterations:\t%" PRIu32 " \n", t_cost);
-        printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
-        printf("Parallelism:\t%" PRIu32 " \n", lanes);
+        printf("Iterations:\t%u\n", t_cost);
+        printf("Memory:\t\t%u KiB\n", m_cost);
+        printf("Parallelism:\t%u\n", lanes);
     }
 
     run(outlen, pwd, pwdlen, salt, t_cost, m_cost, lanes, threads, type,
