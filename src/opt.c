@@ -34,7 +34,44 @@
  * @param with_xor Whether to XOR into the new block (1) or just overwrite (0)
  * @pre all block pointers must be valid
  */
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+static void fill_block(__m512i *state, const block *ref_block,
+                       block *next_block, int with_xor) {
+    __m512i block_XY[ARGON2_512BIT_WORDS_IN_BLOCK];
+    unsigned int i;
+
+    if (with_xor) {
+        for (i = 0; i < ARGON2_512BIT_WORDS_IN_BLOCK; i++) {
+            state[i] = _mm512_xor_si512(
+                state[i], _mm512_loadu_si512((const __m512i *)ref_block->v + i));
+            block_XY[i] = _mm512_xor_si512(
+                state[i], _mm512_loadu_si512((const __m512i *)next_block->v + i));
+        }
+    } else {
+        for (i = 0; i < ARGON2_512BIT_WORDS_IN_BLOCK; i++) {
+            block_XY[i] = state[i] = _mm512_xor_si512(
+                state[i], _mm512_loadu_si512((const __m512i *)ref_block->v + i));
+        }
+    }
+
+    for (i = 0; i < 2; ++i) {
+        BLAKE2_ROUND_1(
+            state[8 * i + 0], state[8 * i + 1], state[8 * i + 2], state[8 * i + 3],
+            state[8 * i + 4], state[8 * i + 5], state[8 * i + 6], state[8 * i + 7]);
+    }
+
+    for (i = 0; i < 2; ++i) {
+        BLAKE2_ROUND_2(
+            state[2 * 0 + i], state[2 * 1 + i], state[2 * 2 + i], state[2 * 3 + i],
+            state[2 * 4 + i], state[2 * 5 + i], state[2 * 6 + i], state[2 * 7 + i]);
+    }
+
+    for (i = 0; i < ARGON2_512BIT_WORDS_IN_BLOCK; i++) {
+        state[i] = _mm512_xor_si512(state[i], block_XY[i]);
+        _mm512_storeu_si512((__m512i *)next_block->v + i, state[i]);
+    }
+}
+#elif defined(__AVX2__)
 static void fill_block(__m256i *state, const block *ref_block,
                        block *next_block, int with_xor) {
     __m256i block_XY[ARGON2_HWORDS_IN_BLOCK];
@@ -110,7 +147,10 @@ static void fill_block(__m128i *state, const block *ref_block,
 
 static void next_addresses(block *address_block, block *input_block) {
     /*Temporary zero-initialized blocks*/
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+    __m512i zero_block[ARGON2_512BIT_WORDS_IN_BLOCK];
+    __m512i zero2_block[ARGON2_512BIT_WORDS_IN_BLOCK];
+#elif defined(__AVX2__)
     __m256i zero_block[ARGON2_HWORDS_IN_BLOCK];
     __m256i zero2_block[ARGON2_HWORDS_IN_BLOCK];
 #else
@@ -138,10 +178,12 @@ void fill_segment(const argon2_instance_t *instance,
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
-#if defined(__AVX2__)
-    __m256i state[32];
+#if defined(__AVX512F__)
+    __m512i state[ARGON2_512BIT_WORDS_IN_BLOCK];
+#elif defined(__AVX2__)
+    __m256i state[ARGON2_HWORDS_IN_BLOCK];
 #else
-    __m128i state[64];
+    __m128i state[ARGON2_OWORDS_IN_BLOCK];
 #endif
     int data_independent_addressing;
 
