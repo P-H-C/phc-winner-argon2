@@ -262,6 +262,7 @@ their documentation):
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
+* [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
 
 
 ## Test suite
