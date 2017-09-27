@@ -125,7 +125,7 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
         fatal("could not allocate memory for output");
     }
 
-    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen, type);
+    encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, saltlen, outlen, type);
     encoded = malloc(encodedlen + 1);
     if (!encoded) {
         clear_internal_memory(pwd, pwdlen);
