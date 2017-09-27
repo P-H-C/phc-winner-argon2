@@ -116,7 +116,7 @@ void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
 
             for (j = 0; j < how_many_words; ++j)
                 printf("Block %.4u [%3u]: %016llx\n", i, j,
-                       instance->memory[i].v[j]);
+                       (unsigned long long)instance->memory[i].v[j]);
         }
     }
 }
