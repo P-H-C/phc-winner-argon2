@@ -17,7 +17,6 @@
 
 #define _GNU_SOURCE 1
 
-#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -325,9 +324,9 @@ int main(int argc, char *argv[]) {
 
     if(!encoded_only && !raw_only) {
         printf("Type:\t\t%s\n", argon2_type2string(type, 1));
-        printf("Iterations:\t%" PRIu32 " \n", t_cost);
-        printf("Memory:\t\t%" PRIu32 " KiB\n", m_cost);
-        printf("Parallelism:\t%" PRIu32 " \n", lanes);
+        printf("Iterations:\t%u\n", t_cost);
+        printf("Memory:\t\t%u KiB\n", m_cost);
+        printf("Parallelism:\t%u\n", lanes);
     }
 
     run(outlen, pwd, pwdlen, salt, t_cost, m_cost, lanes, threads, type,
