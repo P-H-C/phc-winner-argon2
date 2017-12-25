@@ -21,7 +21,7 @@
 #include "blake2.h"
 #include "blake2-impl.h"
 
-/*designed by the Lyra PHC team */
+/* designed by the Lyra PHC team */
 static BLAKE2_INLINE uint64_t fBlaMka(uint64_t x, uint64_t y) {
     const uint64_t m = UINT64_C(0xFFFFFFFF);
     const uint64_t xy = (x & m) * (y & m);
