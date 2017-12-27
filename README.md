@@ -263,6 +263,7 @@ their documentation):
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
 * [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
+* [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
 
 
 ## Test suite
