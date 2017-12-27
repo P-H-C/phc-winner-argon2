@@ -20,7 +20,7 @@ BENCH = bench
 GENKAT = genkat
 
 # Increment on an ABI breaking change
-ABI_VERSION = 0
+ABI_VERSION = 1
 
 DIST = phc-winner-argon2
 
