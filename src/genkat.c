@@ -184,12 +184,8 @@ int main(int argc, char *argv[]) {
     const char *type_str = (argc > 1) ? argv[1] : "i";
     argon2_type type = Argon2_i;
     uint32_t version = ARGON2_VERSION_NUMBER;
-    if (!strcmp(type_str, "d")) {
-        type = Argon2_d;
-    } else if (!strcmp(type_str, "i")) {
+    if (!strcmp(type_str, "i")) {
         type = Argon2_i;
-    } else if (!strcmp(type_str, "id")) {
-        type = Argon2_id;
     } else {
         fatal("wrong Argon2 type");
     }
@@ -198,7 +194,7 @@ int main(int argc, char *argv[]) {
     if (argc > 2) {
         version = strtoul(argv[2], NULL, 10);
     }
-    if (ARGON2_VERSION_10 != version && ARGON2_VERSION_NUMBER != version) {
+    if (ARGON2_VERSION_NUMBER != version) {
         fatal("wrong Argon2 version number");
     }
 

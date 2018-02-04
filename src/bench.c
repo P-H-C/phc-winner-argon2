@@ -62,7 +62,7 @@ static void benchmark() {
     uint32_t t_cost = 3;
     uint32_t m_cost;
     uint32_t thread_test[4] = {1, 2, 4,  8};
-    argon2_type types[3] = {Argon2_i, Argon2_d, Argon2_id};
+    argon2_type types[1] = {Argon2_i};
 
     memset(pwd_array, 0, inlen);
     memset(salt_array, 1, inlen);
@@ -74,7 +74,7 @@ static void benchmark() {
             uint32_t thread_n = thread_test[i];
 
             unsigned j;
-            for (j = 0; j < 3; ++j) {
+            for (j = 0; j < 1; ++j) {
                 clock_t start_time, stop_time;
                 uint64_t start_cycles, stop_cycles;
                 uint64_t delta;
