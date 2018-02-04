@@ -36,16 +36,14 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
+    printf("Usage:  %s [-h] salt [-i] [-t iterations] "
            "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
-           "[-l hash length] [-e|-r] [-v (10|13)]\n",
+           "[-l hash length] [-e|-r] [-v (13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
     printf("\tsalt\t\tThe salt to use, at least 8 characters\n");
     printf("\t-i\t\tUse Argon2i (this is the default)\n");
-    printf("\t-d\t\tUse Argon2d instead of Argon2i\n");
-    printf("\t-id\t\tUse Argon2id instead of Argon2i\n");
     printf("\t-t N\t\tSets the number of iterations to N (default = %d)\n",
            T_COST_DEF);
     printf("\t-m N\t\tSets the memory usage of 2^N KiB (default %d)\n",
@@ -58,7 +56,7 @@ static void usage(const char *cmd) {
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
-    printf("\t-v (10|13)\tArgon2 version (defaults to the most recent version, currently %x)\n",
+    printf("\t-v (13)\tArgon2 version (defaults to the most recent version, currently %x)\n",
             ARGON2_VERSION_NUMBER);
     printf("\t-h\t\tPrint %s usage\n", cmd);
 }
@@ -287,12 +285,6 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-i")) {
             type = Argon2_i;
             ++types_specified;
-        } else if (!strcmp(a, "-d")) {
-            type = Argon2_d;
-            ++types_specified;
-        } else if (!strcmp(a, "-id")) {
-            type = Argon2_id;
-            ++types_specified;
         } else if (!strcmp(a, "-e")) {
             encoded_only = 1;
         } else if (!strcmp(a, "-r")) {
@@ -300,9 +292,7 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-v")) {
             if (i < argc - 1) {
                 i++;
-                if (!strcmp(argv[i], "10")) {
-                    version = ARGON2_VERSION_10;
-                } else if (!strcmp(argv[i], "13")) {
+                if (!strcmp(argv[i], "13")) {
                     version = ARGON2_VERSION_13;
                 } else {
                     fatal("invalid Argon2 version");

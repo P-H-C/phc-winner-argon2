@@ -19,6 +19,7 @@ RUN = argon2
 BENCH = bench
 GENKAT = genkat
 
+# NO_THREADS = 1
 # Increment on an ABI breaking change
 ABI_VERSION = 1
 

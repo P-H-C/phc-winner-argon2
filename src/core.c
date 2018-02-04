@@ -112,7 +112,7 @@ int allocate_memory(const argon2_context *context, uint8_t **memory,
 void free_memory(const argon2_context *context, uint8_t *memory,
                  size_t num, size_t size) {
     size_t memory_size = num*size;
-    clear_internal_memory(memory, memory_size);
+    /*clear_internal_memory(memory, memory_size);*/
     if (context->free_cbk) {
         (context->free_cbk)(memory, memory_size);
     } else {
@@ -162,8 +162,8 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
             blake2b_long(context->out, context->outlen, blockhash_bytes,
                          ARGON2_BLOCK_SIZE);
             /* clear blockhash and blockhash_bytes */
-            clear_internal_memory(blockhash.v, ARGON2_BLOCK_SIZE);
-            clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);
+            /*clear_internal_memory(blockhash.v, ARGON2_BLOCK_SIZE);
+            clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);*/
         }
 
 #ifdef GENKAT
@@ -360,8 +360,8 @@ fail:
 #endif /* ARGON2_NO_THREADS */
 
 int fill_memory_blocks(argon2_instance_t *instance) {
-	if (instance == NULL || instance->lanes == 0) {
-	    return ARGON2_INCORRECT_PARAMETER;
+    if (instance == NULL || instance->lanes == 0) {
+        return ARGON2_INCORRECT_PARAMETER;
     }
 #if defined(ARGON2_NO_THREADS)
     return fill_memory_blocks_st(instance);
@@ -372,6 +372,8 @@ int fill_memory_blocks(argon2_instance_t *instance) {
 }
 
 int validate_inputs(const argon2_context *context) {
+    /*return ARGON2_OK;*/ /* unsafe assume... */
+
     if (NULL == context) {
         return ARGON2_INCORRECT_PARAMETER;
     }
@@ -518,7 +520,7 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
         load_block(&instance->memory[l * instance->lane_length + 1],
                    blockhash_bytes);
     }
-    clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);
+    /*clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);*/
 }
 
 void initial_hash(uint8_t *blockhash, argon2_context *context,
@@ -558,7 +560,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
                        context->pwdlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_PASSWORD) {
-            secure_wipe_memory(context->pwd, context->pwdlen);
+            /*secure_wipe_memory(context->pwd, context->pwdlen);*/
             context->pwdlen = 0;
         }
     }
@@ -579,7 +581,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
                        context->secretlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_SECRET) {
-            secure_wipe_memory(context->secret, context->secretlen);
+            /*secure_wipe_memory(context->secret, context->secretlen);*/
             context->secretlen = 0;
         }
     }
@@ -619,6 +621,7 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
     clear_internal_memory(blockhash + ARGON2_PREHASH_DIGEST_LENGTH,
                           ARGON2_PREHASH_SEED_LENGTH -
                               ARGON2_PREHASH_DIGEST_LENGTH);
+    
 
 #ifdef GENKAT
     initial_kat(blockhash, context, instance->type);
@@ -628,7 +631,7 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
      */
     fill_first_blocks(blockhash, instance);
     /* Clearing the hash */
-    clear_internal_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);
+    /*clear_internal_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);*/
 
     return ARGON2_OK;
 }

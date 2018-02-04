@@ -327,7 +327,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
     CC(type_string);
 
     /* Reading the version number if the default is suppressed */
-    ctx->version = ARGON2_VERSION_10;
+    ctx->version = ARGON2_VERSION_13;
     CC_opt("$v=", DECIMAL_U32(ctx->version));
 
     CC("$m=");
