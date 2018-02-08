@@ -172,6 +172,21 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     return ARGON2_OK;
 }
 
+/* ARIONUM-Customization Begin */
+
+int encode_ctx(char *dst, const size_t dst_len, argon2_context *ctx,
+               argon2_type type) {
+    if (dst && dst_len) {
+        if (encode_string(dst, dst_len, ctx, type) != ARGON2_OK) {
+            clear_internal_memory(dst, dst_len);
+            return ARGON2_ENCODING_FAIL;
+        }
+    }
+    return ARGON2_OK;
+}
+
+/* ARIONUM-Customization End */
+
 int argon2i_hash_encoded(const uint32_t t_cost, const uint32_t m_cost,
                          const uint32_t parallelism, const void *pwd,
                          const size_t pwdlen, const void *salt,

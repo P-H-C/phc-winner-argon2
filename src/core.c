@@ -162,7 +162,7 @@ void finalize(const argon2_context *context, argon2_instance_t *instance) {
             blake2b_long(context->out, context->outlen, blockhash_bytes,
                          ARGON2_BLOCK_SIZE);
             /* clear blockhash and blockhash_bytes */
-            /*clear_internal_memory(blockhash.v, ARGON2_BLOCK_SIZE);
+            /*ARIONUM SPD: clear_internal_memory(blockhash.v, ARGON2_BLOCK_SIZE);
             clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);*/
         }
 
@@ -372,7 +372,6 @@ int fill_memory_blocks(argon2_instance_t *instance) {
 }
 
 int validate_inputs(const argon2_context *context) {
-    /*return ARGON2_OK;*/ /* unsafe assume... */
 
     if (NULL == context) {
         return ARGON2_INCORRECT_PARAMETER;
@@ -520,7 +519,7 @@ void fill_first_blocks(uint8_t *blockhash, const argon2_instance_t *instance) {
         load_block(&instance->memory[l * instance->lane_length + 1],
                    blockhash_bytes);
     }
-    /*clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);*/
+    /*ARIONUM-SPD clear_internal_memory(blockhash_bytes, ARGON2_BLOCK_SIZE);*/
 }
 
 void initial_hash(uint8_t *blockhash, argon2_context *context,
@@ -560,7 +559,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
                        context->pwdlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_PASSWORD) {
-            /*secure_wipe_memory(context->pwd, context->pwdlen);*/
+            /*ARIONUM-SPD secure_wipe_memory(context->pwd, context->pwdlen);*/
             context->pwdlen = 0;
         }
     }
@@ -581,7 +580,7 @@ void initial_hash(uint8_t *blockhash, argon2_context *context,
                        context->secretlen);
 
         if (context->flags & ARGON2_FLAG_CLEAR_SECRET) {
-            /*secure_wipe_memory(context->secret, context->secretlen);*/
+            /*ARIONUM-SPD secure_wipe_memory(context->secret, context->secretlen);*/
             context->secretlen = 0;
         }
     }
@@ -631,7 +630,7 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
      */
     fill_first_blocks(blockhash, instance);
     /* Clearing the hash */
-    /*clear_internal_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);*/
+    /*ARIONUM-SPD clear_internal_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);*/
 
     return ARGON2_OK;
 }

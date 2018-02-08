@@ -352,6 +352,22 @@ ARGON2_PUBLIC size_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
                                        uint32_t parallelism, uint32_t saltlen,
                                        uint32_t hashlen, argon2_type type);
 
+/* ARIONUM-Customization Begin */
+
+/**
+ * Exposes the encode_string function, for raw context-level
+ * end to end usage of this library.
+ * @param dst   Destination encoded buffer
+ * @param dst_len  The length of the buffer
+ * @param ctx  The argon2 context to use to generate an encoded string
+ * @param type  The argon2 variant used in encoding.
+ * @return  Zero if successful, non-zero code otherwise.
+ */
+ARGON2_PUBLIC int encode_ctx(char *dst, const size_t dst_len, argon2_context *ctx,
+                                argon2_type type);
+
+/* ARIONUM-Customization End */
+
 #if defined(__cplusplus)
 }
 #endif
