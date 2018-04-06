@@ -191,9 +191,9 @@ int main(void)
 }
 ```
 
-To use Argon2d instead of Argon2i call `argon2d_hash` instead of
-`argon2i_hash` using the high-level API, and `argon2d` instead of
-`argon2i` using the low-level API. Similarly for Argon2id, call `argond2id_hash`
+To use Argon2d instead of Argon2i call `argon2d_hash_raw` instead of
+`argon2i_hash_raw` using the high-level API, and `argon2d` instead of
+`argon2i` using the low-level API. Similarly for Argon2id, call `argon2id_hash_raw`
 and `argon2id`.
 
 To produce the crypt-like encoding rather than the raw hash, call
