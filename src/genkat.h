@@ -18,6 +18,8 @@
 #ifndef ARGON2_KAT_H
 #define ARGON2_KAT_H
 
+#include "core.h"
+
 /*
  * Initial KAT function that prints the inputs to the file
  * @param  blockhash  Array that contains pre-hashing digest
