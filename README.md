@@ -246,7 +246,7 @@ their documentation):
 * [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
 * [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
-* [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
+* [Haskell](https://hackage.haskell.org/package/argon2) by [@hvr](https://github.com/hvr)
 * [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
 * [JavaScript (native)](https://github.com/jdconley/argon2themax), by [@jdconley](https://github.com/jdconley)
 * [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
