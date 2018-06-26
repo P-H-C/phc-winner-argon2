@@ -251,6 +251,7 @@ their documentation):
 * [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
 * [JavaScript (browser)](https://github.com/antelle/argon2-browser), by [@antelle](https://github.com/antelle)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
+* [JVM (with keyed hashing)](https://github.com/kosprov/jargon2-api) by [@kosprov](https://github.com/kosprov)
 * [Lua (native)](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 * [Lua (ffi)](https://github.com/thibaultCha/lua-argon2-ffi) by [@thibaultCha](https://github.com/thibaultCha)
 * [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
