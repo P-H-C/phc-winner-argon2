@@ -262,6 +262,7 @@ their documentation):
 * [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
+* [Rust](https://docs.rs/argonautica/) by [@bcmyers](https://github.com/bcmyers/)
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
 * [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
