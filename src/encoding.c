@@ -15,7 +15,6 @@
  * software. If not, they may be obtained at the above URLs.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -386,8 +385,13 @@ int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
 #define SX(x)                                                                  \
     do {                                                                       \
         char tmp[30];                                                          \
-        sprintf(tmp, "%lu", (unsigned long)(x));                               \
-        SS(tmp);                                                               \
+        char *p = tmp + sizeof(tmp);                                           \
+        unsigned long v = (x);                                                 \
+        *--p = 0;                                                              \
+        do {                                                                   \
+            *--p = '0' + (v % 10);                                             \
+        } while (v /= 10);                                                     \
+        SS(p);                                                                 \
     } while ((void)0, 0)
 
 #define SB(buf, len)                                                           \
