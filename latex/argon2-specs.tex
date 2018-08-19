@@ -749,7 +749,7 @@ the vast majority of the users would prefer as few parameters as possible.
 \section{Performance}
 
 \subsection{x86 architecture}
-To optimize the data load and store from/to memory, the memory that will be processed has to be alligned on 16-byte boundary when loaded/stored into/from 128-bit registers and on 32-byte boundary when loaded/stored into/from 256-bit registers. If the memory is not aligned on the specified boundaries, then each memory operation may take one extra CPU cycle, which may cause consistent penalties for many memory accesses.
+To optimize the data load and store from/to memory, the memory that will be processed has to be aligned on 16-byte boundary when loaded/stored into/from 128-bit registers and on 32-byte boundary when loaded/stored into/from 256-bit registers. If the memory is not aligned on the specified boundaries, then each memory operation may take one extra CPU cycle, which may cause consistent penalties for many memory accesses.
 
 
 The results presented are obtained using the \texttt{gcc 4.8.2} compiler  with the following options: \texttt{-m64 -mavx -std=c++11 -pthread -O3}.
