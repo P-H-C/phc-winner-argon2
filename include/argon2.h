@@ -93,7 +93,7 @@ extern "C" {
 #define ARGON2_FLAG_CLEAR_SECRET (UINT32_C(1) << 1)
 
 /* Global flag to determine if we are wiping internal memory buffers. This flag
- * is defined in core.c and deafults to 1 (wipe internal memory). */
+ * is defined in core.c and defaults to 1 (wipe internal memory). */
 extern int FLAG_clear_internal_memory;
 
 /* Error codes */
