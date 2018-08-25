@@ -41,8 +41,8 @@ void hashtest(uint32_t version, uint32_t t, uint32_t m, uint32_t p, char *pwd,
     char encoded[ENCODED_LEN];
     int ret, i;
 
-    printf("Hash test: $v=%d t=%d, m=%d, p=%d, pass=%s, salt=%s: ", version,
-           t, m, p, pwd, salt);
+    printf("Hash test: $v=%d t=%d, m=%d, p=%d, pass=%s, salt=%s: ",
+           version, t, m, p, pwd, salt);
 
     ret = argon2_hash(t, 1 << m, p, pwd, strlen(pwd), salt, strlen(salt), out,
                       OUT_LEN, encoded, ENCODED_LEN, type, version);

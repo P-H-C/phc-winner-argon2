@@ -20,6 +20,7 @@ build:
   verbosity: minimal
 
 test_script:
-  - ps: kats\test.ps1
+  - ps: tests\kats\test.ps1 --genkat vs2015\build\Argon2RefGenKAT.exe
+  - ps: tests\kats\test.ps1 --genkat vs2015\build\Argon2OptGenKAT.exe
   - ps: if ("Release" -eq $env:configuration) { vs2015\build\Argon2OptTestCI.exe }
   - ps: if ("Release" -eq $env:configuration) { vs2015\build\Argon2RefTestCI.exe }

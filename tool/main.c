@@ -24,7 +24,9 @@
 #include <time.h>
 
 #include "argon2.h"
-#include "core.h"
+
+/* import private symbol from core.c */
+extern void clear_internal_memory(void *v, size_t n);
 
 #define T_COST_DEF 3
 #define LOG_M_COST_DEF 12 /* 2^12 = 4 MiB */

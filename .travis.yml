@@ -19,7 +19,7 @@ matrix:
       os: linux
       sudo: true
 
-script: make && make testci
+script: make && make testgenkat && make testci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -1,3 +1,5 @@
+#! /usr/bin/env pwsh
+
 Set-Variable tempfile -option Constant -value "tempfile"
 
 function hash($path) {
@@ -23,6 +25,7 @@ function hash($path) {
 
 function main() {
     $files = $(Get-ChildItem * | Where-Object { $_.Name -match '^[a-z2]*(_v)?[0-9]*$' } | select -ExpandProperty name)
+    $_exit_code = 0
 
     foreach ($file in $files) {
         $new = $(hash $file).replace("-","")
@@ -34,9 +37,12 @@ function main() {
         if ($new -eq $old) {
             Write-Host $file "`tOK"
         } else {
-            Write-Host $file "`tERROR"
+            Write-Host $file "`tERROR: checksum mismatch"
+            $_exit_code = 1
         }
     }
+
+    return $_exit_code
 }
 
-main
+exit $(main)
