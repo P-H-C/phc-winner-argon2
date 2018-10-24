@@ -1,26 +1,40 @@
-os: Visual Studio 2015
+version: "{branch}-ci-{build}"
 
 environment:
   matrix:
-    - platform: x86
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
       configuration: Debug
-    - platform: x86
-      configuration: Release
-    - platform: x64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      CMAKE_GENERATOR: "Visual Studio 14 2015"
+      configuration: RelWithDebInfo
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
       configuration: Debug
-    - platform: x64
-      configuration: Release
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
+      configuration: RelWithDebInfo
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CMAKE_GENERATOR: "Visual Studio 15 2017"
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CMAKE_GENERATOR: "Visual Studio 15 2017"
+      configuration: RelWithDebInfo
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+      configuration: Debug
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+      configuration: RelWithDebInfo
 
 matrix:
   fast_finish: false
 
-build:
-  parallel: true
-  project: Argon2.sln
-  verbosity: minimal
-
-test_script:
-  - ps: tests\kats\test.ps1 --genkat vs2015\build\Argon2RefGenKAT.exe
-  - ps: tests\kats\test.ps1 --genkat vs2015\build\Argon2OptGenKAT.exe
-  - ps: if ("Release" -eq $env:configuration) { vs2015\build\Argon2OptTestCI.exe }
-  - ps: if ("Release" -eq $env:configuration) { vs2015\build\Argon2RefTestCI.exe }
+build_script:
+    - ps: cmake --version
+    - ps: cmake -E make_directory "build-dir"
+    - ps: cmake -E chdir "build-dir" cmake -G "$($(Get-Item Env:CMAKE_GENERATOR).Value)" --config $env:configuration -DCMAKE_INSTALL_PREFIX="$($(get-location).Path)/root" ..
+    - ps: cmake --build "build-dir" --config $env:configuration
+    - ps: cd "build-dir"; ctest -V -C $env:configuration --build-run-dir "build-dir"; cd ..
+    - ps: cmake --build "build-dir" --target install --config $env:configuration
