@@ -145,20 +145,7 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
     return olen;
 }
 
-/*
- * Decode Base64 chars into bytes. The '*dst_len' value must initially
- * contain the length of the output buffer '*dst'; when the decoding
- * ends, the actual number of decoded bytes is written back in
- * '*dst_len'.
- *
- * Decoding stops when a non-Base64 character is encountered, or when
- * the output buffer capacity is exceeded. If an error occurred (output
- * buffer is too small, invalid last characters leading to unprocessed
- * buffered bits), then NULL is returned; otherwise, the returned value
- * points to the first non-Base64 character in the source stream, which
- * may be the terminating zero.
- */
-static const char *from_base64(void *dst, size_t *dst_len, const char *src) {
+const char *from_base64(void *dst, size_t *dst_len, const char *src) {
     size_t len;
     unsigned char *buf;
     unsigned acc, acc_len;

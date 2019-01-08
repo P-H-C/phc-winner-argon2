@@ -25,6 +25,7 @@
 
 #include "argon2.h"
 #include "core.h"
+#include "encoding.h"
 
 #define T_COST_DEF 3
 #define LOG_M_COST_DEF 12 /* 2^12 = 4 MiB */
@@ -58,6 +59,7 @@ static void usage(const char *cmd) {
            OUTLEN_DEF);
     printf("\t-e\t\tOutput only encoded hash\n");
     printf("\t-r\t\tOutput only the raw bytes of the hash\n");
+    printf("\t-b\t\tInterpret salt as base64\n");
     printf("\t-v (10|13)\tArgon2 version (defaults to the most recent version, currently %x)\n",
             ARGON2_VERSION_NUMBER);
     printf("\t-h\t\tPrint %s usage\n", cmd);
@@ -89,11 +91,12 @@ Base64-encoded hash string
 @type Argon2 type we want to run
 @encoded_only display only the encoded hash
 @raw_only display only the hexadecimal of the hash
+@base64_salt interpret salt as base64 value
 @version Argon2 version
 */
 static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
-                argon2_type type, int encoded_only, int raw_only, uint32_t version) {
+                argon2_type type, int encoded_only, int raw_only, int base64_salt, uint32_t version) {
     clock_t start_time, stop_time;
     size_t saltlen, encodedlen;
     int result;
@@ -112,6 +115,15 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
     }
 
     saltlen = strlen(salt);
+
+    if(base64_salt) {
+        from_base64(salt, &saltlen, salt);
+    }
+
+    if(!salt) {
+        fatal("salt not base64 encoded");
+    }
+
     if(UINT32_MAX < saltlen) {
         fatal("salt is too long");
     }
@@ -178,6 +190,7 @@ int main(int argc, char *argv[]) {
     int m_cost_specified = 0;
     int encoded_only = 0;
     int raw_only = 0;
+    int base64_salt = 0;
     uint32_t version = ARGON2_VERSION_NUMBER;
     int i;
     size_t pwdlen;
@@ -297,6 +310,8 @@ int main(int argc, char *argv[]) {
             encoded_only = 1;
         } else if (!strcmp(a, "-r")) {
             raw_only = 1;
+        } else if (!strcmp(a, "-b")) {
+            base64_salt = 1;
         } else if (!strcmp(a, "-v")) {
             if (i < argc - 1) {
                 i++;
@@ -330,7 +345,7 @@ int main(int argc, char *argv[]) {
     }
 
     run(outlen, pwd, pwdlen, salt, t_cost, m_cost, lanes, threads, type,
-       encoded_only, raw_only, version);
+       encoded_only, raw_only, base64_salt, version);
 
     return ARGON2_OK;
 }
