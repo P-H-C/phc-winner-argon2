@@ -25,6 +25,9 @@
 #endif
 #define VC_GE_2005(version) (version >= 1400)
 
+/* for explicit_bzero() on glibc */
+#define _DEFAULT_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,12 +123,20 @@ void free_memory(const argon2_context *context, uint8_t *memory,
     }
 }
 
+#if defined(__OpenBSD__)
+#define HAVE_EXPLICIT_BZERO 1
+#elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#if __GLIBC_PREREQ(2,25)
+#define HAVE_EXPLICIT_BZERO 1
+#endif
+#endif
+
 void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
 #if defined(_MSC_VER) && VC_GE_2005(_MSC_VER)
     SecureZeroMemory(v, n);
 #elif defined memset_s
     memset_s(v, n, 0, n);
-#elif defined(__OpenBSD__)
+#elif defined(HAVE_EXPLICIT_BZERO)
     explicit_bzero(v, n);
 #else
     static void *(*const volatile memset_sec)(void *, int, size_t) = &memset;
