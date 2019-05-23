@@ -268,6 +268,48 @@ their documentation):
 * [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
 * [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
 
+## Build
+
+Three build systems are supported: CMake, Makefile, and Meson.
+
+### CMake
+
+On unix:
+```
+mkdir build-dir && cd build-dir
+cmake -DCMAKE_INSTALL_PREFIX="$(pwd)/root" ..
+make
+make test
+make benchmark
+make install
+```
+
+On Windows:
+```
+mkdir build-dir
+cd build-dir
+
+# batch
+cmake -G "Visual Studio 15 2017 Win64" --config RelWithDebInfo -DCMAKE_INSTALL_PREFIX=%cd%/root ..
+# powershell
+cmake -G "Visual Studio 15 2017 Win64" --config RelWithDebInfo -DCMAKE_INSTALL_PREFIX="$($(get-location).Path)/root" ..
+
+cmake --build . --config RelWithDebInfo
+ctest.exe -V -C RelWithDebInfo
+cmake --build . --target benchmark --config RelWithDebInfo
+cmake --build . --target install --config RelWithDebInfo
+```
+
+### Meson
+
+```
+mkdir build-dir && cd build-dir
+meson ..
+ninja
+ninja test
+ninja benchmark
+DESTDIR="$(pwd)/root" ninja install
+```
 
 ## Test suite
 
@@ -276,6 +318,8 @@ function, the other tests the higher level API. Both of these are built and
 executed by running:
 
 `make test`
+or
+`ninja test`
 
 ## Intellectual property
 
