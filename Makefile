@@ -32,9 +32,9 @@ ABI_VERSION = 1
 DIST = phc-winner-argon2
 
 SRC = src/argon2.c src/core.c src/blake2/blake2b.c src/thread.c src/encoding.c
-SRC_RUN = src/run.c
-SRC_BENCH = src/bench.c
-SRC_GENKAT = src/genkat.c
+SRC_RUN = tool/main.c
+SRC_BENCH = tests/bench.c
+SRC_GENKAT = tests/genkat.c
 OBJ = $(SRC:.c=.o)
 
 CFLAGS += -std=c89 -O3 -Wall -g -Iinclude -Isrc
@@ -55,10 +55,12 @@ OPTTEST := $(shell $(CC) -Iinclude -Isrc -march=$(OPTTARGET) src/opt.c -c \
 ifneq ($(OPTTEST), 0)
 $(info Building without optimizations)
 	SRC += src/ref.c
+	GENKAT_BIN := $(GENKAT)-ref
 else
 $(info Building with optimizations for $(OPTTARGET))
 	CFLAGS += -march=$(OPTTARGET)
 	SRC += src/opt.c
+	GENKAT_BIN := $(GENKAT)-opt
 endif
 
 BUILD_PATH := $(shell pwd)
@@ -173,10 +175,10 @@ $(RUN):	        $(SRC) $(SRC_RUN)
 		$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 $(BENCH):       $(SRC) $(SRC_BENCH)
-		$(CC) $(CFLAGS) $^ -o $@
+		$(CC) $(CFLAGS) $^ -o tests/$@
 
 $(GENKAT):      $(SRC) $(SRC_GENKAT)
-		$(CC) $(CFLAGS) $^ -o $@ -DGENKAT
+		$(CC) $(CFLAGS) $^ -o tests/$(GENKAT_BIN) -DGENKAT
 
 $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -o $@
@@ -186,13 +188,15 @@ $(LIB_ST): 	$(OBJ)
 
 .PHONY: clean
 clean:
-		rm -f '$(RUN)' '$(BENCH)' '$(GENKAT)'
+		rm -f $(RUN) tests/$(BENCH) tests/$(GENKAT)-ref tests/$(GENKAT)-opt
 		rm -f '$(LIB_SH)' '$(LIB_ST)' kat-argon2* '$(PC_NAME)'
 		rm -f testcase
 		rm -rf *.dSYM
 		cd src/ && rm -f *.o
 		cd src/blake2/ && rm -f *.o
-		cd kats/ &&  rm -f kat-* diff* run_* make_*
+		cd tool/ && rm -f *.o
+		cd tests/ && rm -f *.o argon2-tests
+		cd tests/kats/ &&  rm -f kat-* diff* run_* make_*
 
 
 # all substitutions to pc template
@@ -213,18 +217,23 @@ dist:
 		cd ..; \
 		tar -c --exclude='.??*' -z -f $(DIST)-`date "+%Y%m%d"`.tgz $(DIST)/*
 
+testgenkat:
+		@echo "--- Default build ---"
+		@make genkat
+		./tests/kats/test.sh --genkat=tests/$(GENKAT)-opt
+		@echo "--- Force OPTTEST=1 ---"
+		@make genkat OPTTEST=1
+		./tests/kats/test.sh --genkat=tests/$(GENKAT)-ref
+
 .PHONY: test
-test:           $(SRC) src/test.c
-		$(CC) $(CFLAGS)  -Wextra -Wno-type-limits $^ -o testcase
-		@sh kats/test.sh
-		./testcase
+test:           $(SRC) tests/test.c
+		$(CC) $(CFLAGS)  -Wextra -Wno-type-limits $^ -o tests/argon2-tests
+		./tests/argon2-tests
 
 .PHONY: testci
-testci:         $(SRC) src/test.c
-		$(CC) $(CI_CFLAGS) $^ -o testcase
-		@sh kats/test.sh
-		./testcase
-
+testci:         $(SRC) tests/test.c
+		$(CC) $(CI_CFLAGS) $^ -o tests/argon2-tests
+		./tests/argon2-tests
 
 .PHONY: format
 format:
