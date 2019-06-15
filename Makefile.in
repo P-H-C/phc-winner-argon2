@@ -67,47 +67,39 @@ MACHINE_NAME := $(shell uname -m)
 
 LIB_NAME = argon2
 PC_NAME = lib$(LIB_NAME).pc
-PC_SRC = $(PC_NAME).in
 
 ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := so.$(ABI_VERSION)
 	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
 	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
 	LINKED_LIB_EXT := so
-	PC_EXTRA_LIBS ?= -lrt -ldl
 endif
 ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),DragonFly FreeBSD NetBSD OpenBSD))
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
-	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(KERNEL_NAME), Darwin)
 	LIB_EXT := $(ABI_VERSION).dylib
 	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
 	LINKED_LIB_EXT := dylib
-	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
-	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
-	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
 	LIB_EXT := dll
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
-	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(KERNEL_NAME), SunOS)
 	CC := gcc
 	CFLAGS += -D_REENTRANT
 	LIB_EXT := so
 	LIB_CFLAGS := -shared -fPIC
-	PC_EXTRA_LIBS ?=
 endif
 
 ifeq ($(KERNEL_NAME), Linux)
@@ -127,7 +119,10 @@ endif
 LIBRARIES = $(LIB_SH) $(LIB_ST)
 HEADERS = include/argon2.h
 
-INSTALL = install
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_DATA = @INSTALL_DATA@
 
 # relative paths for different OS
 ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),DragonFly FreeBSD))
@@ -194,20 +189,6 @@ clean:
 		cd src/blake2/ && rm -f *.o
 		cd kats/ &&  rm -f kat-* diff* run_* make_*
 
-
-# all substitutions to pc template
-SED_COMMANDS  = /^\#\#.*$$/d;
-SED_COMMANDS += s\#@PREFIX@\#$(PREFIX)\#g;
-SED_COMMANDS += s\#@EXTRA_LIBS@\#$(PC_EXTRA_LIBS)\#g;
-SED_COMMANDS += s\#@UPSTREAM_VER@\#$(ARGON2_VERSION)\#g;
-SED_COMMANDS += s\#@HOST_MULTIARCH@\#$(LIBRARY_REL)\#g;
-SED_COMMANDS += s\#@INCLUDE@\#$(INCLUDE_REL)\#g;
-
-# substitute PREFIX and PC_EXTRA_LIBS into pkgconfig pc file
-$(PC_NAME): $(PC_SRC)
-		sed '$(SED_COMMANDS)' < '$(PC_SRC)' > '$@'
-
-
 .PHONY: dist
 dist:
 		cd ..; \
@@ -225,7 +206,6 @@ testci:         $(SRC) src/test.c
 		@sh kats/test.sh
 		./testcase
 
-
 .PHONY: format
 format:
 		clang-format -style="{BasedOnStyle: llvm, IndentWidth: 4}" \
@@ -234,16 +214,16 @@ format:
 .PHONY: install
 install: $(RUN) libs
 	$(INSTALL) -d $(INST_INCLUDE)
-	$(INSTALL) -m 0644 $(HEADERS) $(INST_INCLUDE)
+	$(INSTALL_DATA) $(HEADERS) $(INST_INCLUDE)
 	$(INSTALL) -d $(INST_LIBRARY)
-	$(INSTALL) -m 0644 $(LIBRARIES) $(INST_LIBRARY)
+	$(INSTALL_DATA) $(LIBRARIES) $(INST_LIBRARY)
 ifdef LINKED_LIB_SH
 	cd $(INST_LIBRARY) && ln -s $(notdir $(LIB_SH) $(LINKED_LIB_SH))
 endif
 	$(INSTALL) -d $(INST_BINARY)
 	$(INSTALL) $(RUN) $(INST_BINARY)
 	$(INSTALL) -d $(INST_PKGCONFIG)
-	$(INSTALL) -m 0644 $(PC_NAME) $(INST_PKGCONFIG)
+	$(INSTALL_DATA) $(PC_NAME) $(INST_PKGCONFIG)
 
 .PHONY: uninstall
 uninstall:
