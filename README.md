@@ -243,6 +243,7 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
+* [Android (Java/Kotlin)](https://github.com/lambdapioneer/argon2kt) by [@lambdapioneer](https://github.com/lambdapioneer)
 * [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
 * [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
