@@ -123,6 +123,8 @@ ifdef LINKED_LIB_EXT
 LINKED_LIB_SH := lib$(LIB_NAME).$(LINKED_LIB_EXT)
 endif
 
+# Some systems don't provide an unprefixed ar when cross-compiling.
+AR=ar
 
 LIBRARIES = $(LIB_SH) $(LIB_ST)
 HEADERS = include/argon2.h
@@ -182,7 +184,7 @@ $(LIB_SH): 	$(SRC)
 		$(CC) $(CFLAGS) $(LIB_CFLAGS) $(LDFLAGS) $(SO_LDFLAGS) $^ -o $@
 
 $(LIB_ST): 	$(OBJ)
-		ar rcs $@ $^
+		$(AR) rcs $@ $^
 
 .PHONY: clean
 clean:
