@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(_MSC_VER)
+#ifdef _WIN32
 #define BLAKE2_INLINE __inline
 #elif defined(__GNUC__) || defined(__clang__)
 #define BLAKE2_INLINE __inline__
