@@ -66,13 +66,14 @@ KERNEL_NAME := $(shell uname -s)
 MACHINE_NAME := $(shell uname -m)
 
 LIB_NAME = argon2
+SH_LIB_PREFIX = lib
 PC_NAME = lib$(LIB_NAME).pc
 PC_SRC = $(PC_NAME).in
 
 ifeq ($(KERNEL_NAME), Linux)
 	LIB_EXT := .so.$(ABI_VERSION)
 	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
-	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME)$(LIB_EXT)
+	SO_LDFLAGS := -Wl,-soname,$(SH_LIB_PREFIX)$(LIB_NAME)$(LIB_EXT)
 	LINKED_LIB_EXT := .so
 	PC_EXTRA_LIBS ?= -lrt -ldl
 endif
@@ -83,12 +84,13 @@ ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),DragonFly FreeBSD NetBSD OpenBSD))
 endif
 ifeq ($(KERNEL_NAME), Darwin)
 	LIB_EXT := .$(ABI_VERSION).dylib
-	LIB_CFLAGS = -dynamiclib -install_name $(PREFIX)/$(LIBRARY_REL)/lib$(LIB_NAME)$(LIB_EXT)
+	LIB_CFLAGS = -dynamiclib -install_name $(PREFIX)/$(LIBRARY_REL)/$(SH_LIB_PREFIX)$(LIB_NAME)$(LIB_EXT)
 	LINKED_LIB_EXT := .dylib
 	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
 	LIB_EXT := .dll
+	SH_LIB_PREFIX = cyg
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME)$(LIB_EXT).a
 	PC_EXTRA_LIBS ?=
 endif
@@ -116,11 +118,11 @@ ifeq ($(CC), clang)
 endif
 endif
 
-LIB_SH := lib$(LIB_NAME)$(LIB_EXT)
+LIB_SH := $(SH_LIB_PREFIX)$(LIB_NAME)$(LIB_EXT)
 LIB_ST := lib$(LIB_NAME).a
 
 ifdef LINKED_LIB_EXT
-LINKED_LIB_SH := lib$(LIB_NAME)$(LINKED_LIB_EXT)
+LINKED_LIB_SH := $(SH_LIB_PREFIX)$(LIB_NAME)$(LINKED_LIB_EXT)
 endif
 
 # Some systems don't provide an unprefixed ar when cross-compiling.
