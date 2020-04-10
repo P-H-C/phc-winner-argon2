@@ -62,7 +62,8 @@ $(info Building with optimizations for $(OPTTARGET))
 endif
 
 BUILD_PATH := $(shell pwd)
-KERNEL_NAME := $(shell uname -s)
+UNAME_S := $(shell uname -s)
+KERNEL_NAME ?= $(UNAME_S)
 MACHINE_NAME := $(shell uname -m)
 
 LIB_NAME = argon2
