@@ -89,14 +89,14 @@ ifeq ($(KERNEL_NAME), Darwin)
 	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring CYGWIN, $(KERNEL_NAME)), CYGWIN)
-	LIB_EXT := .dll
+	LIB_EXT := -$(AB_VERSION).dll
 	SH_LIB_PREFIX = cyg
-	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME)$(LIB_EXT).a
+	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).dll.a
 	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring MINGW, $(KERNEL_NAME)), MINGW)
-	LIB_EXT := .dll
-	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME)$(LIB_EXT).a
+	LIB_EXT := -$(ABI_VERSION).dll
+	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).dll.a
 	PC_EXTRA_LIBS ?=
 endif
 ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
