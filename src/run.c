@@ -33,8 +33,6 @@
 #define OUTLEN_DEF 32
 #define MAX_PASS_LEN 128
 
-#define UNUSED_PARAMETER(x) (void)(x)
-
 static void usage(const char *cmd) {
     printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
            "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
@@ -115,8 +113,6 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
     if(UINT32_MAX < saltlen) {
         fatal("salt is too long");
     }
-
-    UNUSED_PARAMETER(lanes);
 
     out = malloc(outlen + 1);
     if (!out) {
