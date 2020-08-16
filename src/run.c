@@ -113,6 +113,7 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
 
     saltlen = strlen(salt);
     if(UINT32_MAX < saltlen) {
+        clear_internal_memory(pwd, pwdlen);
         fatal("salt is too long");
     }
 
@@ -134,8 +135,10 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
     result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
                          out, outlen, encoded, encodedlen, type,
                          version);
-    if (result != ARGON2_OK)
+    if (result != ARGON2_OK) {
+        clear_internal_memory(pwd, pwdlen);
         fatal(argon2_error_message(result));
+    }
 
     stop_time = clock();
 
@@ -146,6 +149,7 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
         print_hex(out, outlen);
 
     if (encoded_only || raw_only) {
+        clear_internal_memory(pwd, pwdlen);
         free(out);
         free(encoded);
         return;
@@ -161,8 +165,11 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
            ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
 
     result = argon2_verify(encoded, pwd, pwdlen, type);
-    if (result != ARGON2_OK)
+    if (result != ARGON2_OK) {
+        clear_internal_memory(pwd, pwdlen);
         fatal(argon2_error_message(result));
+    }
+    clear_internal_memory(pwd, pwdlen);
     printf("Verification ok\n");
     free(encoded);
 }
@@ -189,15 +196,6 @@ int main(int argc, char *argv[]) {
     } else if (argc >= 2 && strcmp(argv[1], "-h") == 0) {
         usage(argv[0]);
         return 1;
-    }
-
-    /* get password from stdin */
-    pwdlen = fread(pwd, 1, sizeof pwd, stdin);
-    if(pwdlen < 1) {
-        fatal("no password read");
-    }
-    if(pwdlen == MAX_PASS_LEN) {
-        fatal("Provided password longer than supported in command line utility");
     }
 
     salt = argv[1];
@@ -321,6 +319,16 @@ int main(int argc, char *argv[]) {
 
     if(encoded_only && raw_only)
         fatal("cannot provide both -e and -r");
+
+    /* get password from stdin */
+    pwdlen = fread(pwd, 1, sizeof pwd, stdin);
+    if(pwdlen < 1) {
+        fatal("no password read");
+    }
+    if(pwdlen == MAX_PASS_LEN) {
+        clear_internal_memory(pwd, pwdlen);
+        fatal("Provided password longer than supported in command line utility");
+    }
 
     if(!encoded_only && !raw_only) {
         printf("Type:\t\t%s\n", argon2_type2string(type, 1));
