@@ -156,11 +156,6 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
         return result;
     }
 
-    /* if raw hash requested, write it */
-    if (hash) {
-        memcpy(hash, out, hashlen);
-    }
-
     /* if encoding requested, write it */
     if (encoded && encodedlen) {
         if (encode_string(encoded, encodedlen, &context, type) != ARGON2_OK) {
@@ -170,6 +165,12 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
             return ARGON2_ENCODING_FAIL;
         }
     }
+
+    /* if raw hash requested, write it */
+    if (hash) {
+        memcpy(hash, out, hashlen);
+    }
+
     clear_internal_memory(out, hashlen);
     free(out);
 
