@@ -222,7 +222,7 @@ void fill_segment(const argon2_instance_t *instance,
     curr_offset = position.lane * instance->lane_length +
                   position.slice * instance->segment_length + starting_index;
 
-    if (0 == curr_offset % instance->lane_length) {
+    if ((0 == position.slice) && (0 == starting_index)) {
         /* Last block in this lane */
         prev_offset = curr_offset + instance->lane_length - 1;
     } else {
@@ -233,12 +233,7 @@ void fill_segment(const argon2_instance_t *instance,
     memcpy(state, ((instance->memory + prev_offset)->v), ARGON2_BLOCK_SIZE);
 
     for (i = starting_index; i < instance->segment_length;
-         ++i, ++curr_offset, ++prev_offset) {
-        /*1.1 Rotating prev_offset if needed */
-        if (curr_offset % instance->lane_length == 1) {
-            prev_offset = curr_offset - 1;
-        }
-
+         ++i, ++curr_offset) {
         /* 1.2 Computing the index of the reference block */
         /* 1.2.1 Taking pseudo-random value from the previous block */
         if (data_independent_addressing) {
@@ -248,6 +243,7 @@ void fill_segment(const argon2_instance_t *instance,
             pseudo_rand = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
         } else {
             pseudo_rand = instance->memory[prev_offset].v[0];
+            prev_offset = curr_offset;
         }
 
         /* 1.2.2 Computing the lane of the reference block */
