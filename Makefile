@@ -83,7 +83,7 @@ ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),DragonFly FreeBSD NetBSD OpenBSD))
 endif
 ifeq ($(KERNEL_NAME), Darwin)
 	LIB_EXT := $(ABI_VERSION).dylib
-	LIB_CFLAGS := -dynamiclib -install_name @rpath/lib$(LIB_NAME).$(LIB_EXT)
+	LIB_CFLAGS = -dynamiclib -install_name $(PREFIX)/$(LIBRARY_REL)/lib$(LIB_NAME).$(LIB_EXT)
 	LINKED_LIB_EXT := dylib
 	PC_EXTRA_LIBS ?=
 endif
