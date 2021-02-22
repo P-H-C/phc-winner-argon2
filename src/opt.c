@@ -179,6 +179,7 @@ void fill_segment(const argon2_instance_t *instance,
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
     uint32_t lanes_reciprocal = 0;
+    uint32_t lanes = instance->lanes;
 #if defined(__AVX512F__)
     __m512i state[ARGON2_512BIT_WORDS_IN_BLOCK];
 #elif defined(__AVX2__)
@@ -231,9 +232,9 @@ void fill_segment(const argon2_instance_t *instance,
         prev_offset = curr_offset - 1;
     }
 
-    /* Fixed point multiply constant for dividing by instance->lanes */
-    if ((instance->lanes & (instance->lanes - 1)) != 0) {
-      lanes_reciprocal = (uint32_t) (UINT64_C(0x100000000) / instance->lanes);
+    /* Fixed point multiply constant for dividing by lanes */
+    if ((lanes & (lanes - 1)) != 0) {
+        lanes_reciprocal = (uint32_t) (UINT64_C(0x100000000) / lanes);
     }
 
     memcpy(state, ((instance->memory + prev_offset)->v), ARGON2_BLOCK_SIZE);
@@ -254,12 +255,10 @@ void fill_segment(const argon2_instance_t *instance,
 
         /* 1.2.2 Computing the lane of the reference block */
         if (lanes_reciprocal == 0) {
-          ref_lane = (pseudo_rand >> 32) & (instance->lanes - 1);
+            ref_lane = (pseudo_rand >> 32) & (lanes - 1);
         } else {
-          ref_lane = (pseudo_rand >> 32) - (((pseudo_rand >> 32) * lanes_reciprocal) >> 32) * instance->lanes;
-          if (ref_lane >= instance->lanes) {
-            ref_lane -= instance->lanes;
-          }
+            ref_lane = (pseudo_rand >> 32) - (((pseudo_rand >> 32) * lanes_reciprocal) >> 32) * lanes - lanes;
+            ref_lane += lanes & (ref_lane >> 32);
         }
 
         if ((position.pass == 0) && (position.slice == 0)) {
