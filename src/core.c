@@ -200,8 +200,8 @@ uint32_t index_alpha(const argon2_instance_t *instance,
      *      Other lanes : (SYNC_POINTS - 1) last segments
      */
     uint32_t reference_area_size;
-    uint64_t relative_position;
-    uint32_t start_position, absolute_position;
+    uint64_t relative_position, absolute_position;
+    uint32_t start_position;
 
     if (0 == position->pass) {
         /* First pass */
@@ -251,9 +251,10 @@ uint32_t index_alpha(const argon2_instance_t *instance,
     }
 
     /* 1.2.6. Computing absolute position */
-    absolute_position = (start_position + relative_position) %
-                        instance->lane_length; /* absolute position */
-    return absolute_position;
+    absolute_position = start_position + relative_position -
+                        instance->lane_length;
+    absolute_position += instance->lane_length & (absolute_position >> 32);
+    return (uint32_t) absolute_position;
 }
 
 /* Single-threaded version for p=1 case */
