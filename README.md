@@ -272,6 +272,7 @@ their documentation):
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
 * [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
 * [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
+* [Swift](https://github.com/tmthecoder/Argon2Swift) by [@tmthecoder](https://github.com/tmthecoder)
 
 
 ## Test suite
