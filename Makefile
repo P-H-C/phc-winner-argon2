@@ -102,6 +102,12 @@ ifeq ($(findstring MSYS, $(KERNEL_NAME)), MSYS)
 	LIB_CFLAGS := -shared -Wl,--out-implib,lib$(LIB_NAME).$(LIB_EXT).a
 	PC_EXTRA_LIBS ?=
 endif
+ifeq ($(KERNEL_NAME), midipix)
+	LIB_EXT := so.$(ABI_VERSION)
+	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1 -Wl,--out-dsolib,lib$(LIB_NAME).lib.a
+	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
+	LINKED_LIB_EXT := so
+endif
 ifeq ($(KERNEL_NAME), SunOS)
 	CC := gcc
 	CFLAGS += -D_REENTRANT
