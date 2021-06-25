@@ -105,7 +105,7 @@ There are many additional parameters, but we will highlight three of them here.
    https://en.wikipedia.org/wiki/Hash-based_message_authentication_code).
    This allows a secret key to be input at hashing time (from some external
    location) and be folded into the value of the hash. This means that even if
-   your salts and hashes are compromized, an attacker cannot brute-force to find
+   your salts and hashes are compromised, an attacker cannot brute-force to find
    the password without the key.
 
 2. The `ad` parameter, which is used to fold any additional data into the hash
@@ -116,7 +116,7 @@ There are many additional parameters, but we will highlight three of them here.
    key only usable at hashing time. The `ad` is for any other data.
 
 3. The `flags` parameter, which determines which memory should be securely
-   erased. This is useful if you want to securly delete the `pwd` or `secret`
+   erased. This is useful if you want to securely delete the `pwd` or `secret`
    fields right after they are used. To do this set `flags` to either
    `ARGON2_FLAG_CLEAR_PASSWORD` or `ARGON2_FLAG_CLEAR_SECRET`. To change how
    internal memory is cleared, change the global flag

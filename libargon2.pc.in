@@ -3,7 +3,7 @@
 ## - replace @UPSTREAM_VER@ with current version, e.g. '20160406'
 ## - replace @HOST_MULTIARCH@ with target arch lib, e.g. 'lib', 'lib/x86_64-linux-gnu' or 'lib64'
 ## - replace @PREFIX@ with install path, e.g. '/usr', '/usr/local', '/usr/pkg'
-## - replace @INCLUDE@ with incluse path, e.g. 'include' or 'include/argon2'
+## - replace @INCLUDE@ with include path, e.g. 'include' or 'include/argon2'
 
 prefix=@PREFIX@
 exec_prefix=${prefix}
