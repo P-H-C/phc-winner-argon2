@@ -427,7 +427,7 @@ ARGON2_PUBLIC const char *argon2_error_message(int error_code);
  * @return  The encoded hash length in bytes
  */
 ARGON2_PUBLIC size_t argon2_encodedlen(uint32_t t_cost, uint32_t m_cost,
-                                       uint32_t parallelism, uint32_t saltlen,
+                                       uint32_t parallelism, size_t saltlen,
                                        uint32_t hashlen, argon2_type type);
 
 #if defined(__cplusplus)
