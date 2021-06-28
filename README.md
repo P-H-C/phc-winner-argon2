@@ -266,6 +266,7 @@ their documentation):
 * [Python (ffi, with keyed hashing)](https://github.com/ultrahorizon/pyargon2), by [@ultrahorizon](https://github.com/ultrahorizon)
 * [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
+* [Ruby](https://github.com/Sorcery/argon2) by [@athix](https://github.com/athix)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
 * [Rust](https://docs.rs/argonautica/) by [@bcmyers](https://github.com/bcmyers/)
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
