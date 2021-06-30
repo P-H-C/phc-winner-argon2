@@ -54,4 +54,19 @@ size_t b64len(uint32_t len);
 /* Returns the length of the encoded number num */
 size_t numlen(uint32_t num);
 
+/*
+ * Decode Base64 chars into bytes. The '*dst_len' value must initially
+ * contain the length of the output buffer '*dst'; when the decoding
+ * ends, the actual number of decoded bytes is written back in
+ * '*dst_len'.
+ *
+ * Decoding stops when a non-Base64 character is encountered, or when
+ * the output buffer capacity is exceeded. If an error occurred (output
+ * buffer is too small, invalid last characters leading to unprocessed
+ * buffered bits), then NULL is returned; otherwise, the returned value
+ * points to the first non-Base64 character in the source stream, which
+ * may be the terminating zero.
+ */
+const char *from_base64(void *dst, size_t *dst_len, const char *src);
+
 #endif
