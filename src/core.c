@@ -125,6 +125,8 @@ void free_memory(const argon2_context *context, uint8_t *memory,
 
 #if defined(__OpenBSD__)
 #define HAVE_EXPLICIT_BZERO 1
+#elif defined(__midipix__)
+#define HAVE_EXPLICIT_BZERO 1
 #elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
 #if __GLIBC_PREREQ(2,25)
 #define HAVE_EXPLICIT_BZERO 1
