@@ -19,6 +19,7 @@ RUN = argon2
 BENCH = bench
 GENKAT = genkat
 ARGON2_VERSION ?= ZERO
+MAN = man/argon2.1
 
 # installation parameters for staging area and final installation path
 # Note; if Linux and not Debian/Ubuntu version also add lib override to make command-line
@@ -109,6 +110,13 @@ ifeq ($(KERNEL_NAME), SunOS)
 	LIB_CFLAGS := -shared -fPIC
 	PC_EXTRA_LIBS ?=
 endif
+ifeq ($(KERNEL_NAME), Haiku)
+	LIB_EXT := so.$(ABI_VERSION)
+	LIB_CFLAGS := -shared -fPIC -DA2_VISCTL=1
+	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
+	LINKED_LIB_EXT := so
+	PC_EXTRA_LIBS ?=
+endif
 
 ifeq ($(KERNEL_NAME), Linux)
 ifeq ($(CC), clang)
@@ -138,6 +146,7 @@ ifeq ($(KERNEL_NAME), $(filter $(KERNEL_NAME),DragonFly FreeBSD))
 BINARY_REL ?= bin
 INCLUDE_REL ?= include
 LIBRARY_REL ?= lib
+MAN_REL ?= share/man/man1
 PKGCONFIG_REL ?= libdata
 
 else ifeq ($(KERNEL_NAME)-$(MACHINE_NAME), Linux-x86_64)
@@ -146,6 +155,16 @@ else ifeq ($(KERNEL_NAME)-$(MACHINE_NAME), Linux-x86_64)
 BINARY_REL ?= bin
 INCLUDE_REL ?= include
 LIBRARY_REL ?= lib/x86_64-linux-gnu
+MAN_REL ?= share/man/man1
+PKGCONFIG_REL ?= $(LIBRARY_REL)
+
+else ifeq ($(KERNEL_NAME), Haiku)
+
+# default for Haiku
+BINARY_REL ?= bin
+INCLUDE_REL ?= develop/headers
+LIBRARY_REL ?= lib
+MAN_REL ?= documentation/man/man1
 PKGCONFIG_REL ?= $(LIBRARY_REL)
 
 else
@@ -154,6 +173,7 @@ else
 BINARY_REL ?= bin
 INCLUDE_REL ?= include
 LIBRARY_REL ?= lib
+MAN_REL ?= share/man/man1
 PKGCONFIG_REL ?= $(LIBRARY_REL)
 
 endif
@@ -162,6 +182,7 @@ endif
 INST_INCLUDE = $(DESTDIR)$(PREFIX)/$(INCLUDE_REL)
 INST_LIBRARY = $(DESTDIR)$(PREFIX)/$(LIBRARY_REL)
 INST_BINARY = $(DESTDIR)$(PREFIX)/$(BINARY_REL)
+INST_MAN = $(DESTDIR)$(PREFIX)/$(MAN_REL)
 INST_PKGCONFIG = $(DESTDIR)$(PREFIX)/$(PKGCONFIG_REL)/pkgconfig
 
 # main target
@@ -244,6 +265,8 @@ ifdef LINKED_LIB_SH
 endif
 	$(INSTALL) -d $(INST_BINARY)
 	$(INSTALL) $(RUN) $(INST_BINARY)
+	$(INSTALL) -d $(INST_MAN)
+	$(INSTALL) -m 0644 $(MAN) $(INST_MAN)
 	$(INSTALL) -d $(INST_PKGCONFIG)
 	$(INSTALL) -m 0644 $(PC_NAME) $(INST_PKGCONFIG)
 
@@ -252,4 +275,5 @@ uninstall:
 	cd $(INST_INCLUDE) && rm -f $(notdir $(HEADERS))
 	cd $(INST_LIBRARY) && rm -f $(notdir $(LIBRARIES) $(LINKED_LIB_SH))
 	cd $(INST_BINARY) && rm -f $(notdir $(RUN))
+	cd $(INST_MAN) && rm -f $(notdir $(MAN))
 	cd $(INST_PKG_CONFIG) && rm -f $(notdir $(PC_NAME))
