@@ -91,7 +91,7 @@ Base64-encoded hash string
 @raw_only display only the hexadecimal of the hash
 @version Argon2 version
 */
-static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t t_cost,
+static void run(size_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t t_cost,
                 uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type, int encoded_only, int raw_only, uint32_t version) {
     clock_t start_time, stop_time;
@@ -168,7 +168,7 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
 }
 
 int main(int argc, char *argv[]) {
-    uint32_t outlen = OUTLEN_DEF;
+    size_t outlen = OUTLEN_DEF;
     uint32_t m_cost = 1 << LOG_M_COST_DEF;
     uint32_t t_cost = T_COST_DEF;
     uint32_t lanes = LANES_DEF;
@@ -279,6 +279,10 @@ int main(int argc, char *argv[]) {
             if (i < argc - 1) {
                 i++;
                 input = strtoul(argv[i], NULL, 10);
+                if (input == 0 || input == ULONG_MAX ||
+                    input >= SIZE_MAX) {
+                    fatal("bad numeric input for -l");
+                }
                 outlen = input;
                 continue;
             } else {
