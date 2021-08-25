@@ -13,6 +13,7 @@ includedir=${prefix}/@INCLUDE@
 Name: libargon2
 Description: Development libraries for libargon2
 Version: @UPSTREAM_VER@
-Libs: -L${libdir} -largon2 @EXTRA_LIBS@
+Libs: -L${libdir} -largon2
+Libs.private: @EXTRA_LIBS@
 Cflags: -I${includedir}
 URL: https://github.com/P-H-C/phc-winner-argon2
