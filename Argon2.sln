@@ -1,8 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Argon2OptTestCI", "vs2015\Argon2OptTestCI\Argon2OptTestCI.vcxproj", "{12956597-5E42-433A-93F3-D4EFF50AA207}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Argon2RefTestCI", "vs2015\Argon2RefTestCI\Argon2RefTestCI.vcxproj", "{8A1F7F84-34AF-4DB2-9D58-D4823DFE79E9}"

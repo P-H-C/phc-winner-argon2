@@ -8,19 +8,24 @@
  * License/Waiver or the Apache Public License 2.0, at your option. The terms of
  * these licenses can be found at:
  *
- * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
- * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
+ * - CC0 1.0 Universal : https://creativecommons.org/publicdomain/zero/1.0
+ * - Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
  *
  * You should have received a copy of both of these licenses along with this
  * software. If not, they may be obtained at the above URLs.
  */
 
-#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "argon2.h"
 #include "core.h"
+#ifdef __MINGW32__
+#include <inttypes.h>
+#else
+/* Don't use <inttypes.h> (it's not C89) */
+#define PRIx64 "llx"
+#endif
 
 void initial_kat(const uint8_t *blockhash, const argon2_context *context,
                  argon2_type type) {
@@ -117,7 +122,7 @@ void internal_kat(const argon2_instance_t *instance, uint32_t pass) {
 
             for (j = 0; j < how_many_words; ++j)
                 printf("Block %.4u [%3u]: %016" PRIx64 "\n", i, j,
-                       instance->memory[i].v[j]);
+                       (unsigned long long)instance->memory[i].v[j]);
         }
     }
 }

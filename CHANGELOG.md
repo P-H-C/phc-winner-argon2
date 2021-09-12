@@ -1,3 +1,10 @@
+# 20171227
+* Added ABI version number
+* AVX2/AVX-512F optimizations of BLAMKA
+* Set Argon2 version number from the command line
+* New bindings
+* Minor bug and warning fixes (no security issue)
+
 # 20161029
 
 * Argon2id added

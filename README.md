@@ -44,9 +44,11 @@ Please report bugs as issues on this repository.
 ## Usage
 
 `make` builds the executable `argon2`, the static library `libargon2.a`,
-and the shared library `libargon2.so` (or `libargon2.dylib` on OSX).
-Make sure to run `make test` to verify that your build produces valid
-results. `make install PREFIX=/usr` installs it to your system.
+and the shared library `libargon2.so` (or on macOS, the dynamic library
+`libargon2.dylib` -- make sure to specify the installation prefix when
+you compile: `make PREFIX=/usr`). Make sure to run `make test` to verify
+that your build produces valid results. `sudo make install PREFIX=/usr`
+installs it to your system.
 
 ### Command-line utility
 
@@ -103,7 +105,7 @@ There are many additional parameters, but we will highlight three of them here.
    https://en.wikipedia.org/wiki/Hash-based_message_authentication_code).
    This allows a secret key to be input at hashing time (from some external
    location) and be folded into the value of the hash. This means that even if
-   your salts and hashes are compromized, an attacker cannot brute-force to find
+   your salts and hashes are compromised, an attacker cannot brute-force to find
    the password without the key.
 
 2. The `ad` parameter, which is used to fold any additional data into the hash
@@ -114,7 +116,7 @@ There are many additional parameters, but we will highlight three of them here.
    key only usable at hashing time. The `ad` is for any other data.
 
 3. The `flags` parameter, which determines which memory should be securely
-   erased. This is useful if you want to securly delete the `pwd` or `secret`
+   erased. This is useful if you want to securely delete the `pwd` or `secret`
    fields right after they are used. To do this set `flags` to either
    `ARGON2_FLAG_CLEAR_PASSWORD` or `ARGON2_FLAG_CLEAR_SECRET`. To change how
    internal memory is cleared, change the global flag
@@ -148,7 +150,7 @@ int main(void)
     uint8_t *pwd = (uint8_t *)strdup(PWD);
     uint32_t pwdlen = strlen((char *)pwd);
 
-    uint32_t t_cost = 2;            // 1-pass computation
+    uint32_t t_cost = 2;            // 2-pass computation
     uint32_t m_cost = (1<<16);      // 64 mebibytes memory usage
     uint32_t parallelism = 1;       // number of threads and lanes
 
@@ -191,9 +193,9 @@ int main(void)
 }
 ```
 
-To use Argon2d instead of Argon2i call `argon2d_hash` instead of
-`argon2i_hash` using the high-level API, and `argon2d` instead of
-`argon2i` using the low-level API. Similarly for Argon2id, call `argond2id_hash`
+To use Argon2d instead of Argon2i call `argon2d_hash_raw` instead of
+`argon2i_hash_raw` using the high-level API, and `argon2d` instead of
+`argon2i` using the low-level API. Similarly for Argon2id, call `argon2id_hash_raw`
 and `argon2id`.
 
 To produce the crypt-like encoding rather than the raw hash, call
@@ -243,26 +245,34 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
+* [Android (Java/Kotlin)](https://github.com/lambdapioneer/argon2kt) by [@lambdapioneer](https://github.com/lambdapioneer)
+* [Dart](https://github.com/tmthecoder/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
 * [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
+* [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
-* [Haskell](https://hackage.haskell.org/package/argon2-1.0.0/docs/Crypto-Argon2.html) by [@ocharles](https://github.com/ocharles)
+* [Haskell](https://hackage.haskell.org/package/argon2) by [@hvr](https://github.com/hvr)
 * [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
 * [JavaScript (native)](https://github.com/jdconley/argon2themax), by [@jdconley](https://github.com/jdconley)
 * [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
 * [JavaScript (browser)](https://github.com/antelle/argon2-browser), by [@antelle](https://github.com/antelle)
 * [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
+* [JVM (with keyed hashing)](https://github.com/kosprov/jargon2-api) by [@kosprov](https://github.com/kosprov)
 * [Lua (native)](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
 * [Lua (ffi)](https://github.com/thibaultCha/lua-argon2-ffi) by [@thibaultCha](https://github.com/thibaultCha)
 * [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
 * [Python (native)](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
 * [Python (ffi)](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
 * [Python (ffi, with keyed hashing)](https://github.com/thusoy/porridge), by [@thusoy](https://github.com/thusoy)
+* [Python (ffi, with keyed hashing)](https://github.com/ultrahorizon/pyargon2), by [@ultrahorizon](https://github.com/ultrahorizon)
 * [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
 * [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
 * [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
+* [Rust](https://docs.rs/argonautica/) by [@bcmyers](https://github.com/bcmyers/)
 * [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
 * [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
 * [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
+* [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
+* [Swift](https://github.com/tmthecoder/Argon2Swift) by [@tmthecoder](https://github.com/tmthecoder)
 
 
 ## Test suite
@@ -279,7 +289,7 @@ Except for the components listed below, the Argon2 code in this
 repository is copyright (c) 2015 Daniel Dinu, Dmitry Khovratovich (main
 authors), Jean-Philippe Aumasson and Samuel Neves, and dual licensed under the
 [CC0 License](https://creativecommons.org/about/cc0) and the
-[Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0). For more info
+[Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0). For more info
 see the LICENSE file.
 
 The string encoding routines in [`src/encoding.c`](src/encoding.c) are

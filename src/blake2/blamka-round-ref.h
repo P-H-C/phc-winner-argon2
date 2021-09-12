@@ -8,8 +8,8 @@
  * License/Waiver or the Apache Public License 2.0, at your option. The terms of
  * these licenses can be found at:
  *
- * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
- * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
+ * - CC0 1.0 Universal : https://creativecommons.org/publicdomain/zero/1.0
+ * - Apache 2.0        : https://www.apache.org/licenses/LICENSE-2.0
  *
  * You should have received a copy of both of these licenses along with this
  * software. If not, they may be obtained at the above URLs.
@@ -21,7 +21,7 @@
 #include "blake2.h"
 #include "blake2-impl.h"
 
-/*designed by the Lyra PHC team */
+/* designed by the Lyra PHC team */
 static BLAKE2_INLINE uint64_t fBlaMka(uint64_t x, uint64_t y) {
     const uint64_t m = UINT64_C(0xFFFFFFFF);
     const uint64_t xy = (x & m) * (y & m);
