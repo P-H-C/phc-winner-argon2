@@ -125,6 +125,8 @@ void free_memory(const argon2_context *context, uint8_t *memory,
 
 #if defined(__OpenBSD__)
 #define HAVE_EXPLICIT_BZERO 1
+#elif defined(__NetBSD__)
+#define HAVE_EXPLICIT_MEMSET 1
 #elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
 #if __GLIBC_PREREQ(2,25)
 #define HAVE_EXPLICIT_BZERO 1
@@ -138,6 +140,8 @@ void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
     memset_s(v, n, 0, n);
 #elif defined(HAVE_EXPLICIT_BZERO)
     explicit_bzero(v, n);
+#elif defined(HAVE_EXPLICIT_MEMSET)
+    explicit_memset(v, 0, n);
 #else
     static void *(*const volatile memset_sec)(void *, int, size_t) = &memset;
     memset_sec(v, 0, n);
