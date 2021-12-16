@@ -284,7 +284,6 @@ static void *fill_segment_thr(void *thread_data)
 {
     argon2_thread_data *my_data = thread_data;
     fill_segment(my_data->instance_ptr, my_data->pos);
-    argon2_thread_exit();
     return 0;
 }
 
