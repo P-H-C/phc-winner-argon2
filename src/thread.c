@@ -46,12 +46,4 @@ int argon2_thread_join(argon2_thread_handle_t handle) {
 #endif
 }
 
-void argon2_thread_exit(void) {
-#if defined(_WIN32)
-    _endthreadex(0);
-#else
-    pthread_exit(NULL);
-#endif
-}
-
 #endif /* ARGON2_NO_THREADS */
