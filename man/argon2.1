@@ -1,53 +1,87 @@
-.TH ARGON2 "1" "April 2016" "argon2 " "User Commands"
+.TH ARGON2 "1" "December 2021" "argon2 " "User Commands"
 
 .SH NAME
 argon2 \- generate argon2 hashes
 
 .SH SYNOPSIS
-.B argon2 salt
-.RB [ OPTIONS ]
+.B argon2
+\fI\,salt\/\fR [\fI\,-i\/\fR|\fI\,-d\/\fR|\fI\,-id\/\fR] [\fI\,-t iterations\/\fR] [\fI\,-m memory\/\fR | \fI\,-k memory\/\fR] [\fI\,-p parallelism\/\fR] [\fI\,-l output-length\/\fR] [\fI\,-e\/\fR|\fI\,-r\/\fR] [\fI\,-v\/\fR (\fI\,10\/\fR|\fI\,13\/\fR)]
+.br
+.B argon2
+[\fI\,-h\/\fR]
 
 .SH DESCRIPTION
 Generate Argon2 hashes from the command line.
 
-The supplied salt (the first argument to the command) must be at least
+The supplied \fI\,salt\/\fR (the first argument to the command) must be at least
 8 octets in length, and the password is supplied on standard input.
 
-By default, this uses Argon2i variant (where memory access is
-independent of secret data) which is the preferred one for password
-hashing and password-based key derivation.
+By default, this uses the Argon2i variant but RFC 9106 recommends the Argon2id
+variant “for all environments”.
 
 .SH OPTIONS
 .TP
-.B \-h
-Display tool usage
+.B \fI\,-i\/\fR
+Use the Argon2i variant, which uses data-independent memory access, which is
+used for password hashing and password-based key derivation.
+.br
+This is the default.
+.br
+Mutually exclusive with \fI\,-d\/\fR and \fI\,-id\/\fR.
 .TP
-.B \-d
-Use Argon2d instead of Argon2i (Argon2i is the default)
+.B \fI\,-d\/\fR
+Use the Argon2d variant, which uses data-dependent memory access, which makes it
+suitable for cryptocurrencies and proof-of-work applications with no threats
+from side-channel timing attacks.
+.br
+Mutually exclusive with \fI\,-i\/\fR and \fI\,-id\/\fR.
 .TP
-.B \-id
-Use Argon2id instead of Argon2i (Argon2i is the default)
+.B \fI\,-id\/\fR
+Use the Argon2id variant, which works as Argon2i for the first half of the first
+pass over the memory and as Argon2d for the rest, thus providing both
+side-channel attack protection and brute-force cost savings due to time-memory
+trade-offs.
+.br
+Mutually exclusive with \fI\,-i\/\fR and \fI\,-d\/\fR.
 .TP
-.BI \-t " N"
-Sets the number of iterations to N (default = 3)
+.BI \fI\,-t " iterations"\/\fR
+Sets the number of iterations to \fI\,iterations\/\fR (defaults to 3).
 .TP
-.BI \-m " N"
-Sets the memory usage of 2^N KiB (default = 12)
+.BI \fI\,-m " memory"\/\fR
+Sets the memory usage to 2^\fI\,memory\/\fR KiB (defaults to 12).
+.br
+Mutually exclusive with \fI\,-k\/\fR.
 .TP
-.BI \-p " N"
-Sets parallelism to N threads (default = 1)
+.BI \fI\,-k " memory"\/\fR
+Sets the memory usage to \fI\,memory\/\fR KiB (defaults to 4096).
+.br
+Mutually exclusive with \fI\,-m\/\fR.
 .TP
-.BI \-l " N"
-Sets hash output length to N bytes (default = 32)
+.BI \fI\,-p " parallelism"\/\fR
+Sets the parallelism to \fI\,parallelism\/\fR threads (defaults to 1).
 .TP
-.B \-e
-Output only encoded hash
+.BI \fI\,-l " output-length"\/\fR
+Sets the hash output length to \fI\,output-length\/\fR bytes (defaults to 32).
 .TP
-.B \-r
-Output only the raw bytes of the hash
+.B \fI\,-e\/\fR
+Output only encoded hash.
+.br
+Mutually exclusive with \fI\,-r\/\fR.
 .TP
-.B \-v (10|13)
-Argon2 version (defaults to the most recent version, currently 13)
+.B \fI\,-r\/\fR
+Output only the raw bytes of the hash.
+.br
+Mutually exclusive with \fI\,-e\/\fR.
+.TP
+.B \fI\,-v\/\fR (\fI\,10\/\fR|\fI\,13\/\fR)
+Sets the Argon2 version (defaults to the most recent version, currently \fI\,13\/\fR).
+.TP
+.B \fI\,-h\/\fR
+Display program usage.
+
+.SH REFERENCES
+RFC 9106 “Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work
+Applications”
 
 .SH COPYRIGHT
 This manpage was written by \fBDaniel Kahn Gillmor\fR for the Debian
