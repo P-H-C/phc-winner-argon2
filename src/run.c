@@ -206,6 +206,7 @@ int main(int argc, char *argv[]) {
     for (i = 2; i < argc; i++) {
         const char *a = argv[i];
         unsigned long input = 0;
+        char *endptr = NULL;
         if (!strcmp(a, "-h")) {
             usage(argv[0]);
             return 1;
@@ -216,8 +217,8 @@ int main(int argc, char *argv[]) {
             m_cost_specified = 1;
             if (i < argc - 1) {
                 i++;
-                input = strtoul(argv[i], NULL, 10);
-                if (input == 0 || input == ULONG_MAX ||
+                input = strtoul(argv[i], &endptr, 10);
+                if (input == 0 || input == ULONG_MAX || *endptr != '\0' ||
                     input > ARGON2_MAX_MEMORY_BITS) {
                     fatal("bad numeric input for -m");
                 }
@@ -236,8 +237,8 @@ int main(int argc, char *argv[]) {
             m_cost_specified = 1;
             if (i < argc - 1) {
                 i++;
-                input = strtoul(argv[i], NULL, 10);
-                if (input == 0 || input == ULONG_MAX) {
+                input = strtoul(argv[i], &endptr, 10);
+                if (input == 0 || input == ULONG_MAX || *endptr != '\0') {
                     fatal("bad numeric input for -k");
                 }
                 m_cost = ARGON2_MIN(input, UINT32_C(0xFFFFFFFF));
@@ -251,8 +252,8 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-t")) {
             if (i < argc - 1) {
                 i++;
-                input = strtoul(argv[i], NULL, 10);
-                if (input == 0 || input == ULONG_MAX ||
+                input = strtoul(argv[i], &endptr, 10);
+                if (input == 0 || input == ULONG_MAX || *endptr != '\0' ||
                     input > ARGON2_MAX_TIME) {
                     fatal("bad numeric input for -t");
                 }
@@ -264,8 +265,8 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-p")) {
             if (i < argc - 1) {
                 i++;
-                input = strtoul(argv[i], NULL, 10);
-                if (input == 0 || input == ULONG_MAX ||
+                input = strtoul(argv[i], &endptr, 10);
+                if (input == 0 || input == ULONG_MAX || *endptr != '\0' ||
                     input > ARGON2_MAX_THREADS || input > ARGON2_MAX_LANES) {
                     fatal("bad numeric input for -p");
                 }
@@ -278,7 +279,10 @@ int main(int argc, char *argv[]) {
         } else if (!strcmp(a, "-l")) {
             if (i < argc - 1) {
                 i++;
-                input = strtoul(argv[i], NULL, 10);
+                input = strtoul(argv[i], &endptr, 10);
+                if (input == 0 || input == ULONG_MAX || *endptr != '\0') {
+                    fatal("bad numeric input for -l");
+                }
                 outlen = input;
                 continue;
             } else {
