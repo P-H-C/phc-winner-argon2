@@ -36,10 +36,11 @@
 #define UNUSED_PARAMETER(x) (void)(x)
 
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
+    printf("Usage:  %s salt [-i|-d|-id] [-t iterations] "
            "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
            "[-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
+    printf("        %s [-h]\n", cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
     printf("\tsalt\t\tThe salt to use, at least 8 characters\n");
