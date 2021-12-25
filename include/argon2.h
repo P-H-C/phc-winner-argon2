@@ -192,17 +192,17 @@ typedef struct Argon2_Context {
     uint8_t *out;    /* output array */
     uint32_t outlen; /* digest length */
 
-    uint8_t *pwd;    /* password array */
-    uint32_t pwdlen; /* password length */
+    uint8_t const *pwd; /* password array */
+    uint32_t pwdlen;    /* password length */
 
-    uint8_t *salt;    /* salt array */
-    uint32_t saltlen; /* salt length */
+    uint8_t const *salt; /* salt array */
+    uint32_t saltlen;    /* salt length */
 
-    uint8_t *secret;    /* key array */
-    uint32_t secretlen; /* key length */
+    uint8_t const *secret; /* key array */
+    uint32_t secretlen;    /* key length */
 
-    uint8_t *ad;    /* associated data array */
-    uint32_t adlen; /* associated data length */
+    uint8_t const *ad; /* associated data array */
+    uint32_t adlen;    /* associated data length */
 
     uint32_t t_cost;  /* number of passes */
     uint32_t m_cost;  /* amount of memory requested (KB) */
