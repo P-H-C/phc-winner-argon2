@@ -124,7 +124,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
         return ARGON2_OUTPUT_TOO_SHORT;
     }
 
-    out = malloc(hashlen);
+    out = (uint8_t *)malloc(hashlen);
     if (!out) {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
@@ -276,8 +276,8 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     ctx.saltlen = max_field_len;
     ctx.outlen = max_field_len;
 
-    ctx.salt = malloc(ctx.saltlen);
-    ctx.out = malloc(ctx.outlen);
+    ctx.salt = (uint8_t *)malloc(ctx.saltlen);
+    ctx.out = (uint8_t *)malloc(ctx.outlen);
     if (!ctx.salt || !ctx.out) {
         ret = ARGON2_MEMORY_ALLOCATION_ERROR;
         goto fail;
@@ -293,7 +293,7 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
 
     /* Set aside the desired result, and get a new buffer. */
     desired_result = ctx.out;
-    ctx.out = malloc(ctx.outlen);
+    ctx.out = (uint8_t *)malloc(ctx.outlen);
     if (!ctx.out) {
         ret = ARGON2_MEMORY_ALLOCATION_ERROR;
         goto fail;
