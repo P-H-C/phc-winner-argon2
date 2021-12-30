@@ -102,7 +102,7 @@ int allocate_memory(const argon2_context *context, uint8_t **memory,
     if (context->allocate_cbk) {
         (context->allocate_cbk)(memory, memory_size);
     } else {
-        *memory = malloc(memory_size);
+        *memory = (uint8_t *)malloc(memory_size);
     }
 
     if (*memory == NULL) {
@@ -282,7 +282,7 @@ static unsigned __stdcall fill_segment_thr(void *thread_data)
 static void *fill_segment_thr(void *thread_data)
 #endif
 {
-    argon2_thread_data *my_data = thread_data;
+    argon2_thread_data *my_data = (argon2_thread_data *)thread_data;
     fill_segment(my_data->instance_ptr, my_data->pos);
     argon2_thread_exit();
     return 0;
@@ -296,13 +296,13 @@ static int fill_memory_blocks_mt(argon2_instance_t *instance) {
     int rc = ARGON2_OK;
 
     /* 1. Allocating space for threads */
-    thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
+    thread = (argon2_thread_handle_t *)calloc(instance->lanes, sizeof(argon2_thread_handle_t));
     if (thread == NULL) {
         rc = ARGON2_MEMORY_ALLOCATION_ERROR;
         goto fail;
     }
 
-    thr_data = calloc(instance->lanes, sizeof(argon2_thread_data));
+    thr_data = (argon2_thread_data *)calloc(instance->lanes, sizeof(argon2_thread_data));
     if (thr_data == NULL) {
         rc = ARGON2_MEMORY_ALLOCATION_ERROR;
         goto fail;
