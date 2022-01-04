@@ -18,7 +18,14 @@
 #ifndef PORTABLE_BLAKE2_IMPL_H
 #define PORTABLE_BLAKE2_IMPL_H
 
+#if (_MSC_VER < 1600)
+typedef unsigned __int64 uint64_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int8 uint8_t;
+#define UINT64_C(val) val##ui64
+#else
 #include <stdint.h>
+#endif
 #include <string.h>
 
 #ifdef _WIN32

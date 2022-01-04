@@ -18,7 +18,15 @@
 #ifndef ARGON2_H
 #define ARGON2_H
 
+#if (_MSC_VER < 1600)
+typedef unsigned __int64 uint64_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int8 uint8_t;
+#define UINT32_MAX   _UI32_MAX
+#define UINT32_C(val) val##ui32
+#else
 #include <stdint.h>
+#endif
 #include <stddef.h>
 #include <limits.h>
 
