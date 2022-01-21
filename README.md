@@ -246,7 +246,8 @@ Bindings are available for the following languages (make sure to read
 their documentation):
 
 * [Android (Java/Kotlin)](https://github.com/lambdapioneer/argon2kt) by [@lambdapioneer](https://github.com/lambdapioneer)
-* [Dart](https://github.com/tmthecoder/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
+* [Dart (Native)](https://github.com/tmthecoder/dargon2/blob/main/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
+* [Dart (Flutter)](https://github.com/tmthecoder/dargon2_flutter/blob/main/dargon2_flutter) by [@tmthecoder](https://github.com/tmthecoder)
 * [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
 * [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
