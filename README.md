@@ -249,6 +249,7 @@ their documentation):
 * [Dart](https://github.com/tmthecoder/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
 * [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
 * [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
+* [Go (pure go)](https://github.com/matthewhartstonge/argon2) by [@matthewhartstonge](https://github.com/matthewhartstonge)
 * [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
 * [Haskell](https://hackage.haskell.org/package/argon2) by [@hvr](https://github.com/hvr)
 * [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
