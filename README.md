@@ -50,6 +50,11 @@ you compile: `make PREFIX=/usr`). Make sure to run `make test` to verify
 that your build produces valid results. `sudo make install PREFIX=/usr`
 installs it to your system.
 
+### Recommended Parameters
+
+Argon2 takes many parameters. [RFC 9160](https://www.rfc-editor.org/rfc/rfc9106.html#name-parameter-choice) has a section on choosing parameters.
+
+
 ### Command-line utility
 
 `argon2` is a command-line utility to test specific Argon2 instances
