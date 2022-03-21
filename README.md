@@ -36,6 +36,9 @@ Argon2i, Argon2d, and Argon2id are parametrized by:
 * A **memory** cost, which defines the memory usage, given in kibibytes
 * A **parallelism** degree, which defines the number of parallel threads
 
+[RFC9106](https://www.rfc-editor.org/rfc/rfc9106.html) gives recommendations
+for implementations and users.
+
 The [Argon2 document](argon2-specs.pdf) gives detailed specs and design
 rationale.
 
