@@ -50,6 +50,19 @@ you compile: `make PREFIX=/usr`). Make sure to run `make test` to verify
 that your build produces valid results. `sudo make install PREFIX=/usr`
 installs it to your system.
 
+### Installing from vcpkg
+
+You can download and install `argon2` using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+```sh
+  git clone https://github.com/Microsoft/vcpkg.git
+  cd vcpkg
+  ./bootstrap-vcpkg.sh #.\bootstrap-vcpkg.bat(for windows)
+  ./vcpkg integrate install
+  ./vcpkg install argon2
+```
+
+The `argon2` port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull   request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 ### Command-line utility
 
 `argon2` is a command-line utility to test specific Argon2 instances
