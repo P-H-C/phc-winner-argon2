@@ -31,7 +31,7 @@
 #define LANES_DEF 1
 #define THREADS_DEF 1
 #define OUTLEN_DEF 32
-#define MAX_PASS_LEN 128
+#define MAX_PASS_LEN 256
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
