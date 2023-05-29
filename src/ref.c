@@ -15,7 +15,6 @@
  * software. If not, they may be obtained at the above URLs.
  */
 
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 
