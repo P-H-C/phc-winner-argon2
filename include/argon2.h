@@ -18,7 +18,7 @@
 #ifndef ARGON2_H
 #define ARGON2_H
 
-#if (_MSC_VER < 1600)
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef unsigned __int64 uint64_t;
 typedef unsigned __int32 uint32_t;
 typedef unsigned __int8 uint8_t;
