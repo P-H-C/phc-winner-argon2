@@ -416,6 +416,32 @@ ARGON2_PUBLIC int argon2_verify_ctx(argon2_context *context, const char *hash,
  */
 ARGON2_PUBLIC const char *argon2_error_message(int error_code);
 
+/*
+* Encodes an Argon2 hash string into the provided buffer. 'dst_len'
+* contains the size, in characters, of the 'dst' buffer; if 'dst_len'
+* is less than the number of required characters (including the
+* terminating 0), then this function returns ARGON2_ENCODING_ERROR.
+*
+* on success, ARGON2_OK is returned.
+*/
+int argon2_encode_string(char *dst, size_t dst_len, argon2_context *ctx,
+                  argon2_type type);
+
+/*
+* Decodes an Argon2 hash string into the provided structure 'ctx'.
+* The only fields that must be set prior to this call are ctx.saltlen and
+* ctx.outlen (which must be the maximal salt and out length values that are
+* allowed), ctx.salt and ctx.out (which must be buffers of the specified
+* length), and ctx.pwd and ctx.pwdlen which must hold a valid password.
+*
+* Invalid input string causes an error. On success, the ctx is valid and all
+* fields have been initialized.
+*
+* Returned value is ARGON2_OK on success, other ARGON2_ codes on error.
+*/
+int argon2_decode_string(argon2_context *ctx, const char *str, argon2_type type);
+
+
 /**
  * Returns the encoded hash length for the given input parameters
  * @param t_cost  Number of iterations

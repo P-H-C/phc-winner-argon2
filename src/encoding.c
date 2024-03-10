@@ -252,10 +252,10 @@ static const char *decode_decimal(const char *str, unsigned long *v) {
  * output length must be in the allowed ranges defined in argon2.h.
  *
  * The ctx struct must contain buffers large enough to hold the salt and pwd
- * when it is fed into decode_string.
+ * when it is fed into argon2_decode_string.
  */
 
-int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
+int argon2_decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 
 /* check for prefix */
 #define CC(prefix)                                                             \
@@ -370,7 +370,7 @@ int decode_string(argon2_context *ctx, const char *str, argon2_type type) {
 #undef BIN
 }
 
-int encode_string(char *dst, size_t dst_len, argon2_context *ctx,
+int argon2_encode_string(char *dst, size_t dst_len, argon2_context *ctx,
                   argon2_type type) {
 #define SS(str)                                                                \
     do {                                                                       \
