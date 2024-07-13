@@ -126,7 +126,7 @@ Here the time cost `t_cost` is set to 2 iterations, the
 memory cost `m_cost` is set to 2<sup>16</sup> kibibytes (64 mebibytes),
 and parallelism is set to 1 (single-thread).
 
-Compile for example as `gcc test.c libargon2.a -Isrc -o test`, if the program
+Compile for example as `gcc test.c libargon2.a -Iinclude -o test`, if the program
 below is named `test.c` and placed in the project's root directory.
 
 ```c
