@@ -119,7 +119,7 @@ static size_t to_base64(char *dst, size_t dst_len, const void *src,
     switch (src_len % 3) {
     case 2:
         olen++;
-    /* fall through */
+        __attribute__((fallthrough));
     case 1:
         olen += 2;
         break;
@@ -443,7 +443,7 @@ size_t b64len(uint32_t len) {
     switch (len % 3) {
     case 2:
         olen++;
-    /* fall through */
+        __attribute__((fallthrough));
     case 1:
         olen += 2;
         break;
