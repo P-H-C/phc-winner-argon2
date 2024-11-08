@@ -178,6 +178,8 @@ void fill_segment(const argon2_instance_t *instance,
     uint64_t pseudo_rand, ref_index, ref_lane;
     uint32_t prev_offset, curr_offset;
     uint32_t starting_index, i;
+    uint32_t lanes_reciprocal = 0;
+    uint32_t lanes = instance->lanes;
 #if defined(__AVX512F__)
     __m512i state[ARGON2_512BIT_WORDS_IN_BLOCK];
 #elif defined(__AVX2__)
@@ -222,7 +224,7 @@ void fill_segment(const argon2_instance_t *instance,
     curr_offset = position.lane * instance->lane_length +
                   position.slice * instance->segment_length + starting_index;
 
-    if (0 == curr_offset % instance->lane_length) {
+    if ((0 == position.slice) && (0 == starting_index)) {
         /* Last block in this lane */
         prev_offset = curr_offset + instance->lane_length - 1;
     } else {
@@ -230,15 +232,15 @@ void fill_segment(const argon2_instance_t *instance,
         prev_offset = curr_offset - 1;
     }
 
+    /* Fixed point multiply constant for dividing by lanes */
+    if ((lanes & (lanes - 1)) != 0) {
+        lanes_reciprocal = (uint32_t) (UINT64_C(0x100000000) / lanes);
+    }
+
     memcpy(state, ((instance->memory + prev_offset)->v), ARGON2_BLOCK_SIZE);
 
     for (i = starting_index; i < instance->segment_length;
-         ++i, ++curr_offset, ++prev_offset) {
-        /*1.1 Rotating prev_offset if needed */
-        if (curr_offset % instance->lane_length == 1) {
-            prev_offset = curr_offset - 1;
-        }
-
+         ++i, ++curr_offset) {
         /* 1.2 Computing the index of the reference block */
         /* 1.2.1 Taking pseudo-random value from the previous block */
         if (data_independent_addressing) {
@@ -248,10 +250,16 @@ void fill_segment(const argon2_instance_t *instance,
             pseudo_rand = address_block.v[i % ARGON2_ADDRESSES_IN_BLOCK];
         } else {
             pseudo_rand = instance->memory[prev_offset].v[0];
+            prev_offset = curr_offset;
         }
 
         /* 1.2.2 Computing the lane of the reference block */
-        ref_lane = ((pseudo_rand >> 32)) % instance->lanes;
+        if (lanes_reciprocal == 0) {
+            ref_lane = (pseudo_rand >> 32) & (lanes - 1);
+        } else {
+            ref_lane = (pseudo_rand >> 32) - (((pseudo_rand >> 32) * lanes_reciprocal) >> 32) * lanes - lanes;
+            ref_lane += lanes & (ref_lane >> 32);
+        }
 
         if ((position.pass == 0) && (position.slice == 0)) {
             /* Can not reference other lanes yet */
