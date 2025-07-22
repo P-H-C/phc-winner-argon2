@@ -35,14 +35,43 @@
 
 #define UNUSED_PARAMETER(x) (void)(x)
 
+/* Helper: convert a hex digit char to numeric value, or -1 on error */
+static int hexchar2int(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+/* Convert hex string (even length) to binary bytes.
+ * Returns number of bytes written or -1 on error.
+ * dst must have at least strlen(src)/2 bytes allocated.
+ */
+static int hex2bin(const char *src, unsigned char *dst, size_t maxdstlen) {
+    size_t srclen = strlen(src);
+    size_t i;
+    int hi, lo;
+
+    if (srclen % 2 != 0) return -1;
+
+    for (i = 0; i < srclen / 2; i++) {
+        hi = hexchar2int(src[2*i]);
+        lo = hexchar2int(src[2*i + 1]);
+        if (hi == -1 || lo == -1) return -1;
+        if (i >= maxdstlen) return -1;
+        dst[i] = (unsigned char)((hi << 4) | lo);
+    }
+    return (int)(srclen / 2);
+}
+
 static void usage(const char *cmd) {
-    printf("Usage:  %s [-h] salt [-i|-d|-id] [-t iterations] "
+    printf("Usage:  %s [-h] --salt-hex <hexsalt> [-i|-d|-id] [-t iterations] "
            "[-m log2(memory in KiB) | -k memory in KiB] [-p parallelism] "
            "[-l hash length] [-e|-r] [-v (10|13)]\n",
            cmd);
     printf("\tPassword is read from stdin\n");
     printf("Parameters:\n");
-    printf("\tsalt\t\tThe salt to use, at least 8 characters\n");
+    printf("\t--salt-hex\tSalt to use, hex-encoded binary, at least 8 bytes\n");
     printf("\t-i\t\tUse Argon2i (this is the default)\n");
     printf("\t-d\t\tUse Argon2d instead of Argon2i\n");
     printf("\t-id\t\tUse Argon2id instead of Argon2i\n");
@@ -82,6 +111,7 @@ Base64-encoded hash string
 @out output array with at least 32 bytes allocated
 @pwd NULL-terminated string, presumably from argv[]
 @salt salt array
+@saltlen length of salt in bytes
 @t_cost number of iterations
 @m_cost amount of requested memory in KB
 @lanes amount of requested parallelism
@@ -91,11 +121,11 @@ Base64-encoded hash string
 @raw_only display only the hexadecimal of the hash
 @version Argon2 version
 */
-static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t t_cost,
-                uint32_t m_cost, uint32_t lanes, uint32_t threads,
+static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, size_t saltlen,
+                uint32_t t_cost, uint32_t m_cost, uint32_t lanes, uint32_t threads,
                 argon2_type type, int encoded_only, int raw_only, uint32_t version) {
     clock_t start_time, stop_time;
-    size_t saltlen, encodedlen;
+    size_t encodedlen;
     int result;
     unsigned char * out = NULL;
     char * encoded = NULL;
@@ -111,27 +141,26 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
         fatal("salt missing");
     }
 
-    saltlen = strlen(salt);
     if(UINT32_MAX < saltlen) {
         fatal("salt is too long");
     }
 
     UNUSED_PARAMETER(lanes);
 
-    out = malloc(outlen + 1);
+    out = (unsigned char *)malloc(outlen + 1);
     if (!out) {
         clear_internal_memory(pwd, pwdlen);
         fatal("could not allocate memory for output");
     }
 
     encodedlen = argon2_encodedlen(t_cost, m_cost, lanes, (uint32_t)saltlen, outlen, type);
-    encoded = malloc(encodedlen + 1);
+    encoded = (char *)malloc(encodedlen + 1);
     if (!encoded) {
         clear_internal_memory(pwd, pwdlen);
         fatal("could not allocate memory for hash");
     }
 
-    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, salt, saltlen,
+    result = argon2_hash(t_cost, m_cost, threads, pwd, pwdlen, (unsigned char *)salt, saltlen,
                          out, outlen, encoded, encodedlen, type,
                          version);
     if (result != ARGON2_OK)
@@ -158,7 +187,7 @@ static void run(uint32_t outlen, char *pwd, size_t pwdlen, char *salt, uint32_t 
     printf("Encoded:\t%s\n", encoded);
 
     printf("%2.3f seconds\n",
-           ((double)stop_time - start_time) / (CLOCKS_PER_SEC));
+           ((double)(stop_time - start_time)) / (CLOCKS_PER_SEC));
 
     result = argon2_verify(encoded, pwd, pwdlen, type);
     if (result != ARGON2_OK)
@@ -181,7 +210,10 @@ int main(int argc, char *argv[]) {
     uint32_t version = ARGON2_VERSION_NUMBER;
     int i;
     size_t pwdlen;
-    char pwd[MAX_PASS_LEN], *salt;
+    char pwd[MAX_PASS_LEN];
+    unsigned char saltbin[256];
+    int saltlen = 0;
+    char *salt_hex = NULL;
 
     if (argc < 2) {
         usage(argv[0]);
@@ -200,10 +232,8 @@ int main(int argc, char *argv[]) {
         fatal("Provided password longer than supported in command line utility");
     }
 
-    salt = argv[1];
-
     /* parse options */
-    for (i = 2; i < argc; i++) {
+    for (i = 1; i < argc; i++) {
         const char *a = argv[i];
         unsigned long input = 0;
         if (!strcmp(a, "-h")) {
@@ -310,6 +340,16 @@ int main(int argc, char *argv[]) {
             } else {
                 fatal("missing -v argument");
             }
+        } else if (!strcmp(a, "--salt-hex")) {
+            if (salt_hex != NULL) {
+                fatal("multiple --salt-hex arguments not allowed");
+            }
+            if (i < argc - 1) {
+                i++;
+                salt_hex = argv[i];
+            } else {
+                fatal("missing argument for --salt-hex");
+            }
         } else {
             fatal("unknown argument");
         }
@@ -322,6 +362,19 @@ int main(int argc, char *argv[]) {
     if(encoded_only && raw_only)
         fatal("cannot provide both -e and -r");
 
+    if (salt_hex == NULL) {
+        fatal("--salt-hex argument is required");
+    }
+
+    /* decode hex salt */
+    saltlen = hex2bin(salt_hex, saltbin, sizeof(saltbin));
+    if (saltlen < 8) {
+        fatal("salt must be at least 8 bytes");
+    }
+    if (saltlen < 0) {
+        fatal("invalid hex in --salt-hex argument");
+    }
+
     if(!encoded_only && !raw_only) {
         printf("Type:\t\t%s\n", argon2_type2string(type, 1));
         printf("Iterations:\t%u\n", t_cost);
@@ -329,9 +382,9 @@ int main(int argc, char *argv[]) {
         printf("Parallelism:\t%u\n", lanes);
     }
 
-    run(outlen, pwd, pwdlen, salt, t_cost, m_cost, lanes, threads, type,
+    /* Note: run() expects salt as char*, so cast binary salt accordingly */
+    run(outlen, pwd, pwdlen, (char *)saltbin, saltlen, t_cost, m_cost, lanes, threads, type,
        encoded_only, raw_only, version);
 
     return ARGON2_OK;
 }
-
