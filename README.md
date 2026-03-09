@@ -31,10 +31,10 @@ cracking attacks.
 
 Argon2i, Argon2d, and Argon2id are parametrized by:
 
-* A **time** cost, which defines the amount of computation realized and
+- A **time** cost, which defines the amount of computation realized and
   therefore the execution time, given in number of iterations
-* A **memory** cost, which defines the memory usage, given in kibibytes
-* A **parallelism** degree, which defines the number of parallel threads
+- A **memory** cost, which defines the memory usage, given in kibibytes
+- A **parallelism** degree, which defines the number of parallel threads
 
 The [Argon2 document](argon2-specs.pdf) gives detailed specs and design
 rationale.
@@ -55,6 +55,7 @@ installs it to your system.
 `argon2` is a command-line utility to test specific Argon2 instances
 on your system. To show usage instructions, run
 `./argon2 -h` as
+
 ```
 Usage:  ./argon2 [-h] salt [-i|-d|-id] [-t iterations] [-m memory] [-p parallelism] [-l hash length] [-e|-r] [-v (10|13)]
         Password is read from stdin
@@ -72,9 +73,11 @@ Parameters:
         -v (10|13)      Argon2 version (defaults to the most recent version, currently 13)
         -h              Print argon2 usage
 ```
+
 For example, to hash "password" using "somesalt" as a salt and doing 2
 iterations, consuming 64 MiB, using four parallel threads and an output hash
 of 24 bytes
+
 ```
 $ echo -n "password" | ./argon2 somesalt -t 2 -m 16 -p 4 -l 24
 Type:           Argon2i
@@ -108,14 +111,14 @@ There are many additional parameters, but we will highlight three of them here.
    your salts and hashes are compromised, an attacker cannot brute-force to find
    the password without the key.
 
-2. The `ad` parameter, which is used to fold any additional data into the hash
+3. The `ad` parameter, which is used to fold any additional data into the hash
    value. Functionally, this behaves almost exactly like the `secret` or `salt`
    parameters; the `ad` parameter is folding into the value of the hash.
    However, this parameter is used for different data. The `salt` should be a
    random string stored alongside your password. The `secret` should be a random
    key only usable at hashing time. The `ad` is for any other data.
 
-3. The `flags` parameter, which determines which memory should be securely
+4. The `flags` parameter, which determines which memory should be securely
    erased. This is useful if you want to securely delete the `pwd` or `secret`
    fields right after they are used. To do this set `flags` to either
    `ARGON2_FLAG_CLEAR_PASSWORD` or `ARGON2_FLAG_CLEAR_SECRET`. To change how
@@ -204,9 +207,8 @@ To produce the crypt-like encoding rather than the raw hash, call
 
 See [`include/argon2.h`](include/argon2.h) for API details.
 
-*Note: in this example the salt is set to the all-`0x00` string for the
-sake of simplicity, but in your application you should use a random salt.*
-
+_Note: in this example the salt is set to the all-`0x00` string for the
+sake of simplicity, but in your application you should use a random salt._
 
 ### Benchmarks
 
@@ -245,35 +247,35 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 Bindings are available for the following languages (make sure to read
 their documentation):
 
-* [Android (Java/Kotlin)](https://github.com/lambdapioneer/argon2kt) by [@lambdapioneer](https://github.com/lambdapioneer)
-* [Dart](https://github.com/tmthecoder/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
-* [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
-* [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
-* [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
-* [Haskell](https://hackage.haskell.org/package/argon2) by [@hvr](https://github.com/hvr)
-* [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
-* [JavaScript (native)](https://github.com/jdconley/argon2themax), by [@jdconley](https://github.com/jdconley)
-* [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
-* [JavaScript (browser)](https://github.com/antelle/argon2-browser), by [@antelle](https://github.com/antelle)
-* [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
-* [JVM (with keyed hashing)](https://github.com/kosprov/jargon2-api) by [@kosprov](https://github.com/kosprov)
-* [Lua (native)](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
-* [Lua (ffi)](https://github.com/thibaultCha/lua-argon2-ffi) by [@thibaultCha](https://github.com/thibaultCha)
-* [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
-* [Python (native)](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
-* [Python (ffi)](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
-* [Python (ffi, with keyed hashing)](https://github.com/thusoy/porridge), by [@thusoy](https://github.com/thusoy)
-* [Python (ffi, with keyed hashing)](https://github.com/ultrahorizon/pyargon2), by [@ultrahorizon](https://github.com/ultrahorizon)
-* [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
-* [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
-* [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
-* [Rust](https://docs.rs/argonautica/) by [@bcmyers](https://github.com/bcmyers/)
-* [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
-* [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
-* [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
-* [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
-* [Swift](https://github.com/tmthecoder/Argon2Swift) by [@tmthecoder](https://github.com/tmthecoder)
-
+- [Android (Java/Kotlin)](https://github.com/lambdapioneer/argon2kt) by [@lambdapioneer](https://github.com/lambdapioneer)
+- [Dart](https://github.com/tmthecoder/dargon2) by [@tmthecoder](https://github.com/tmthecoder)
+- [Elixir](https://github.com/riverrun/argon2_elixir) by [@riverrun](https://github.com/riverrun)
+- [Erlang](https://github.com/ergenius/eargon2) by [@ergenius](https://github.com/ergenius)
+- [Go](https://github.com/tvdburgt/go-argon2) by [@tvdburgt](https://github.com/tvdburgt)
+- [Haskell](https://hackage.haskell.org/package/argon2) by [@hvr](https://github.com/hvr)
+- [JavaScript (native)](https://github.com/ranisalt/node-argon2), by [@ranisalt](https://github.com/ranisalt)
+- [JavaScript (native)](https://github.com/jdconley/argon2themax), by [@jdconley](https://github.com/jdconley)
+- [JavaScript (ffi)](https://github.com/cjlarose/argon2-ffi), by [@cjlarose](https://github.com/cjlarose)
+- [JavaScript (browser)](https://github.com/antelle/argon2-browser), by [@antelle](https://github.com/antelle)
+- [JVM](https://github.com/phxql/argon2-jvm) by [@phXql](https://github.com/phxql)
+- [JVM (with keyed hashing)](https://github.com/kosprov/jargon2-api) by [@kosprov](https://github.com/kosprov)
+- [Lua (native)](https://github.com/thibaultCha/lua-argon2) by [@thibaultCha](https://github.com/thibaultCha)
+- [Lua (ffi)](https://github.com/thibaultCha/lua-argon2-ffi) by [@thibaultCha](https://github.com/thibaultCha)
+- [OCaml](https://github.com/Khady/ocaml-argon2) by [@Khady](https://github.com/Khady)
+- [Python (native)](https://pypi.python.org/pypi/argon2), by [@flamewow](https://github.com/flamewow)
+- [Python (ffi)](https://pypi.python.org/pypi/argon2_cffi), by [@hynek](https://github.com/hynek)
+- [Python (ffi, with keyed hashing)](https://github.com/thusoy/porridge), by [@thusoy](https://github.com/thusoy)
+- [Python (ffi, with keyed hashing)](https://github.com/ultrahorizon/pyargon2), by [@ultrahorizon](https://github.com/ultrahorizon)
+- [R](https://cran.r-project.org/package=argon2) by [@wrathematics](https://github.com/wrathematics)
+- [Ruby](https://github.com/technion/ruby-argon2) by [@technion](https://github.com/technion)
+- [Rust](https://github.com/quininer/argon2-rs) by [@quininer](https://github.com/quininer)
+- [Rust](https://docs.rs/argonautica/) by [@bcmyers](https://github.com/bcmyers/)
+- [C#/.NET CoreCLR](https://github.com/kmaragon/Konscious.Security.Cryptography) by [@kmaragon](https://github.com/kmaragon)
+- [Perl](https://github.com/Leont/crypt-argon2) by [@leont](https://github.com/Leont)
+- [mruby](https://github.com/Asmod4n/mruby-argon2) by [@Asmod4n](https://github.com/Asmod4n)
+- [Swift](https://github.com/ImKcat/CatCrypto) by [@ImKcat](https://github.com/ImKcat)
+- [Swift](https://github.com/tmthecoder/Argon2Swift) by [@tmthecoder](https://github.com/tmthecoder)
+- [Delphi](https://github.com/Rtrevisan20/HDMessageDlg) by [@Rtrevisan20](https://github.com/Rtrevisan20)
 
 ## Test suite
 
