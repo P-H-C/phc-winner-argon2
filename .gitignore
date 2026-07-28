@@ -20,3 +20,11 @@ Argon2.VC.opendb
 *.zip
 *.tar.gz
 tags
+
+# Windows Builds
+.vscode/
+*.obj
+*.exe
+*.lib
+*.exp
+*.dll
