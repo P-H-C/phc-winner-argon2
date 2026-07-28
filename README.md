@@ -239,11 +239,12 @@ Argon2i 1 iterations  4096 MiB 4 threads:  2.72 cpb 11124.86 Mcycles
 
 (...)
 ```
+
 ## Windows
 
-Argon2 can be built on Windows using the provided Visual Studio solution (`Argon2.sln`) or MSVC Build Tools.
+Argon2 can be built using the provided Visual Studio solution (`Argon2.sln`) or MSVC Build Tools.
 
-For detailed Windows build instructions, including manual compilation with `cl.exe` and `link.exe`, see [docs/windows-build.md](docs/windows-build.md).
+For detailed Windows build instructions, see [BUILDING-WINDOWS.md](BUILDING-WINDOWS.md).
 
 ## Bindings
 
