@@ -109,6 +109,12 @@ ifeq ($(KERNEL_NAME), SunOS)
 	LIB_CFLAGS := -shared -fPIC
 	PC_EXTRA_LIBS ?=
 endif
+ifeq ($(KERNEL_NAME), Android)
+	LIB_EXT := so
+	LIB_CFLAGS := -shared -fPIC -fvisibility=hidden -DA2_VISCTL=1
+	SO_LDFLAGS := -Wl,-soname,lib$(LIB_NAME).$(LIB_EXT)
+	PC_EXTRA_LIBS ?= -lrt -ldl
+endif
 
 ifeq ($(KERNEL_NAME), Linux)
 ifeq ($(CC), clang)
@@ -124,7 +130,7 @@ LINKED_LIB_SH := lib$(LIB_NAME).$(LINKED_LIB_EXT)
 endif
 
 # Some systems don't provide an unprefixed ar when cross-compiling.
-AR=ar
+AR ?= ar
 
 LIBRARIES = $(LIB_SH) $(LIB_ST)
 HEADERS = include/argon2.h
