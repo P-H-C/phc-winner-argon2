@@ -124,7 +124,7 @@ LINKED_LIB_SH := lib$(LIB_NAME).$(LINKED_LIB_EXT)
 endif
 
 # Some systems don't provide an unprefixed ar when cross-compiling.
-AR=ar
+AR ?= ar
 
 LIBRARIES = $(LIB_SH) $(LIB_ST)
 HEADERS = include/argon2.h
