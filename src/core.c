@@ -288,8 +288,238 @@ static void *fill_segment_thr(void *thread_data)
     return 0;
 }
 
+#if defined(ARGON2_EXPERIMENT_PERSISTENT_WORKERS) && defined(__linux__) && \
+    !defined(_WIN32) && !defined(ARGON2_NO_THREADS) && !defined(GENKAT)
+
+/*
+ * Linux-only experimental optimization (disabled unless
+ * -DARGON2_EXPERIMENT_PERSISTENT_WORKERS is passed and the platform is
+ * Linux with POSIX threads):
+ *
+ * The original fill_memory_blocks_mt() creates and joins a pthread for
+ * every (pass, slice, lane) triple; for the t=3, p=4 workload that is 48
+ * pthread_create()+join() pairs per hash. This experimental variant, for
+ * the lanes == threads >= 2 case only, creates the worker threads once per
+ * hash. Each worker owns one lane and runs all passes and all slices of
+ * that lane, waiting on a reusable barrier after every slice so that no
+ * lane can read a not-yet-written segment of another lane. The set of
+ * fill_segment() calls, and therefore the computation and the digest, is
+ * byte-identical to the original.
+ *
+ * The thread pool is created inside fill_memory_blocks_mt_persistent()
+ * and every worker is joined before the function returns, so no threads
+ * outlive a single hash.
+ *
+ * GENKAT is explicitly excluded: the KAT driver prints the memory contents
+ * between passes from the main thread, which is only possible with the
+ * original join-per-slice scheduling. Keeping the original path for GENKAT
+ * builds keeps the stored KAT files byte-identical.
+ *
+ * Synchronization failures are reported as ARGON2_THREAD_FAIL. A failing
+ * barrier is marked failed and wakes all waiters so no worker can block
+ * forever, and a worker that fails to spawn causes the barrier to be broken
+ * before the already-running workers are joined, again without deadlock.
+ */
+
+typedef struct Argon2_exp_barrier_t {
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    unsigned count;
+    unsigned participants;
+    unsigned epoch;
+    int failed;
+} argon2_exp_barrier;
+
+typedef struct Argon2_exp_worker_t {
+    argon2_instance_t *instance;
+    argon2_exp_barrier *barrier;
+    uint32_t lane;
+    int sync_error;
+} argon2_exp_worker_data;
+
+#include <errno.h>
+
+static int argon2_exp_barrier_init(argon2_exp_barrier *b, unsigned n) {
+    if (pthread_mutex_init(&b->mutex, NULL) != 0) {
+        return -1;
+    }
+    if (pthread_cond_init(&b->cond, NULL) != 0) {
+        pthread_mutex_destroy(&b->mutex);
+        return -1;
+    }
+    b->count = 0;
+    b->participants = n;
+    b->epoch = 0;
+    b->failed = 0;
+    return 0;
+}
+
+static void argon2_exp_barrier_destroy(argon2_exp_barrier *b) {
+    pthread_cond_destroy(&b->cond);
+    pthread_mutex_destroy(&b->mutex);
+}
+
+/* Reusable barrier. On a real synchronization failure the barrier is marked
+ * failed and every waiter is woken and released, so no thread can block
+ * forever. */
+static int argon2_exp_barrier_wait(argon2_exp_barrier *b) {
+    unsigned epoch;
+    if (pthread_mutex_lock(&b->mutex) != 0) {
+        return -1;
+    }
+    if (b->failed) {
+        pthread_mutex_unlock(&b->mutex);
+        return -1;
+    }
+    epoch = b->epoch;
+    ++b->count;
+    if (b->count == b->participants) {
+        b->count = 0;
+        ++b->epoch;
+        pthread_cond_broadcast(&b->cond);
+        pthread_mutex_unlock(&b->mutex);
+        return 0;
+    }
+    while (epoch == b->epoch) {
+        int r = pthread_cond_wait(&b->cond, &b->mutex);
+        if (r != 0 && r != EINTR) {
+            b->failed = 1;
+            pthread_cond_broadcast(&b->cond);
+            pthread_mutex_unlock(&b->mutex);
+            return -1;
+        }
+        if (b->failed) {
+            pthread_mutex_unlock(&b->mutex);
+            return -1;
+        }
+    }
+    pthread_mutex_unlock(&b->mutex);
+    return 0;
+}
+
+/* Force all blocked waiters to fail and leave, used when a worker could not
+ * be spawned so that the already-running workers are released and can be
+ * joined instead of waiting forever for the missing participant. */
+static void argon2_exp_barrier_break(argon2_exp_barrier *b) {
+    pthread_mutex_lock(&b->mutex);
+    b->failed = 1;
+    b->count = 0;
+    pthread_cond_broadcast(&b->cond);
+    pthread_mutex_unlock(&b->mutex);
+}
+
+static void *fill_lane_thr(void *thread_data) {
+    argon2_exp_worker_data *data = (argon2_exp_worker_data *)thread_data;
+    argon2_instance_t *instance = data->instance;
+    uint32_t r, s;
+    for (r = 0; r < instance->passes; ++r) {
+        for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
+            argon2_position_t position;
+            position.pass = r;
+            position.lane = data->lane;
+            position.slice = (uint8_t)s;
+            position.index = 0;
+            fill_segment(instance, position);
+            if (argon2_exp_barrier_wait(data->barrier) != 0) {
+                data->sync_error = 1;
+                argon2_thread_exit();
+            }
+        }
+    }
+    argon2_thread_exit();
+    return 0;
+}
+
+static int fill_memory_blocks_mt_persistent(argon2_instance_t *instance) {
+    uint32_t l;
+    argon2_thread_handle_t *thread = NULL;
+    argon2_exp_worker_data *thr_data = NULL;
+    argon2_exp_barrier barrier;
+    int rc = ARGON2_OK;
+    int barrier_ok = 0;
+
+#ifdef ARGON2_EXPERIMENT_PERSISTENT_WORKERS_DEBUG
+    fprintf(stderr,
+            "argon2: experimental persistent workers active (lanes=%u)\n",
+            (unsigned)instance->lanes);
+#endif
+
+    /* This variant is only used for the one-worker-per-lane case. */
+    if (instance->lanes < 2 || instance->lanes != instance->threads) {
+        return ARGON2_THREAD_FAIL;
+    }
+
+    thread = calloc(instance->lanes, sizeof(argon2_thread_handle_t));
+    if (thread == NULL) {
+        rc = ARGON2_MEMORY_ALLOCATION_ERROR;
+        goto fail;
+    }
+    thr_data = calloc(instance->lanes, sizeof(argon2_exp_worker_data));
+    if (thr_data == NULL) {
+        rc = ARGON2_MEMORY_ALLOCATION_ERROR;
+        goto fail;
+    }
+    if (argon2_exp_barrier_init(&barrier, (unsigned)instance->lanes) != 0) {
+        rc = ARGON2_THREAD_FAIL;
+        goto fail;
+    }
+    barrier_ok = 1;
+
+    for (l = 0; l < instance->lanes; ++l) {
+        thr_data[l].instance = instance;
+        thr_data[l].barrier = &barrier;
+        thr_data[l].lane = l;
+        thr_data[l].sync_error = 0;
+        if (argon2_thread_create(&thread[l], &fill_lane_thr,
+                                 (void *)&thr_data[l])) {
+            uint32_t ll;
+            /* Release the workers that already started (they would otherwise
+             * block forever waiting for the missing participant), join them,
+             * then report failure. */
+            argon2_exp_barrier_break(&barrier);
+            for (ll = 0; ll < l; ++ll) {
+                argon2_thread_join(thread[ll]);
+            }
+            rc = ARGON2_THREAD_FAIL;
+            goto fail;
+        }
+    }
+
+    for (l = 0; l < instance->lanes; ++l) {
+        if (argon2_thread_join(thread[l]) != 0) {
+            rc = ARGON2_THREAD_FAIL;
+        }
+        if (thr_data[l].sync_error) {
+            rc = ARGON2_THREAD_FAIL;
+        }
+    }
+
+fail:
+    if (barrier_ok) {
+        argon2_exp_barrier_destroy(&barrier);
+    }
+    if (thread != NULL) {
+        free(thread);
+    }
+    if (thr_data != NULL) {
+        free(thr_data);
+    }
+    return rc;
+}
+
+#endif /* ARGON2_EXPERIMENT_PERSISTENT_WORKERS */
+
 /* Multi-threaded version for p > 1 case */
 static int fill_memory_blocks_mt(argon2_instance_t *instance) {
+#if defined(ARGON2_EXPERIMENT_PERSISTENT_WORKERS) && defined(__linux__) && \
+    !defined(_WIN32) && !defined(ARGON2_NO_THREADS) && !defined(GENKAT)
+    /* Experimental: one persistent worker per lane for the lanes == threads
+     * case (e.g. the t=3, m=65536 KiB, p=4 workload). Any unsupported
+     * configuration falls through to the original implementation. */
+    if (instance->lanes == instance->threads && instance->lanes >= 2) {
+        return fill_memory_blocks_mt_persistent(instance);
+    }
+#endif
     uint32_t r, s;
     argon2_thread_handle_t *thread = NULL;
     argon2_thread_data *thr_data = NULL;
